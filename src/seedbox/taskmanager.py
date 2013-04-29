@@ -193,6 +193,7 @@ def _execute(disabled_phases, retry=False, max_retry=None):
         torrents = torrentmanager.get_torrents_by_state(state, retry)
 
         if retry:
+            log.trace('checking if any torrents need to be cancelled')
             # handle any and all cancellations; we will get back
             # only those torrents that still need processing
             # if nothing, it will be an empty list
@@ -209,6 +210,7 @@ def _execute(disabled_phases, retry=False, max_retry=None):
             processed_torrents = _handle_phase_execution(state, torrents)
 
             if retry:
+                log.trace('resetting counters for the successfully executed retried torrents')
                 # the processed torrents were the succesful ones so 
                 # we need to reset the retry counter
                 for torrent in processed_torrents:
@@ -270,6 +272,7 @@ def _handle_torrent_cancellation(torrents, max_retry):
         log.info('using configured max retry [%d]', max_retry)
         use_max_retry = max_retry
 
+    log.trace('sorting torrents to abort or continue execution')
     execute_torrents = []
     abort_torrents = []
     for torrent in torrents:

@@ -24,10 +24,7 @@ class PurgeFile(object):
         """
         processed_torrents = []
 
-        # need to backup the databaes before we start purging anything otherwise
-        # we could have real issues later on.
-        helpers.perform_db_backup(configs.resource_path)
-
+        need_backup = True
         log.trace('starting purge file plugin.')
         for torrent in torrents:
 
@@ -35,6 +32,16 @@ class PurgeFile(object):
                 log.debug('checking if purgeable torrent %s', torrent)
     
                 if helpers.is_torrent_purgeable(torrent):
+                    # only perform backup IF we are actually going to purge something
+                    # otherwise there really is no backup. Once we are done with backup
+                    # we will flip the flag so we don't do it again
+                    if need_backup:
+                        # need to backup the databaes before we start purging anything otherwise
+                        # we could have real issues later on.
+                        log.trace('purging required; requesting backup')
+                        helpers.perform_db_backup(configs.resource_path)
+                        need_backup = False
+
                     log.debug('purging media files')
                     helpers.purge_media_files(torrent)
     
@@ -43,6 +50,7 @@ class PurgeFile(object):
                 processed_torrents.append(torrent)
     
             except Exception as err:
+                log.info('%s was unable to process %s due to [%s]', PurgeFile.__name__, torrent, err)
                 # TODO: need to refine this further so we know what errors really happened
                 helpers.set_torrent_failed(torrent, err)
 

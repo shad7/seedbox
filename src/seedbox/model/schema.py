@@ -88,7 +88,7 @@ def backup(resource_path):
     log.trace('starting database backup process')
     current_db = os.path.join(resource_path, DB_NAME)
     backup_db = os.path.join(resource_path, time.strftime('%Y%m%d-%H%M%S')+'_'+DB_NAME)
-    log.trace('location of database: [%s]', dbloc)
+    log.trace('location of database: [%s]', current_db)
     if os.path.exists(current_db):
         log.info('backing up db [%s] to [%s]', current_db, backup_db)
         shutil.copy2(current_db, backup_db)

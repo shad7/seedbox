@@ -44,6 +44,7 @@ class DeleteFile(object):
                 processed_torrents.append(torrent)
 
             except Exception as err:
+                log.info('%s was unable to process %s due to [%s]', DeleteFile.__name__, torrent, err)
                 # TODO: need to refine this further so we know what errors really happened
                 helpers.set_torrent_failed(torrent, err)
 

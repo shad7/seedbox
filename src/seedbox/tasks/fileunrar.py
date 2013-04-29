@@ -42,12 +42,17 @@ class UnrarFile(object):
                         archived_files = compressed_file.namelist()
                         compressed_file.extractall(path=configs.sync_path)
                         helpers.add_mediafiles_to_torrent(torrent, configs.sync_path, archived_files)
+                        # need to show we completed the unrar process; so show it as synced
+                        # which is technically true since we synced it to the sync path.
+                        helpers.synced_media_file(media_file)
+
                 
                 # after we are done processing the torrent added it the list of
                 # processed torrents
                 processed_torrents.append(torrent)
     
             except Exception as err:
+                log.info('%s was unable to process %s due to [%s]', UnrarFile.__name__, torrent, err)
                 # TODO: need to refine this further so we know what errors really happened
                 helpers.set_torrent_failed(torrent, err)
 

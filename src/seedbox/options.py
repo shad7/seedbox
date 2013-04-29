@@ -397,6 +397,7 @@ def _find_configs(parser, args):
                 continue
             log.debug('loaded config file found: [%s]', found)
             # need to set the resource path (include in args and configuration file)
+            parser.set('DEFAULT', 'resource_path', os.path.dirname(config_file))
             args.resource_path = os.path.dirname(config_file)
             log.debug('setting resource path to %s', os.path.dirname(config_file))
             # if this break is never reached then the else block will be executed
