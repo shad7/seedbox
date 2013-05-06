@@ -36,8 +36,11 @@ class DeleteFile(object):
                 # now loop through the files we got back, if none then no files
                 # were in need of deleting
                 for media_file in media_files:
-                    log.trace('delete file: %s', media_file.filename)
-                    os.remove(os.path.join(configs.sync_path, media_file.filename))
+                    # if for some reason it doesn't exist then no worries just skip
+                    # over it and continue; otherwise delete it
+                    if os.path.exists(os.path.join(configs.sync_path, media_file.filename)):
+                        log.trace('delete file: %s', media_file.filename)
+                        os.remove(os.path.join(configs.sync_path, media_file.filename))
                 
                 # after we are done processing the torrent added it the list of
                 # processed torrents
