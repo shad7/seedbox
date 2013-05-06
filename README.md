@@ -89,7 +89,7 @@ syncfile (optional)
 
 Logging
 --------
-Supports python logging framework. All modules use __name__ (package.module) so you can enable or disable based on your choice.
+Supports python logging framework. All modules use <pre>__name__</pre> (package.module) so you can enable or disable based on your choice.
 For developers, you can put a logging configuration file (logging.cfg) in the same location as the seedbox.cfg file and it will
 configure logging using that file.
 
