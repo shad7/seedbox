@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 import unittest
 import os, sys
-import time
 
 # required since we leverage custom logging levels
 from seedbox import logext as logmgr

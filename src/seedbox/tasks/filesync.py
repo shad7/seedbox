@@ -26,10 +26,10 @@ most common needs. Flags will be either True/False (None not supported)
 from __future__ import absolute_import
 import logging
 import os
-import subprocess
 
 from seedbox import helpers
 from seedbox.pluginmanager import register_plugin, phase
+from seedbox.subprocessext import ProcessLogging
 
 __version__ = '0.1'
 
@@ -204,7 +204,7 @@ class SyncFile(object):
         cmd.append(self.attrs.get('remote_path') + os.sep)
         log.debug('file specific command [%s]', cmd)
 
-        subprocess.check_call(cmd)
+        ProcessLogging(cmd, log)
         log.info('file synced %s', filename)
 
 
