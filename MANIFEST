@@ -22,6 +22,3 @@ src/seedbox/tasks/filedelete.py
 src/seedbox/tasks/filepurge.py
 src/seedbox/tasks/filesync.py
 src/seedbox/tasks/fileunrar.py
-test/test_model.py
-test/test_opt.py
-test/test_wf.py
