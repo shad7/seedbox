@@ -69,7 +69,6 @@ class SyncFile(object):
             'delayupdates': True,
             'recursive': True,
             'chmod': None,
-            'logfile': None,
             'identity': None,
             'port': None,
             'sync_path': None,
@@ -138,8 +137,6 @@ class SyncFile(object):
             self._cmd.append('--recursive')
         if self.attrs.get('chmod'):
             self._cmd.append('--chmod=%s' % self.attrs.get('chmod'))
-        if self.attrs.get('logfile'):
-            self._cmd.append('--log-file=%s' % self.attrs.get('logfile'))
 
         if self.attrs.get('identity') or self.attrs.get('port'):
             ssh_cmd = '--rsh=ssh'
