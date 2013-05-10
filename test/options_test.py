@@ -16,6 +16,13 @@ class TestOptions(unittest.TestCase):
     and then storing and accessing them via a Namespace
     """
 
+    def setUp(self):
+        # since we execute everything via setup.py; need to determine
+        # where we really are so we have the correct path for finding
+        # test configuration files.
+        name = os.sep.join(__name__.split('.'))
+        self.mod_path = os.path.dirname(os.path.abspath(name))
+
     def test_init(self):
         """
         test the initliaze process
@@ -44,8 +51,12 @@ class TestOptions(unittest.TestCase):
         Verify we load a config file stored in current working directory
         """
         configurator = opt_loader.initialize(__version__)
-        configurator.load_configs()
 
+        core_configs = configurator.get_configs()
+        # force a value in for resource_path (given it gets executed such it can't be found)
+        core_configs.resource_path = self.mod_path
+
+        configurator.load_configs()
         core_configs = configurator.get_configs()
         self.assertIsNotNone(core_configs.resource_path)
 
@@ -54,6 +65,11 @@ class TestOptions(unittest.TestCase):
         Verify we have all the required values
         """
         configurator = opt_loader.initialize(__version__)
+
+        core_configs = configurator.get_configs()
+        # force a value in for resource_path (given it gets executed such it can't be found)
+        core_configs.resource_path = self.mod_path
+
         configurator.load_configs()
 
         core_configs = configurator.get_configs()
@@ -69,7 +85,7 @@ class TestOptions(unittest.TestCase):
         core_configs = configurator.get_configs()
 
         # force a value in for rcfile
-        core_configs.rcfile = os.path.join(os.getcwd(), 'missing.cfg')
+        core_configs.rcfile = os.path.join(self.mod_path, 'missing.cfg')
         
         with self.assertRaises(IOError):
             configurator.load_configs()
@@ -83,7 +99,7 @@ class TestOptions(unittest.TestCase):
         core_configs = configurator.get_configs()
 
         # force a value in for rcfile
-        core_configs.rcfile = os.path.join(sys.path[0], 'bad.cfg')
+        core_configs.rcfile = os.path.join(self.mod_path, 'bad.cfg')
 
         with self.assertRaises(ValueError):
             configurator.load_configs()
@@ -93,6 +109,11 @@ class TestOptions(unittest.TestCase):
         Verify media_paths, plugin_paths, disabled_phases
         """
         configurator = opt_loader.initialize(__version__)
+
+        core_configs = configurator.get_configs()
+        # force a value in for resource_path (given it gets executed such it can't be found)
+        core_configs.resource_path = self.mod_path
+
         configurator.load_configs()
 
         core_configs = configurator.get_configs()

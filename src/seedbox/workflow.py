@@ -4,8 +4,6 @@ workflow
 from __future__ import absolute_import
 import xworkflows
 
-__version__ = '0.1'
-
 class Taskflow(xworkflows.Workflow):
     """
     Define the workflow conditions for managing torrents;

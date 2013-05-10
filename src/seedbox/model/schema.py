@@ -9,8 +9,6 @@ import os, sys
 import shutil
 import time
 
-__version__ = '0.1'
-
 log = logging.getLogger(__name__)
 DB_NAME = 'torrent.db'
 

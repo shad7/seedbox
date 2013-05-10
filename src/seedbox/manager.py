@@ -6,11 +6,10 @@ Task Manager
 from __future__ import absolute_import
 import logging
 
+from seedbox import __version__
 from seedbox import logext as logmgr
 from seedbox import options as opt_loader
 from seedbox import pluginmanager, processmap, taskmanager, torrentmanager
-
-__version__ = '0.1'
 
 log = logging.getLogger('main')
 

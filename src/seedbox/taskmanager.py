@@ -8,8 +8,6 @@ import xworkflows
 from seedbox import processmap, torrentmanager
 from seedbox.workflow import Taskflow
 
-__version__ = '0.1'
-
 log = logging.getLogger(__name__)
 
 DEFAULT_MAX_RETRY = 5

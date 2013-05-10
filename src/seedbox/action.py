@@ -4,9 +4,6 @@ encapsulate an action, and the registering of actions
 from __future__ import absolute_import
 import logging
 
-__version__ = '0.1'
-
-
 log = logging.getLogger(__name__)
 
 _actions = {}

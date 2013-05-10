@@ -12,8 +12,6 @@ import time
 from seedbox.model.schema import Torrent, MediaFile, init as schema_init, backup as schema_backup
 from seedbox.torrentparser import TorrentParser, MalformedTorrentError, ParsingError
 
-__version__ = '0.1'
-
 log = logging.getLogger(__name__)
 
 def add_torrent(name):

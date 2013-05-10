@@ -17,7 +17,6 @@ most common needs. Flags will be either True/False (None not supported)
     delayupdates (rsync: delay-updates): default[True]
     recursive: default[True]
     chmod: default[ugo+rwx]
-    logfile [rsync: log-file]: default[]
     identity (rsync: rsh=ssh) default[]
     port (rsync: rsh=ssh) default[] rsyc default[22]
 
