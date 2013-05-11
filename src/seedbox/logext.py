@@ -51,7 +51,19 @@ def configure(loglevel=logging.INFO, logfile='seedbox.log', resourceloc=None, de
 
     use_resource = resourceloc
     if not use_resource:
-        use_resource = os.getcwd()
+        if sys.platform.startswith('win'):
+            # On windows look in ~/seedbox as well, as explorer does not let you create a 
+            # folder starting with a dot
+            default_path = os.path.join(os.path.expanduser('~'), 'seedbox')
+        else:
+            default_path = os.path.join(os.path.expanduser('~'), '.seedbox')
+
+        # if the user folder exists; then we'll use it if we were not provided one
+        if os.path.exists(default_path):
+            use_resource = default_path
+        else:
+            # if all else fails then we just use the current working directory
+            use_resource = os.getcwd()
 
     if devmode:
         logging.config.fileConfig(os.path.join(use_resource, 'logging.cfg'), disable_existing_loggers=False)

@@ -379,7 +379,8 @@ def _find_configs(parser, args):
         possible.append(sys.path[0])
         possible.append(os.path.join(os.path.expanduser('~'), '.seedbox'))
         if sys.platform.startswith('win'):
-            # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
+            # On windows look in ~/seedbox as well, as explorer does not let you 
+            # create a folder starting with a dot
             possible.append(os.path.join(os.path.expanduser('~'), 'seedbox'))
 
     log.trace('possibles: %s', possible)
