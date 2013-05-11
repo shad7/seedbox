@@ -62,8 +62,9 @@ By default it will look for a configuration file named seedbox.cfg located in th
 * site-wide install directory (do not recommend this except for really general purpose info)
 
 Required configuration inputs:
-* torrent_path
-* media_paths (list of paths)
+* torrent_path (actual .torrent file location)
+* incomplete_path (location where files are initially downloaded to)
+* media_paths (list of paths) (location where files are typically moved after downloading completes)
 * sync_path
 
 Optional configuration inputs:
