@@ -304,6 +304,11 @@ def _validate_and_format(configs):
         log.debug('torrent_path was not supplied in the configuration file')
         missing_required.append('TORRENT_PATH')
 
+    config_group['incomplete_path'] = _verify_path(config_group.get('incomplete_path'))
+    if not config_group.get('incomplete_path'):
+        log.debug('incomplete_path was not supplied in the configuration file')
+        missing_required.append('INCOMPLETE_PATH')
+
     config_group['media_paths'] = _verify_paths(config_group.get('media_paths'))
     if not config_group.get('media_paths'):
         log.debug('media_paths was not supplied in the configuration file')

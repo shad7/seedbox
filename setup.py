@@ -2,9 +2,13 @@
 
 import os, re, sys
 
-# make sure setuptools are available
-from ez_setup import use_setuptools
-use_setuptools()
+try:
+    # make sure setuptools are available
+    from ez_setup import use_setuptools
+    use_setuptools()
+except ImportError:
+    # just ignore it
+    pass
 
 from setuptools import find_packages, setup
 from setuptools.command.test import test as TestCommand
@@ -48,7 +52,7 @@ required.append('SQLObject >= 1.3.2')
 required.append('xworkflows')
 required.append('rarfile >= 2.6')
 
-data_files = ['ez_setup.py', 'LICENSE', 'README', 'README.md']
+data_files = ['LICENSE', 'README', 'README.md']
 
 setup(
       name='SeedboxManager',

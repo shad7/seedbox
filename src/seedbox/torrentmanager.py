@@ -213,10 +213,10 @@ def start(configs):
     # new so we will skip the load aspect and only handle the database
     # aspect of starting up
     if not configs.retry:
-        load_torrents(configs.torrent_path, configs.media_paths)
+        load_torrents(configs.torrent_path, configs.media_paths, configs.incomplete_path)
 
 
-def load_torrents(torrent_location, media_locations):
+def load_torrents(torrent_location, media_locations, inprogress_location):
     """
     Find all the torrents in the specified directory, verify it is a valid
     torrent file (via parsing) and capture the relevant details. Next create
@@ -243,6 +243,14 @@ def load_torrents(torrent_location, media_locations):
                     media_items = parser.get_files_details()
                     log.trace('Total files in torrent %d', len(media_items))
                     total_media_files += len(media_items)
+
+                    # determine if any of the files are still inprogress of being
+                    # downloaded; if so then go to next torrent. Because no files
+                    # were added to the cache for the torrent we will once again
+                    # parse and attempt to process it.
+                    if _is_torrent_downloading(inprogress_location, media_items):
+                        log.trace('torrent still downloading, next...')
+                        continue
 
                     media_files = _parse_torrent(media_locations, media_items)
                     add_files_to_torrent(torrent, media_files)
@@ -301,6 +309,30 @@ def _is_parsing_required(torrent):
         parse = False
 
     return parse
+
+def _is_torrent_downloading(inprogress_location, media_items):
+    """
+    Verify if atleast one item still located in the inprogress/downloading location
+    
+    args:
+        inprogress_location: the directory/path to where files are stored while downloading happens
+        media_items: files found inside a torrent
+    returns:
+        true: if any file is still within inprogress_location
+        false: if no file is within inprogress_location
+    """
+
+    found = False
+    for (filename, filesize) in media_items:
+
+        # if the file is found then break out of the loop and
+        # return found; else we will return default not found
+        if os.path.exists(os.path.join(inprogress_location, filename)):
+            found = True
+            break
+
+    return found
+
 
 def _parse_torrent(media_locations, media_items):
     """
