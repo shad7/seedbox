@@ -48,7 +48,7 @@ required.append('SQLObject >= 1.3.2')
 required.append('xworkflows')
 required.append('rarfile >= 2.6')
 
-data_files = ['LICENSE', 'README', 'README.md']
+data_files = ['ez_setup.py', 'LICENSE', 'README', 'README.md']
 
 setup(
       name='SeedboxManager',
@@ -56,7 +56,7 @@ setup(
       description='Provides framework for performing tasks on a seedbox',
       author='shad7',
       author_email='kenny.shad7@gmail.com',
-      url='TBD',
+      url='https://github.com/shad7/seedbox',
       license='MIT',
       packages=find_packages(PKG_DIR),
       package_dir={'': PKG_DIR},
