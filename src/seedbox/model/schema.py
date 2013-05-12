@@ -131,5 +131,5 @@ def backup(resource_path):
         else:
             log.error('no exceptions raised, but backup file does not exist!')
     else:
-        log.warn('Database [%s] does not exist, no backup taken.', current_db)
+        log.warn('Database [%s] does not exist, no backup taken.', default_db_name)
 

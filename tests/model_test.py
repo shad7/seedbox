@@ -319,12 +319,28 @@ class TestModelSchema(unittest.TestCase):
         """
         # initialize the database and schema details
         schema.init(RESOURCE_PATH)
+        # make sure the table is really empty before we start
+        schema.Torrent.clearTable()
 
-        schema.Torrent.dropTable(ifExists=True)
-        self.assertFalse(schema.Torrent.tableExists())
-        schema.MediaFile.dropTable(ifExists=True)
-        self.assertFalse(schema.MediaFile.tableExists())
+        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent', 'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
 
+        # loop through and create the torrents
+        for name in tornames:
+            schema.Torrent(name=name)
+
+        # do simple search to get a list of torrents back...default value for failed
+        # is always False, so we should get back the same number we just put in.
+        search = schema.Torrent.selectBy(failed=False)
+        self.assertEqual(len(tornames), len(list(search)))
+
+        schema.init(RESOURCE_PATH, True)
+        search = schema.Torrent.selectBy(failed=False)
+        self.assertEqual(0, len(list(search)))
+
+#       schema.Torrent.dropTable(ifExists=True)
+#       self.assertFalse(schema.Torrent.tableExists())
+#       schema.MediaFile.dropTable(ifExists=True)
+#       self.assertFalse(schema.MediaFile.tableExists())
 
     def test_backup_database(self):
         """
