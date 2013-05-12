@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 import unittest
 import os
+import glob
 from datetime import datetime
-import time
 
 # required since we leverage custom logging levels
 from seedbox import logext as logmgr
@@ -330,27 +330,29 @@ class TestModelSchema(unittest.TestCase):
         """
         Testing backing up the database
         """
-        # perform backup
-        schema.backup(RESOURCE_PATH)
-        
-        # capture the current year as a string
-        year = time.strftime('%Y')
-        files = os.listdir(RESOURCE_PATH)
+        # make sure we remove any from a previous test
+        for dbfile in glob.glob(os.path.join(RESOURCE_PATH, schema.DB_NAME+'*')):
+            try:
+                os.remove(dbfile)
+            except:
+                pass
+        # initialize the database and schema details
+        schema.init(RESOURCE_PATH)
 
-        # now walk through the list of files in the current directory
-        # if the files end with '.db' and start with current year
-        # then we have found the backup. Set the found flag and 
-        # delete the file so it will not be there next time.
-        # if we fail to find it we will fail this test as the
-        # flag will still be False.
-        found = False
-        for item in files:
-            (name, ext) = os.path.splitext(item)
-            if ext == '.db' and name.startswith(year):
-                found = True
-                os.remove(os.path.join(RESOURCE_PATH, item))
+        for cnt in range(0, 15):
+            print 'cnt %d' % cnt
+            if cnt == 0:
+                print 'cnt %d' % cnt
+                self.assertEqual(len(glob.glob(os.path.join(RESOURCE_PATH, schema.DB_NAME+'*'))), 1)
+            elif cnt >= 1 and cnt <= 12:
+                print 'cnt %d' % cnt
+                self.assertEqual(len(glob.glob(os.path.join(RESOURCE_PATH, schema.DB_NAME+'*'))), 1+cnt)
+            else:
+                print 'cnt %d' % cnt
+                self.assertEqual(len(glob.glob(os.path.join(RESOURCE_PATH, schema.DB_NAME+'*'))), 13)
 
-        self.assertTrue(found)
+            # perform backup
+            schema.backup(RESOURCE_PATH)
 
     def test_set_appstate(self):
         """

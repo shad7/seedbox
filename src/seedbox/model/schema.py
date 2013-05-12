@@ -7,10 +7,10 @@ from sqlobject import *
 import logging
 import os, sys
 import shutil
-import time
 
 log = logging.getLogger(__name__)
 DB_NAME = 'torrent.db'
+MAX_BACKUP_COUNT = 12
 
 class Torrent(SQLObject):
     """
@@ -110,19 +110,26 @@ def backup(resource_path):
     """
     create a copy of myself
     """
-
     log.trace('starting database backup process')
-    current_db = os.path.join(resource_path, DB_NAME)
-    backup_db = os.path.join(resource_path, time.strftime('%Y%m%d-%H%M%S')+'_'+DB_NAME)
-    log.trace('location of database: [%s]', current_db)
-    if os.path.exists(current_db):
-        log.info('backing up db [%s] to [%s]', current_db, backup_db)
-        shutil.copy2(current_db, backup_db)
-        if os.path.exists(backup_db):
+    default_db_name = os.path.abspath(os.path.join(resource_path, DB_NAME))
+    log.trace('location of database: [%s]', default_db_name)
+    if os.path.exists(default_db_name):
+        for i in range(MAX_BACKUP_COUNT - 1, 0, -1):
+            sfn = '%s.%d' % (default_db_name, i)
+            dfn = '%s.%d' % (default_db_name, i + 1)
+            if os.path.exists(sfn):
+                if os.path.exists(dfn):
+                    os.remove(dfn)
+                os.rename(sfn, dfn)
+        dfn = default_db_name + '.1'
+        if os.path.exists(dfn):
+            os.remove(dfn)
+        log.info('backing up db [%s] to [%s]', default_db_name, dfn)
+        shutil.copy2(default_db_name, dfn)
+        if os.path.exists(dfn):
             log.info('backup complete')
         else:
             log.error('no exceptions raised, but backup file does not exist!')
     else:
         log.warn('Database [%s] does not exist, no backup taken.', current_db)
-
 
