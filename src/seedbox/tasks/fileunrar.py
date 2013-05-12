@@ -8,12 +8,19 @@ import logging
 import os
 import rarfile
 
-from seedbox import helpers
+from seedbox import helpers, tools
 from seedbox.pluginmanager import register_plugin, phase
 
 __version__ = '0.1'
 
 log = logging.getLogger(__name__)
+
+# make sure the path for unrar is set properly; if we can't find it
+# then we'll just have to let it error out and the user will need to figure
+# it out on their system.
+unrar_exec = tools.get_exec_path('unrar')
+if unrar_exec is not None:
+    rarfile.UNRAR_TOOL = unrar_exec
 
 class UnrarFile(object):
     """

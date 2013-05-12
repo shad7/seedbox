@@ -7,6 +7,8 @@ from configparser import ConfigParser
 import logging
 import os, sys
 
+from seedbox import tools
+
 log = logging.getLogger(__name__)
 
 DEFAULT_CFG_FILENAME = 'seedbox.cfg'
@@ -180,17 +182,14 @@ class ConfigOptions(_Namedspace):
 
 # end ConfigOptions
 
-_boolean_states = {'1': True, 'yes': True, 'true': True, 'on': True,
-                   '0': False, 'no': False, 'false': False, 'off': False}
-
 def _set_type(value):
     """
     a workaround for a problem where we set flags using strings in a config file
     but we really need them to be booleans when we consume them. Also handles
     converting values to their proper types so they are consumable.
     """
-    if value.lower() in _boolean_states:
-        return _boolean_states[value.lower()]
+    if value.lower() in tools.BOOLEAN_STATES:
+        return tools.BOOLEAN_STATES[value.lower()]
     elif isinstance(value, int):
         return int(value)
     elif isinstance(value, list):
@@ -200,76 +199,20 @@ def _set_type(value):
             return None
         return str(value)
 
-def _verify_path(path_entry):
-    """
-    verify a path, if it exists make sure it is 
-    and absolute path and return. else None
-    """
-    if path_entry and os.path.exists(path_entry):
-        if os.path.isabs(path_entry):
-            return path_entry
-        else:
-            return os.path.realpath(path_entry)
-    else:
-        return None
-
 def _verify_paths(path_list):
     """
     verify list of paths; return list -- it will also handle splitting any string list
     that is provided vs. an actual list. 
     """
-    to_verify_paths = []
-    # if we got a list then simply use it
-    if isinstance(path_list, list):
-        to_verify_paths = path_list
-    # if we got a string then we will need to split it
-    if isinstance(path_list, basestring):
-        # check for the following list of separators
-        # if found in string, then split it; else try
-        # the next one.
-        for sep in [',', ';']:
-            if path_list.find(sep) != -1:
-                to_verify_paths = path_list.split(sep)
-        # if after looping try splitting based on just whitespace
-        if not to_verify_paths:
-            to_verify_paths = path_list.split()
-
-        # strip away excess whitespace after the splits
-        to_verify_paths[:] = map(str.strip, to_verify_paths)
-
-    # if after all those attempts we will be left with an empty list
-    # to process and as a result we will return an empty list back.
+    to_verify_paths = tools.to_list(path_list)
 
     valid_items = []
     for item in to_verify_paths:
-        verified_item = _verify_path(item)
+        verified_item = tools.verify_path(item)
         if verified_item:
             valid_items.append(verified_item)
 
     return valid_items
-
-def _to_list(attributes):
-    """
-    convert a comma separated list into an actual list
-    """
-    attr_list = []
-
-    if isinstance(attributes,  basestring):
-        # check for the following list of separators
-        # if found in string, then split it; else try
-        # the next one.
-        for sep in [',', ';']:
-            if attributes.find(sep) != -1:
-                attr_list = attributes.split(sep)
-        # if after looping try splitting based on just whitespace
-        if not attr_list:
-            attr_list = attributes.split()
-
-        # strip away excess whitespace after the splits
-        attr_list[:] = map(str.strip,  attr_list)
-
-    # now send back the results; empty list or not
-    return attr_list
 
 def _validate_and_format(configs):
     """
@@ -299,12 +242,12 @@ def _validate_and_format(configs):
     # verification and None will be return. So the entry will be always
     # a full and complete path or None. If None then we'll raise an error
     # down below. 
-    config_group['torrent_path'] = _verify_path(config_group.get('torrent_path'))
+    config_group['torrent_path'] = tools.verify_path(config_group.get('torrent_path'))
     if not config_group.get('torrent_path'):
         log.debug('torrent_path was not supplied in the configuration file')
         missing_required.append('TORRENT_PATH')
 
-    config_group['incomplete_path'] = _verify_path(config_group.get('incomplete_path'))
+    config_group['incomplete_path'] = tools.verify_path(config_group.get('incomplete_path'))
     if not config_group.get('incomplete_path'):
         log.debug('incomplete_path was not supplied in the configuration file')
         missing_required.append('INCOMPLETE_PATH')
@@ -325,7 +268,7 @@ def _validate_and_format(configs):
     # by commas. Unable to split None, so the default will be an empty string
     # which when split will result in an empty list. If the verified list is
     # empty then the verified list will also be empty.
-    config_group['disabled_phases'] = _to_list(config_group.get('disabled_phases', ''))
+    config_group['disabled_phases'] = tools.to_list(config_group.get('disabled_phases', ''))
 
     log.trace('final config group: %s', config_group)
     if missing_required:
@@ -454,8 +397,9 @@ def _load_args(namespace, app_version):
 
     log.trace('all known arguments added to parser....now parse')
     # the namespace is an object that will actually hold a reference to each value in
-    # a corresponding attribute field. dest=attribute name
-    parser.parse_args(namespace=namespace)
+    # a corresponding attribute field. dest=attribute name; we are parsing the 
+    # known args ONLY; we will even ignore those that were extraneous.
+    parser.parse_known_args(namespace=namespace)
     log.debug('found command line arguments: [%s]', namespace)
 
 

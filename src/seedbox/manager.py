@@ -9,12 +9,13 @@ import logging
 from seedbox import __version__
 from seedbox import logext as logmgr
 from seedbox import options as opt_loader
-from seedbox import pluginmanager, processmap, taskmanager, torrentmanager
+from seedbox import pluginmanager, processmap, taskmanager, datamanager
 
 log = logging.getLogger('main')
 
 def main():
-    """Main program
+    """
+    Main program
     """
     # processes all command-line inputs that control how we execute
     # logging, run mode, etc.; and we get a handle back to access the info
@@ -42,7 +43,7 @@ def main():
     # setup database and initialize connection; then loads up all torrents
     # into the cache. Now we have a database and potentially some torrents
     # that need processing
-    torrentmanager.start(core_configs)
+    datamanager.start(core_configs)
 
     # time to start processing
     taskmanager.start(core_configs)

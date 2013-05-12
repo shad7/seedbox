@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import logging
 import xworkflows
 
-from seedbox import processmap, torrentmanager
+from seedbox import processmap, datamanager
 from seedbox.workflow import Taskflow
 
 log = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ class Process(xworkflows.WorkflowEnabled):
         log.trace('current state [%s]', self.state.name)
         self.cancel()
         log.trace('updated state [%s]', self.state.name)
-        torrentmanager.update_state(torrents, self.state.name)
+        datamanager.update_state(torrents, self.state.name)
 
 
     def get_transistion_method(self):
@@ -188,7 +188,7 @@ def _execute(disabled_phases, retry=False, max_retry=None):
         # if False, load all non-failed torrents
         state = processmap.get_state(phase)
         log.trace('Loading torrents for state [%s]', state)
-        torrents = torrentmanager.get_torrents_by_state(state, retry)
+        torrents = datamanager.get_torrents_by_state(state, retry)
 
         if retry:
             log.trace('checking if any torrents need to be cancelled')
@@ -249,7 +249,7 @@ def _handle_phase_execution(state, torrents):
         log.trace('Processing torrents [%d] for state [%s]', len(torrents), state)
         processed_torrents = tran_method(torrents)
         log.trace('Successfully processed torrents [%d] for state [%s]', len(processed_torrents), state)
-        torrentmanager.update_state(processed_torrents, process.state.name)
+        datamanager.update_state(processed_torrents, process.state.name)
 
     # now return the successfully processed torrents so additional processing can 
     # take place if needed.
@@ -281,7 +281,7 @@ def _handle_torrent_cancellation(torrents, max_retry):
 
         # not reached limit then we will reset the failed flags
         # so that if it errors again we will have a new error message
-        torrentmanager.reset_failed(torrent)
+        datamanager.reset_failed(torrent)
 
         # now increment retry counter as we are about to execute!
         torrent.retry_count += 1

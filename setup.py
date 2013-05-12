@@ -21,10 +21,6 @@ class PyTest(TestCommand):
     def run_tests(self):
         #import here, cause outside the eggs aren't loaded
         import pytest
-        # because we are using sys.argv for testing our options
-        # module, and by passing in 'test' or other inputs; we need
-        # to reduce to what we are able to process so pop!
-        sys.argv.pop()
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 

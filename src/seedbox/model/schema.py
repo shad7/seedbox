@@ -43,20 +43,32 @@ class MediaFile(SQLObject):
     skipped = BoolCol(default=False)
     torrent = ForeignKey('Torrent', cascade=True)
 
+class AppState(SQLObject):
+    """
+    A class that defines maintains information about the state of the application
+    and internal processing. Effectively it is just a key-value pair except we
+    store the values by type.
+    """
+
+    name = StringCol(unique=True)
+    val_str = StringCol(default=None)
+    val_int = IntCol(default=-99999)
+    val_list = StringCol(default=None)
+    val_flag = BoolCol(default=False)
+    val_date = DateTimeCol(default=DateTimeCol.now)
+
+
 def init(resource_path, reset=False):
     """
     Establish a connection and make sure all structures are in place
     """
 
     dbloc = os.path.join(resource_path, DB_NAME)
-    log.trace('location of database: [%s]', dbloc)
+    log.trace('location of database will be: [%s]', dbloc)
+    db_exists = False
     if os.path.exists(dbloc):
-        if reset:
-            log.info('reset requested; deleting database cache.')
-            os.remove(dbloc)
-            log.info('creating new database....[%s]', dbloc)
-        else:
-            log.info('loading database [%s]', dbloc)
+        db_exists = True
+        log.info('loading database [%s]', dbloc)
     else:
         log.info('database does not exist; creating database....[%s]', dbloc)
 
@@ -65,11 +77,23 @@ def init(resource_path, reset=False):
     # create connection to the database
     sqlhub.processConnection = connectionForURI(connect_str)
 
+    # if the database already existed and a reset was requested then
+    # we drop all the tables
+    if db_exists and reset:
+        log.info('reset requested; deleting database cache.')
+        Torrent.dropTable(ifExists=True)
+        MediaFile.dropTable(ifExists=True)
+        AppState.dropTable(ifExists=True)
+        log.info('recreating database cache....')
+
     # we have defined the class, so create the table if it doesn't exist
     Torrent.createTable(ifNotExists=True)
 
     # we have defined the class, so create the table if it doesn't exist
     MediaFile.createTable(ifNotExists=True)
+
+    # we have defined the class, so create the table if it doesn't exist
+    AppState.createTable(ifNotExists=True)
 
     if log.isEnabledFor(logging.DEBUG):
         log.trace('Torrent table: [%s]', Torrent.sqlmeta.table)
@@ -77,6 +101,10 @@ def init(resource_path, reset=False):
     
         log.trace('MediaFile table: [%s]', MediaFile.sqlmeta.table)
         log.trace('MediaFile Columns: [%s]', MediaFile.sqlmeta.columns.keys())
+
+        log.trace('AppState table: [%s]', AppState.sqlmeta.table)
+        log.trace('AppState Columns: [%s]', AppState.sqlmeta.columns.keys())
+
 
 def backup(resource_path):
     """

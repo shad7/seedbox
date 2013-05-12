@@ -8,7 +8,7 @@ from __future__ import absolute_import
 from itertools import ifilter
 import logging
 import os
-from seedbox import torrentmanager
+from seedbox import datamanager
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def set_torrent_failed(torrent, error):
         torrent: torrent entry provided as input to all plugins
         error: the actual exception that happened        
     """
-    torrentmanager.set_failed(torrent, error)
+    datamanager.set_failed(torrent, error)
 
 def get_media_files(torrent, file_exts=None, compressed=False, synced=False,
     missing=False, skipped=False):
@@ -50,7 +50,7 @@ def get_media_files(torrent, file_exts=None, compressed=False, synced=False,
     if compressed is None or synced is None or missing is None or skipped is None:
         raise ValueError('invalid input: flag inputs must be boolean (True/False)')
 
-    media_files = torrentmanager.get_media_files(torrent, compressed, synced, missing, skipped)
+    media_files = datamanager.get_media_files(torrent, compressed, synced, missing, skipped)
     if not media_files:
         log.debug('no mediafiles found for specified torrent')
         # no results found
@@ -65,75 +65,6 @@ def get_media_files(torrent, file_exts=None, compressed=False, synced=False,
 
     log.debug('found %d media files', len(media_files))
     return media_files
-
-def get_processed_media_files(torrent):
-    """
-    retrieve a list of media files that have already been processed
-    either during original parsing or through normal processing.
-    synced = True; missing = True; or skipping = True
-
-    args:
-        torrent: torrent entry provided as input to all plugins
-    returns:
-        list of media files; list will be empty is none found
-    exceptions:
-        ValueError: when incorrect inputs provided (eg. missing torrent or empty torrent)
-    """
-
-    if not torrent or not torrent.id:
-        raise ValueError('missing input: torrent is a required input')
-
-    return torrentmanager.get_processed_media_files(torrent)
-
-def is_torrent_purgeable(torrent):
-    """
-    determine if ALLL media files associated with torrent are purgeable;
-    therefore ultimately the torrent itself is pureable.
-
-    args:
-        torrent: torrent entry provided as input to all plugins
-    returns:
-        flag: True if purgeable or False if not
-    exceptions:
-        ValueError: when incorrect inputs provided (eg. missing torrent or empty torrent)
-    """
-
-    if not torrent or not torrent.id:
-        raise ValueError('missing input: torrent is a required input')
-
-    flag = False
-    # how many files are associated with torrent
-    total_files = len(torrentmanager.get_files_by_torrent(torrent))
-    # how many files have already been processed, therefore purgeable
-    total_processed = len(get_processed_media_files(torrent))
-
-    log.trace('total files [%d] vs. total processed [%d]', total_files, total_processed)
-    # if the two totals are the same then torrent is purgeable
-    # if the torrent has already been purged or is invalid (has no files)
-    # then both will return 0, therefore the same.
-    if total_files == total_processed:
-        flag = True
-
-    return flag
-
-def purge_media_files(torrent):
-    """
-    purge/delete all media files within the cache for a given torrent
-
-    args:
-        torrent: torrent entry provided as input to all plugins
-    returns:
-        N/A
-    exceptions:
-        ValueError: when incorrect inputs provided (eg. missing torrent or empty torrent)
-    """
-
-    if not torrent or not torrent.id:
-        raise ValueError('missing input: torrent is a required input')
-
-    log.trace('executing purge of media for torrent %s', torrent)
-    torrentmanager.purge_media(torrent)
-    log.trace('purge complete')
 
 def synced_media_file(media_file):
     """
@@ -234,14 +165,6 @@ def add_mediafiles_to_torrent(torrent, file_location, added_files):
     log.trace('total media files to add %d', len(media_files))
     if media_files:
         log.trace('adding files to torrent')
-        torrentmanager.add_files_to_torrent(torrent, media_files)
+        datamanager.add_files_to_torrent(torrent, media_files)
         log.trace('files added')
 
-def perform_db_backup(resource_path):
-    """
-    Perform a backup on the database
-    """
-    if not resource_path:
-        raise ValueError('missing input: resource_path is a required input')
-
-    torrentmanager.backup_db(resource_path)

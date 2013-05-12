@@ -6,10 +6,12 @@ related to data persistence or even having to understand how things are
 persisted outside of the model area.
 """
 from __future__ import absolute_import
+import datetime as datemod
 import logging
 import os
 import time
-from seedbox.model.schema import Torrent, MediaFile, init as schema_init, backup as schema_backup
+from seedbox import tools
+from seedbox.model import schema
 from seedbox.torrentparser import TorrentParser, MalformedTorrentError, ParsingError
 
 log = logging.getLogger(__name__)
@@ -18,7 +20,7 @@ def add_torrent(name):
     """
     Create the torrent and return it
     """
-    torrent = Torrent(name=name)
+    torrent = schema.Torrent(name=name)
 
     return torrent
 
@@ -53,7 +55,7 @@ def fetch_torrent_by_name(name):
     """
     Retrieve torrent by name
     """
-    search = Torrent.selectBy(name=name)
+    search = schema.Torrent.selectBy(name=name)
     # because name is unique, it will always be Zero or One entry
     # so we can use the getOne() feature. By passing in None we avoid
     # get back an exception, and therefore we can check for no
@@ -80,7 +82,7 @@ def add_file_to_torrent(torrent, media):
     """
     Add a file to the torrent
     """
-    MediaFile(filename=media.get('filename'), file_ext=media.get('file_ext'),
+    schema.MediaFile(filename=media.get('filename'), file_ext=media.get('file_ext'),
         file_path=media.get('file_path'),
         size=media.get('size'), compressed=media.get('compressed'),
         synced=media.get('synced'), missing=media.get('missing'),
@@ -115,7 +117,7 @@ def get_torrents_by_state(state, failed=False):
     that are still need to go through retry, but if requested get those
     that need to be retried for a given state.
     """
-    search = Torrent.selectBy(state=state, failed=failed)
+    search = schema.Torrent.selectBy(state=state, failed=failed)
 
     return list(search)
 
@@ -124,7 +126,7 @@ def get_torrents_to_retry():
     To all the torrents that have not been aborted/cancelled that are in
     and error state.
     """
-    search = Torrent.selectBy(failed=True)
+    search = schema.Torrent.selectBy(failed=True)
 
     return list(search)
 
@@ -133,15 +135,45 @@ def delete_torrents(torrents):
     Delete a list of torrents
     """
     for torrent in torrents:
-        Torrent.delete(id=torrent.id)
+        schema.Torrent.delete(id=torrent.id)
 
 def delete_media_files(media_files):
     """
     Delete a list of media files
     """
     for media_file in media_files:
-        MediaFile.delete(id=media_file.id)
+        schema.MediaFile.delete(id=media_file.id)
 
+def get_eligible_for_purging():
+    """
+    get list of torrents for which the mediafiles are eligible for purging
+    """
+    where_clause = []
+    where_clause.append('torrent.invalid = 0')
+    where_clause.append('AND torrent.purged = 0')
+    where_clause.append('AND (torrent.state = {0}'.format(schema.Torrent.sqlrepr('done')))
+    where_clause.append('OR torrent.state = {0})'.format(schema.Torrent.sqlrepr('cancelled')))
+    str_where_clause = ' '.join(where_clause)
+
+    log.debug('WHERE: [%s]', str_where_clause)
+    search = schema.Torrent.select(str_where_clause, distinct=True)
+
+    return list(search)
+
+def get_eligible_for_removal():
+    """
+    get list of torrents for which could be eligible for actual removal
+    """
+    where_clause = []
+    where_clause.append('torrent.purged = 1')
+    where_clause.append('AND (torrent.state = {0}'.format(schema.Torrent.sqlrepr('done')))
+    where_clause.append('OR torrent.state = {0})'.format(schema.Torrent.sqlrepr('cancelled')))
+    str_where_clause = ' '.join(where_clause)
+
+    log.debug('WHERE: [%s]', str_where_clause)
+    search = schema.Torrent.select(str_where_clause, distinct=True)
+
+    return list(search)
 
 ###
 # Helper private implementations; see seedbox.helpers for public interface
@@ -157,7 +189,7 @@ def get_media_files(torrent, compressed, synced, missing, skipped):
     implementation for helpers; the public interface is provided
     by helpers so we don't provide any default values on this interface
     """
-    search = MediaFile.selectBy(torrent=torrent.id, compressed=compressed,
+    search = schema.MediaFile.selectBy(torrent=torrent.id, compressed=compressed,
         synced=synced, missing=missing, skipped=skipped)
 
     return list(search)
@@ -181,7 +213,7 @@ def get_processed_media_files(torrent):
     str_where_clause = ' '.join(where_clause)
 
     log.debug('WHERE: [%s]', str_where_clause)
-    search = MediaFile.select(str_where_clause, distinct=True)
+    search = schema.MediaFile.select(str_where_clause, distinct=True)
 
     return list(search)
 
@@ -191,14 +223,142 @@ def purge_media(torrent):
     the specified torrent (means all processing is done, so no need to keep
     track of all the files originally associated with torrent.
     """
-    MediaFile.deleteBy(torrent=torrent.id)
+    schema.MediaFile.deleteBy(torrent=torrent.id)
     torrent.purged = True
 
 def backup_db(resource_path):
     """
     perform backup of the database, typical right before a purge action
     """
-    schema_backup(resource_path)
+    schema.backup(resource_path)
+
+###
+# Functions for managing the application state data entries
+###
+def _fetch(name):
+    """
+    Checks to see if the name already exists in db
+    """
+    search = schema.AppState.selectBy(name=name)
+    # because name is unique, it will always be Zero or One entry
+    # so we can use the getOne() feature. By passing in None we avoid
+    # get back an exception, and therefore we can check for no
+    # results and simply create it if needed
+    entry = search.getOne(None)
+
+    return entry
+
+def _create(name):
+    """
+    Creates the new entry in the app state
+    """
+    return schema.AppState(name=name)
+
+def _fetch_or_create(name):
+    """
+    convience function that handles retrieving existing entry or creating
+    a new one for us.
+    """
+    entry = _fetch(name)
+
+    if not entry:
+        entry = _create(name)
+
+    return entry
+
+def set(name, value):
+    """
+    set name to value where value is stored as string
+    """
+    entry = _fetch_or_create(name)
+    entry.val_str = value
+
+def set_int(name, value):
+    """
+    set name to value where value is stored as int
+    """
+    entry = _fetch_or_create(name)
+    entry.val_int = tools.to_int(value)
+
+def set_list(name, values):
+    """
+    set name to value where value is stored as delimited list
+    """
+    entry = _fetch_or_create(name)
+    entry.val_list = tools.list_to_str(values)
+
+def set_flag(name, value):
+    """
+    set name to value where value is stored as boolean
+    """
+    entry = _fetch_or_create(name)
+    entry.val_flag = tools.to_bool(value)
+
+def set_date(name, value):
+    """
+    set name to value where value is stored as date; if date is None
+    we will let it default to current date.
+    """
+    entry = _fetch_or_create(name)
+    if value and isinstance(value, datemod.datetime):
+        entry.val_date = value
+    else:
+        entry.val_date = datemod.datetime.utcnow()
+
+def get(name, default=None):
+    """
+    retrieve named value where value is stored as string
+    """
+    entry = _fetch(name)
+
+    if not entry:
+        return default
+    else:
+        return entry.val_str
+
+def get_int(name, default=None):
+    """
+    retrieve named value where value is stored as int
+    """
+    entry = _fetch(name)
+
+    if not entry:
+        return default
+    else:
+        return entry.val_int
+
+def get_list(name, default=None):
+    """
+    retrieve named value where value is stored as delimited list of values
+    """
+    entry = _fetch(name)
+
+    if not entry:
+        return default
+    else:
+        return tools.to_list(entry.val_list)
+
+def get_flag(name, default=None):
+    """
+    retrieve named value where value is stored as boolean
+    """
+    entry = _fetch(name)
+
+    if not entry:
+        return default
+    else:
+        return entry.val_flag
+
+def get_date(name, default=None):
+    """
+    retrieve named value where value is stored as date
+    """
+    entry = _fetch(name)
+
+    if not entry:
+        return default
+    else:
+        return entry.val_date
 
 ###
 # This is where we handle the loading and/or initializing of the database and all the
@@ -208,13 +368,75 @@ def start(configs):
     """
     Make sure the database is configured and connection established
     """
-    schema_init(configs.resource_path, configs.reset)
+    schema.init(configs.resource_path, configs.reset)
+
+    # step to clean up database
+    perform_db_cleanup(configs.resource_path, configs.torrent_path, configs.reset)
+
     # as part of running in retry mode; we don't want to load anything
     # new so we will skip the load aspect and only handle the database
     # aspect of starting up
     if not configs.retry:
         load_torrents(configs.torrent_path, configs.media_paths, configs.incomplete_path)
 
+def perform_db_cleanup(resource_path, torrent_location, reset_flag=False):
+    """
+    Determine if it is time to clean up the database, if it is then backup database and 
+    start purging the necessary data.
+    """
+    default_date = datemod.datetime.min
+    state_key = 'last_purge_date'
+    one_week = datemod.timedelta(weeks=1)
+    
+    log.trace('starting perform_db_cleanup...')
+
+    if reset_flag:
+        log.debug('reset performed....need to reset app state. Setting last purge date to now.')
+        set_date(state_key, None)
+        return
+
+    last_purge_date = get_date(state_key, default_date)
+
+    if last_purge_date == default_date:
+        log.info('First running...setting last purge date to now')
+        # never been purged so need to set an initial date (today)
+        set_date(state_key, None)
+        return
+
+    if (last_purge_date + one_week) >= datemod.datetime.utcnow():
+        log.trace('last purge was more than 1 week ago....ready for some clean up.')
+        # ready to start purge process....
+        torrents = get_eligible_for_purging()
+        if torrents:
+            log.trace('found torrents eligible for purging: %s', len(torrents))
+            # perform database backup
+            backup_db(resource_path)
+
+            log.debug('purging media associated with torrents....')
+            for torrent in torrents:
+                purge_media(torrent)
+
+            # done deleting mediafiles; now delete any torrents that were found to be
+            # missing from filesystem thereby no longer in need of caching.
+            torrents = get_eligible_for_removal()
+            torrents_to_delete = []
+            for torrent in torrents:
+                if not os.path.exists(os.path.join(torrent_location, torrent.name)):
+                    # actual torrent file no longer exists so we can safely delete
+                    # the torrent from cache
+                    torrents_to_delete.append(torrent)
+
+            log.debug('found torrents eligible for removal: %s', len(torrents_to_delete))
+            delete_torrents(torrents_to_delete)
+
+            # now reset the last purge date to now.
+            set_date(state_key, None)
+
+        else:
+            # no torrents eligible for purging
+            log.debug('no torrents found eligible for purging...')
+    
+    log.trace('perform_db_cleanup completed')    
 
 def load_torrents(torrent_location, media_locations, inprogress_location):
     """

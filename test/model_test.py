@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import unittest
 import os
+from datetime import datetime
 import time
 
 # required since we leverage custom logging levels
@@ -316,12 +317,14 @@ class TestModelSchema(unittest.TestCase):
         """
         Testing resetting the database
         """
-        # might be tough to test this one; would need to figure out how to 
-        # close the connection, and therefore the db file in order to actually
-        # perform a reset. Since the connection is never externalized by either
-        # the framework or by the schema module. We'd have to do some serious hacking
-        # and that is just not worth it. So I'll leave this as a placeholder for now.
-        self.assertTrue(True)
+        # initialize the database and schema details
+        schema.init(RESOURCE_PATH)
+
+        schema.Torrent.dropTable(ifExists=True)
+        self.assertFalse(schema.Torrent.tableExists())
+        schema.MediaFile.dropTable(ifExists=True)
+        self.assertFalse(schema.MediaFile.tableExists())
+
 
     def test_backup_database(self):
         """
@@ -348,6 +351,99 @@ class TestModelSchema(unittest.TestCase):
                 os.remove(os.path.join(RESOURCE_PATH, item))
 
         self.assertTrue(found)
+
+    def test_set_appstate(self):
+        """
+        AppState is just a key:value pair caching. So test out setting each 'type'
+        in one test case.
+        """
+        # initialize the database and schema details
+        schema.init(RESOURCE_PATH)
+        # make sure the table is really empty before we start
+        schema.AppState.clearTable()
+
+        str_state = schema.AppState(name='key_str')
+        # verify we have an instance
+        self.assertIsInstance(str_state, schema.AppState)
+
+        str_state.val_str = 'Just a simple string'
+        self.assertIsInstance(str_state.val_str, basestring)
+        self.assertIsNotNone(str_state.val_str)
+
+        int_state = schema.AppState(name='key_int')
+        # verify we have an instance
+        self.assertIsInstance(int_state, schema.AppState)
+
+        int_state.val_int = 7
+        self.assertIsInstance(int_state.val_int, int)
+        self.assertIsNotNone(int_state.val_int)
+
+        list_state = schema.AppState(name='key_list')
+        # verify we have an instance
+        self.assertIsInstance(list_state, schema.AppState)
+
+        list_state.val_list = 'item1,item2,item3,item4,item5'
+        self.assertIsInstance(list_state.val_list.split(','), list)
+        self.assertIsNotNone(list_state.val_list)
+
+        flag_state = schema.AppState(name='key_flag')
+        # verify we have an instance
+        self.assertIsInstance(flag_state, schema.AppState)
+
+        flag_state.val_flag = True
+        self.assertIsInstance(flag_state.val_flag, bool)
+        self.assertIsNotNone(flag_state.val_flag)
+
+        date_state = schema.AppState(name='key_date')
+        # verify we have an instance
+        self.assertIsInstance(date_state, schema.AppState)
+
+        self.assertIsInstance(date_state.val_date, datetime)
+        self.assertIsNotNone(date_state.val_date)
+
+
+    def test_get_appstate(self):
+        """
+        AppState is just a key:value pair caching. So test out getting each 'type'
+        in one test case.
+        """
+        # initialize the database and schema details
+        schema.init(RESOURCE_PATH)
+        # make sure the table is really empty before we start
+        schema.AppState.clearTable()
+
+        # first need to actually create some data
+        str_state = schema.AppState(name='key_str')
+        str_state.val_str = 'Just a simple string'
+
+        int_state = schema.AppState(name='key_int')
+        int_state.val_int = 7
+
+        list_state = schema.AppState(name='key_list')
+        list_state.val_list = 'item1,item2,item3,item4,item5'
+
+        flag_state = schema.AppState(name='key_flag')
+        flag_state.val_flag = True
+
+        date_state = schema.AppState(name='key_date')
+        
+        # now fetch the data
+        for key in ['key_str', 'key_int', 'key_list', 'key_flag', 'key_date']:
+            search = schema.AppState.selectBy(name=key)
+            entry = search.getOne(None)
+            self.assertIsNotNone(entry)
+
+            if key == 'key_str':
+                self.assertIsInstance(entry.val_str, basestring)
+            elif key == 'key_int':
+                self.assertIsInstance(entry.val_int, int)
+            elif key == 'key_list':
+                self.assertIsInstance(entry.val_list.split(','), list)
+            elif key == 'key_flag':
+                self.assertIsInstance(entry.val_flag, bool)
+            elif key == 'key_date':
+                self.assertIsInstance(entry.val_date, datetime)
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestModelSchema)
