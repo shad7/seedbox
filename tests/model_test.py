@@ -337,11 +337,6 @@ class TestModelSchema(unittest.TestCase):
         search = schema.Torrent.selectBy(failed=False)
         self.assertEqual(0, len(list(search)))
 
-#       schema.Torrent.dropTable(ifExists=True)
-#       self.assertFalse(schema.Torrent.tableExists())
-#       schema.MediaFile.dropTable(ifExists=True)
-#       self.assertFalse(schema.MediaFile.tableExists())
-
     def test_backup_database(self):
         """
         Testing backing up the database
