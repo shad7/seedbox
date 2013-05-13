@@ -28,6 +28,8 @@ Dependencies
 * xworkflows (0.4.1): https://xworkflows.readthedocs.org/en/latest/
 * rarfile (2.6): https://rarfile.readthedocs.org/en/latest/
 * torrentparser: https://github.com/mohanraj-r/torrentparse
+* lockfile: https://pypi.python.org/pypi/lockfile
+* shutilwhich: https://pypi.python.org/pypi/shutilwhich
  
 How does it all work?
 ---------------------
@@ -46,13 +48,12 @@ Phases and Built-in Tasks
 -------------------------- 
 * prepare: filecopy and fileunrar
 * activate: filesync
-* complete: filedelete and filepurge
+* complete: filedelete
 
 filecopy: copy supported media files related to torrents from download directory to sync directory
 fileunrar: decompress rar media files related to torrents from download directory to sync directory
 filesync: rsync files in sync directory to remote server location
 filedelete: delete media files from sync directory after successful sync to remote server location
-filepurge: delete cache entry for media files from databases since they are done. (maintain torrent details while torrent file exists)
 
 Configuration
 --------------
