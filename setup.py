@@ -48,6 +48,7 @@ required.append('SQLObject >= 1.3.2')
 required.append('xworkflows')
 required.append('rarfile >= 2.6')
 required.append('shutilwhich')
+required.append('lockfile')
 
 data_files = ['LICENSE', 'README', 'README.md']
 
