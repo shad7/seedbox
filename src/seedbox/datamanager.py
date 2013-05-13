@@ -396,6 +396,7 @@ def perform_db_cleanup(resource_path, torrent_location, reset_flag=False):
         return
 
     last_purge_date = get_date(state_key, default_date)
+    log.debug('last_purge_date: %s', last_purge_date)
 
     if last_purge_date == default_date:
         log.info('First running...setting last purge date to now')
@@ -403,7 +404,9 @@ def perform_db_cleanup(resource_path, torrent_location, reset_flag=False):
         set_date(state_key, None)
         return
 
-    if last_purge_date >= (datemod.datetime.utcnow() - one_week):
+    log.debug('current_date - last_purge_date vs. 1 week: (%s) - (%s) >= (%s) = (%s)', 
+        datemod.datetime.utcnow(), last_purge_date, one_week, datemod.datetime.utcnow() - last_purge_date)
+    if (datemod.datetime.utcnow() - last_purge_date) >= one_week:
         log.trace('last purge was more than 1 week ago....ready for some clean up.')
         # ready to start purge process....
         torrents = get_eligible_for_purging()
