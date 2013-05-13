@@ -3,59 +3,60 @@ A class that defines a torrent file and the associated state. Also defined is a 
 that defines the contents of a torrent file, ie some media files typically.
 """
 from __future__ import absolute_import
-from sqlobject import *
+#from sqlobject import *
+import sqlobject
 import logging
-import os, sys
+import os
 import shutil
 
 log = logging.getLogger(__name__)
 DB_NAME = 'torrent.db'
 MAX_BACKUP_COUNT = 12
 
-class Torrent(SQLObject):
+class Torrent(sqlobject.SQLObject):
     """
     A class that defines a torrent and associated database table using
     SQLObjects to handle persistence.
     """
-    name = StringCol(unique=True)
-    create_date = DateCol(default=DateTimeCol.now)
-    state = EnumCol(enumValues=['init', 'ready', 'active', 'done', 'cancelled'], default='init')
-    retry_count = IntCol(default=0)
-    failed = BoolCol(default=False)
-    error_msg = StringCol(default=None)
-    invalid = BoolCol(default=False)
-    purged = BoolCol(default=False)
-    media_files = SQLMultipleJoin('MediaFile')
+    name = sqlobject.StringCol(unique=True)
+    create_date = sqlobject.DateCol(default=sqlobject.DateTimeCol.now)
+    state = sqlobject.EnumCol(enumValues=['init', 'ready', 'active', 'done', 'cancelled'], default='init')
+    retry_count = sqlobject.IntCol(default=0)
+    failed = sqlobject.BoolCol(default=False)
+    error_msg = sqlobject.StringCol(default=None)
+    invalid = sqlobject.BoolCol(default=False)
+    purged = sqlobject.BoolCol(default=False)
+    media_files = sqlobject.SQLMultipleJoin('MediaFile')
 
-class MediaFile(SQLObject):
+class MediaFile(sqlobject.SQLObject):
     """
     A class that defines a media file contained within a torrent file
     and associatd database table using SQLObjects to handle persistence.
     """
 
-    filename = StringCol()
-    file_ext = StringCol()
-    file_path = StringCol(default=None)
-    size = IntCol(default=0)
-    compressed = BoolCol(default=False)
-    synced = BoolCol(default=False)
-    missing = BoolCol(default=False)
-    skipped = BoolCol(default=False)
-    torrent = ForeignKey('Torrent', cascade=True)
+    filename = sqlobject.StringCol()
+    file_ext = sqlobject.StringCol()
+    file_path = sqlobject.StringCol(default=None)
+    size = sqlobject.IntCol(default=0)
+    compressed = sqlobject.BoolCol(default=False)
+    synced = sqlobject.BoolCol(default=False)
+    missing = sqlobject.BoolCol(default=False)
+    skipped = sqlobject.BoolCol(default=False)
+    torrent = sqlobject.ForeignKey('Torrent', cascade=True)
 
-class AppState(SQLObject):
+class AppState(sqlobject.SQLObject):
     """
     A class that defines maintains information about the state of the application
     and internal processing. Effectively it is just a key-value pair except we
     store the values by type.
     """
 
-    name = StringCol(unique=True)
-    val_str = StringCol(default=None)
-    val_int = IntCol(default=-99999)
-    val_list = StringCol(default=None)
-    val_flag = BoolCol(default=False)
-    val_date = DateTimeCol(default=DateTimeCol.now)
+    name = sqlobject.StringCol(unique=True)
+    val_str = sqlobject.StringCol(default=None)
+    val_int = sqlobject.IntCol(default=-99999)
+    val_list = sqlobject.StringCol(default=None)
+    val_flag = sqlobject.BoolCol(default=False)
+    val_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
 
 
 def init(resource_path, reset=False):
@@ -75,7 +76,7 @@ def init(resource_path, reset=False):
     connect_str = '{0}{1}{2}'.format('sqlite:', dbloc, '?driver=sqlite3')
     log.trace('establishing connection to database: [%s]', connect_str)
     # create connection to the database
-    sqlhub.processConnection = connectionForURI(connect_str)
+    sqlobject.sqlhub.processConnection = sqlobject.connectionForURI(connect_str)
 
     # if the database already existed and a reset was requested then
     # we drop all the tables
@@ -122,14 +123,9 @@ def backup(resource_path):
                     os.remove(dfn)
                 os.rename(sfn, dfn)
         dfn = default_db_name + '.1'
-        if os.path.exists(dfn):
-            os.remove(dfn)
         log.info('backing up db [%s] to [%s]', default_db_name, dfn)
         shutil.copy2(default_db_name, dfn)
-        if os.path.exists(dfn):
-            log.info('backup complete')
-        else:
-            log.error('no exceptions raised, but backup file does not exist!')
+        log.info('backup complete')
     else:
         log.warn('Database [%s] does not exist, no backup taken.', default_db_name)
 

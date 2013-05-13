@@ -186,14 +186,10 @@ def _set_type(value):
     """
     a workaround for a problem where we set flags using strings in a config file
     but we really need them to be booleans when we consume them. Also handles
-    converting values to their proper types so they are consumable.
+    converting a value to None if no value; otherwise a string.
     """
     if value.lower() in tools.BOOLEAN_STATES:
         return tools.BOOLEAN_STATES[value.lower()]
-    elif isinstance(value, int):
-        return int(value)
-    elif isinstance(value, list):
-        return list(value)
     else:
         if not value:
             return None

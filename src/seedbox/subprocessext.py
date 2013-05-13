@@ -48,8 +48,10 @@ class ProcessLogging(subprocess.Popen):
         """
         Start a thread logging output from pipe
         """
-        # thread function to log subprocess output
         def log_output(out, log_func):
+            """
+            thread function to log subprocess output
+            """
             for line in iter(out.readline, b''):
                 log_func(line.rstrip('\n'))
 
@@ -59,7 +61,7 @@ class ProcessLogging(subprocess.Popen):
         thread.start()
         thread.join()
 
-    def _complete(self):
+    def complete(self):
         """
         Handle all the processing of the subprocess
         """
@@ -82,7 +84,7 @@ class ProcessLogging(subprocess.Popen):
         module level.
         """
         proc = ProcessLogging(cmd, logger)
-        proc._complete()
+        proc.complete()
 
 # end ProcessLogging
 

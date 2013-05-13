@@ -150,7 +150,9 @@ class Process(xworkflows.WorkflowEnabled):
 # end Process
 
 def start(core_configs):
-
+    """
+    entry point for module to handle managing the end2end processing and tasking
+    """
     if core_configs.retry:
         log.info('running in retry mode....no new work will be done')
         # only process those that are in an error state, and have not

@@ -351,15 +351,11 @@ class TestModelSchema(unittest.TestCase):
         schema.init(RESOURCE_PATH)
 
         for cnt in range(0, 15):
-            print 'cnt %d' % cnt
             if cnt == 0:
-                print 'cnt %d' % cnt
                 self.assertEqual(len(glob.glob(os.path.join(RESOURCE_PATH, schema.DB_NAME+'*'))), 1)
             elif cnt >= 1 and cnt <= 12:
-                print 'cnt %d' % cnt
                 self.assertEqual(len(glob.glob(os.path.join(RESOURCE_PATH, schema.DB_NAME+'*'))), 1+cnt)
             else:
-                print 'cnt %d' % cnt
                 self.assertEqual(len(glob.glob(os.path.join(RESOURCE_PATH, schema.DB_NAME+'*'))), 13)
 
             # perform backup
