@@ -87,8 +87,7 @@ def exec_action(name, *args, **kwargs):
     execute the associated action based on name action
     """
     log.trace('Time to execute action named: [%s]', name)
-    if not name in _actions:
-        return
     for action in get_actions(name):
         log.trace('Using action: [%s]', action)
         action(*args, **kwargs)
+
