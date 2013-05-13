@@ -403,7 +403,7 @@ def perform_db_cleanup(resource_path, torrent_location, reset_flag=False):
         set_date(state_key, None)
         return
 
-    if (last_purge_date + one_week) >= datemod.datetime.utcnow():
+    if last_purge_date >= (datemod.datetime.utcnow() - one_week):
         log.trace('last purge was more than 1 week ago....ready for some clean up.')
         # ready to start purge process....
         torrents = get_eligible_for_purging()
