@@ -7,9 +7,9 @@ from __future__ import absolute_import, print_function
 import os, sys
 import logging
 import lockfile as locker
+from lockfile.pidlockfile import PIDLockFile
 
 from seedbox import __version__
-from seedbox.lockfileext import TimeoutPIDLockFile
 from seedbox import logext as logmgr
 from seedbox import options as opt_loader
 from seedbox import pluginmanager, processmap, taskmanager, datamanager
@@ -45,7 +45,7 @@ def main():
     # need to create a lock to make sure multiple instances do not start at the
     # sametime because we are running as a cron.
     filelock = os.path.join(_get_default_location(), 'seedmgr.lock')
-    lock = TimeoutPIDLockFile(filelock, 10)
+    lock = PIDLockFile(filelock, timeout=10)
     try:
         with lock:
             # processes all command-line inputs that control how we execute
@@ -79,10 +79,10 @@ def main():
             # time to start processing
             taskmanager.start(core_configs)
 
-    except locker.LockTimeout:
+    except locker.LockTimeout as lockerr:
         # if we have managed timeout, it means there is another instance already running
         # so we will simply bow out and let the existing one still run.
-        print('Unable to acquire a lock, so another process is still running. (see cron log)',
+        print('Unable to acquire a lock, so another process is still running. (see cron log): {0}'.format(lockerr),
             file=sys.stderr)
 
 
