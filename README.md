@@ -47,13 +47,12 @@ end to end process flow.
 Phases and Built-in Tasks
 -------------------------- 
 * prepare: filecopy and fileunrar
+** filecopy: copy supported media files related to torrents from download directory to sync directory
+** fileunrar: decompress rar media files related to torrents from download directory to sync directory
 * activate: filesync
+** filesync: rsync files in sync directory to remote server location
 * complete: filedelete
-
-filecopy: copy supported media files related to torrents from download directory to sync directory
-fileunrar: decompress rar media files related to torrents from download directory to sync directory
-filesync: rsync files in sync directory to remote server location
-filedelete: delete media files from sync directory after successful sync to remote server location
+** filedelete: delete media files from sync directory after successful sync to remote server location
 
 Configuration
 --------------
