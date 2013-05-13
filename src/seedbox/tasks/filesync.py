@@ -200,7 +200,7 @@ class SyncFile(object):
         cmd.append(self.attrs.get('remote_path') + os.sep)
         log.debug('file specific command [%s]', cmd)
 
-        ProcessLogging.execute(cmd, log)
+        ProcessLogging(cmd, log)
         log.info('file synced %s', filename)
 
 
