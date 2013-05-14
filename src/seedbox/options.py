@@ -381,7 +381,7 @@ def _load_args(namespace, app_version):
     parser.add_argument('--logfile', dest='logfile', metavar='LOG_FILE', default=DEFAULT_LOG_FILENAME,
         help='specify name of log file (location is resource path)')
     parser.add_argument('--loglevel', dest='loglevel', metavar='LOG_LEVEL', default=DEFAULT_LOG_LEVEL,
-        choices=['none', 'critical', 'error', 'warning', 'info', 'debug', 'trace'],
+        type=str.lower, choices=['none', 'critical', 'error', 'warning', 'info', 'debug', 'trace'],
         help=SUPPRESS)
 
     parser.add_argument('--reset', action='store_true',
