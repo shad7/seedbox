@@ -14,11 +14,14 @@ Created on 2012-03-07
 @author: mohanr
 """
 from __future__ import absolute_import
+import bencode
+from BTL import BTFailure
+
 from datetime import datetime
 from StringIO import StringIO
+import logging
 import os
 import string
-import types
 
 
 def humanize_bytes(in_bytes, precision=1):
@@ -208,26 +211,29 @@ class TorrentParser(object):
         Returns:
             None
         Raises:
-            ValueError - when passed arg is not of string type
             IOError - when the string arg passed points to a non-existent file
                     
         """
-        if not isinstance(
-            torrent_file_path, types.StringType) and not isinstance(
-                torrent_file_path, types.UnicodeType):
-            raise ValueError(
-                'Path of the torrent file expected in string format.'
-                )
-        
         if not os.path.exists(torrent_file_path):
-            raise IOError("No file found at '%s'" % torrent_file_path)
+            raise IOError('No file found at %s'.format(torrent_file_path))
         
-        self.torrent_file = open(torrent_file_path)
-        self.torrent_content = self.torrent_file.read()
-        self.torrent_str = self._TorrentStr(self.torrent_content)
-        
-        self.parsed_content = self._parse_torrent()
-  
+        with open(torrent_file_path, 'rb') as handle:
+            self.torrent_content = handle.read()
+
+        # bencode is supremely more efficient parser of torrents but extremely strict in the
+        # format of the file. The custom parser is an implementation that someone wrote that
+        # does a good job of parsing but it is not very efficient. So we are going to pair
+        # the two solutions together. when the file is well formed we will leverage most efficient
+        # standard but we will leverage the custom parser when bencode generates an exception.
+        # If the custom parser fails then it is really invalid file and the consumer will handle
+        # it correspondingly.
+        try:
+            self.parsed_content = bencode.bdecode(self.torrent_content)
+        except BTFailure as bterr:
+            logging.debug('bencode.bdecode failed: ({0}); trying alternate approach'.format(bterr))
+            self.torrent_str = self._TorrentStr(self.torrent_content)
+            self.parsed_content = self._parse_torrent()
+
     def get_tracker_url(self):
         """ Returns the tracker URL from the parsed torrent file. """        
         return self.parsed_content.get('announce')

@@ -49,6 +49,7 @@ required.append('xworkflows')
 required.append('rarfile >= 2.6')
 required.append('shutilwhich')
 required.append('lockfile')
+required.append('BitTorrent-bencode')
 
 data_files = ['LICENSE', 'README', 'README.md']
 

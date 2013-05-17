@@ -69,7 +69,7 @@ def init(resource_path, reset=False):
     db_exists = False
     if os.path.exists(dbloc):
         db_exists = True
-        log.info('loading database [%s]', dbloc)
+        log.debug('loading database [%s]', dbloc)
     else:
         log.info('database does not exist; creating database....[%s]', dbloc)
 

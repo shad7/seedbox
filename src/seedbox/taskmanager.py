@@ -202,7 +202,7 @@ def _execute(disabled_phases, retry=False, max_retry=None):
         # if there are no torrents in this particular state then simply proceed
         # to the next phase
         if not torrents:
-            log.info('No torrents found for state [%s]', state)
+            log.debug('No torrents found for state [%s]', state)
             continue
 
         try:

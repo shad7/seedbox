@@ -22,7 +22,7 @@ def set_torrent_failed(torrent, error):
     """
     datamanager.set_failed(torrent, error)
 
-def get_media_files(torrent, file_exts=None, compressed=False, synced=False,
+def get_media_files(torrent, file_exts=None, file_path=None, compressed=False, synced=False,
     missing=False, skipped=False):
     """
     Retrieve mediafiles associated with the specified torrent entry.
@@ -32,6 +32,7 @@ def get_media_files(torrent, file_exts=None, compressed=False, synced=False,
 
         (optional filters inputs)
         file_ext: list of file extensions to include in the results list
+        file_path: string represent the path where the file can be found
         compressed: flag to include or not include compressed files
         synced: flag to include or not include files synced
         missing: flag to include or not include files there were not able to be located during parsing
@@ -47,10 +48,7 @@ def get_media_files(torrent, file_exts=None, compressed=False, synced=False,
     if not torrent or not torrent.id:
         raise ValueError('missing input: torrent is a required input')
 
-    if compressed is None or synced is None or missing is None or skipped is None:
-        raise ValueError('invalid input: flag inputs must be boolean (True/False)')
-
-    media_files = datamanager.get_media_files(torrent, compressed, synced, missing, skipped)
+    media_files = datamanager.get_media_files(torrent, file_path, compressed, synced, missing, skipped)
     if not media_files:
         log.debug('no mediafiles found for specified torrent')
         # no results found
@@ -65,6 +63,36 @@ def get_media_files(torrent, file_exts=None, compressed=False, synced=False,
 
     log.debug('found %d media files', len(media_files))
     return media_files
+
+def is_torrent_processed(torrent):
+    """
+    determine if ALLL media files associated with torrent are completely processed;
+
+    args:
+        torrent: torrent entry provided as input to all plugins
+    returns:
+        flag: True if all files processed or False if not
+    exceptions:
+        ValueError: when incorrect inputs provided (eg. missing torrent or empty torrent)
+    """
+
+    if not torrent or not torrent.id:
+        raise ValueError('missing input: torrent is a required input')
+
+    flag = False
+    # how many files are associated with torrent
+    total_files = len(datamanager.get_files_by_torrent(torrent))
+    # how many files have already been processed
+    total_processed = len(datamanager.get_processed_media_files(torrent))
+
+    log.trace('total files [%d] vs. total processed [%d]', total_files, total_processed)
+    # if the two totals are the same then torrent is fully processed
+    # if the torrent has already been purged or is invalid (has no files)
+    # then both will return 0, therefore the same.
+    if total_files == total_processed:
+        flag = True
+
+    return flag
 
 def synced_media_file(media_file):
     """

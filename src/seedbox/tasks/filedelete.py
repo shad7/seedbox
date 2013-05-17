@@ -31,7 +31,7 @@ class DeleteFile(object):
 
             try:
                 log.debug('deleting media files for torrent %s', torrent)
-                media_files = helpers.get_media_files(torrent, synced=True)
+                media_files = helpers.get_media_files(torrent, file_path=configs.sync_path, synced=True)
     
                 # now loop through the files we got back, if none then no files
                 # were in need of deleting

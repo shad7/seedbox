@@ -184,13 +184,32 @@ def get_eligible_for_removal():
 # in our private implementation.
 ###
 
-def get_media_files(torrent, compressed, synced, missing, skipped):
+def get_media_files(torrent, file_path, compressed, synced, missing, skipped):
     """
     implementation for helpers; the public interface is provided
     by helpers so we don't provide any default values on this interface
     """
-    search = schema.MediaFile.selectBy(torrent=torrent.id, compressed=compressed,
-        synced=synced, missing=missing, skipped=skipped)
+    where_clause = []
+    where_clause.append('media_file.torrent_id = %d' % torrent.id)
+
+    if file_path is not None:
+        where_clause.append('AND media_file.file_path = %s' % file_path)
+    if compressed is not None:
+        where_clause.append('AND media_file.compressed = %d' % (1 if compressed else 0))
+    if synced is not None:
+        where_clause.append('AND media_file.synced = %d' % (1 if synced else 0))
+    if missing is not None:
+        where_clause.append('AND media_file.missing = %d' % (1 if missing else 0))
+    if skipped is not None:
+        where_clause.append('AND media_file.skipped = %d' % (1 if skipped else 0))
+
+    str_where_clause = ' '.join(where_clause)
+
+    log.debug('WHERE: [%s]', str_where_clause)
+    search = schema.MediaFile.select(str_where_clause, distinct=True)
+
+#   search = schema.MediaFile.selectBy(torrent=torrent.id, compressed=compressed,
+#       synced=synced, missing=missing, skipped=skipped)
 
     return list(search)
 
@@ -447,6 +466,7 @@ def load_torrents(torrent_location, media_locations, inprogress_location):
     torrent file (via parsing) and capture the relevant details. Next create
     a record in the cache for each torrent.
     """
+    known_skip_files = ['torrents.fastresume', 'torrents.state']
     torrent_files = os.listdir(u""+torrent_location)
 
     log.trace('torrent files found [%d] processing', len(torrent_files))
@@ -501,10 +521,14 @@ def load_torrents(torrent_location, media_locations, inprogress_location):
                         torrent_file, ape)
 
         else:
-            log.warn('Skipping unknown file: [%s]', torrent_file)
+            if torrent_file not in known_skip_files:
+                log.warn('Skipping unknown file: [%s]', torrent_file)
+            else:
+                log.debug('Skipping known skippable file: [%s]', torrent_file)
 
-    took = time.time() - start_time
-    log.debug('torrents and media files [%d] took %.2f seconds to load', total_media_files, took)
+
+    log.debug('torrents and media files [%d] took %.2f seconds to load', 
+        total_media_files, time.time() - start_time)
 
 
 def _is_parsing_required(torrent):
@@ -594,6 +618,7 @@ def _parse_torrent(media_locations, media_items):
             # if ends with rar, then it is a compressed file;
             if in_ext in ('.rar'):
                 details['compressed'] = 1
+                log.debug('adding compressed file: %s', filename)
 
             # if the file is a video type, but less than 75Mb then
             # the file is just a sample video and as such we will
@@ -604,6 +629,8 @@ def _parse_torrent(media_locations, media_items):
                     log.debug(
                         'Based on size, this is a sample file [%s].\
                          Skipping..', filename)
+                else:
+                    log.debug('adding video file: %s', filename)
 
             # if the file has any other extension (rNN, etc.) we will
             # simply skip the file
