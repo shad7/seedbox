@@ -193,7 +193,7 @@ def get_media_files(torrent, file_path, compressed, synced, missing, skipped):
     where_clause.append('media_file.torrent_id = %d' % torrent.id)
 
     if file_path is not None:
-        where_clause.append('AND media_file.file_path = )}'.format(schema.MediaFile.sqlrepr(file_path)))
+        where_clause.append('AND media_file.file_path = {0}'.format(schema.MediaFile.sqlrepr(file_path)))
     if compressed is not None:
         where_clause.append('AND media_file.compressed = %d' % (1 if compressed else 0))
     if synced is not None:
