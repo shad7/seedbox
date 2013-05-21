@@ -61,7 +61,7 @@ class UnrarFile(object):
     
             except Exception as err:
                 log.debug('torrent: [{0}] media_files: [{1}] stacktrace: {2}'.format(torrent,
-                    media_files, traceback.format_exec()))
+                    media_files, traceback.format_exc()))
                 log.info('%s was unable to process %s due to [%s]', UnrarFile.__name__, torrent, err)
                 # TODO: need to refine this further so we know what errors really happened
                 helpers.set_torrent_failed(torrent, err)
