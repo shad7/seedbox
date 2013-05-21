@@ -6,6 +6,7 @@ and corresponding state.
 from __future__ import absolute_import
 import logging
 import os
+import traceback
 
 from seedbox import helpers
 from seedbox.pluginmanager import register_plugin, phase
@@ -47,6 +48,8 @@ class DeleteFile(object):
                 processed_torrents.append(torrent)
 
             except Exception as err:
+                log.debug('torrent: [{0}] media_files: [{1}] stacktrace: {2}'.format(torrent,
+                    media_files, traceback.format_exec()))
                 log.info('%s was unable to process %s due to [%s]', DeleteFile.__name__, torrent, err)
                 # TODO: need to refine this further so we know what errors really happened
                 helpers.set_torrent_failed(torrent, err)
