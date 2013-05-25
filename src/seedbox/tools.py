@@ -125,3 +125,29 @@ def get_exec_path(program):
     the specified program
     """
     return shutil.which(program)
+
+def format_file_ext(filetypes):
+    """
+    verifies that each item in the list of filetypes is a string
+    and starts with a '.'
+    """
+
+    result_list = []
+    # first validate we have a value and it is of list type
+    if filetypes and isinstance(filetypes, list):
+        for filetype in filetypes:
+            # make sure None or some other garbage was not put into
+            # the list
+            if not filetype or not isinstance(filetype, basestring):
+                continue
+            # if someone configured it but left off the '.', then we will
+            # simply add it for them; otherwise use as-is
+            if not filetype.startswith('.'):
+                result_list.append('.' + filetype)
+            else:
+                result_list.append(filetype)
+
+    return result_list
+
+
+

@@ -266,6 +266,13 @@ def _validate_and_format(configs):
     # empty then the verified list will also be empty.
     config_group['disabled_phases'] = tools.to_list(config_group.get('disabled_phases', ''))
 
+    # filetypes are considered optional as we have defaults built-in to the system
+    # but if the consumer wants to override defaults and provide their own list, then we
+    # read those list of values in and provide as part of the configurations.
+    # As always it will be an empty list if nothing provided or a populated list
+    config_group['compressed_filetypes'] = tools.to_list(config_group.get('compressed_filetypes', ''))
+    config_group['video_filetypes'] = tools.to_list(config_group.get('video_filetypes', ''))
+
     log.trace('final config group: %s', config_group)
     if missing_required:
         raise ValueError('missing required input(s) [%s] not supplied in configuration file)' % missing_required)

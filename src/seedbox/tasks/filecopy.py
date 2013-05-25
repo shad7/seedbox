@@ -10,6 +10,7 @@ import traceback
 import shutil
 
 from seedbox import helpers
+from seedbox import tools
 from seedbox.pluginmanager import register_plugin, phase
 
 __version__ = '0.1'
@@ -24,6 +25,19 @@ class CopyFile(object):
     # our list of supported extensions, no need to go copying all files
     supported_exts = ['.mp4', '.avi']
 
+    @staticmethod
+    def _get_supported_types(video_filetypes):
+        """
+        Make sure we have a valid set of filetypes from provided or default set.
+        """
+        video_types = tools.format_file_ext(video_filetypes)
+
+        if not video_types:
+            video_types = CopyFile.supported_exts
+
+        return video_types
+
+
     @phase(name='prepare')
     def execute(self, torrents, configs):
         """
@@ -36,7 +50,8 @@ class CopyFile(object):
 
             try:
                 log.debug('copying media files for torrent %s', torrent)
-                media_files = helpers.get_media_files(torrent, file_exts=CopyFile.supported_exts)
+                media_files = helpers.get_media_files(torrent, 
+                    file_exts=CopyFile._get_supported_types(configs.video_filetypes))
     
                 # now loop through the files we got back, if none then no files
                 # were in need of copying

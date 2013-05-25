@@ -396,7 +396,24 @@ def start(configs):
     # new so we will skip the load aspect and only handle the database
     # aspect of starting up
     if not configs.retry:
-        load_torrents(configs.torrent_path, configs.media_paths, configs.incomplete_path)
+        compressed_types, video_types = _get_supported_filetypes(configs.compressed_filetypes, configs.video_filetypes)
+        load_torrents(configs.torrent_path, configs.media_paths, configs.incomplete_path, compressed_types, video_types)
+
+def _get_supported_filetypes(compressed_filetypes, video_filetypes):
+    """
+    checks the provided lists to determine if any where provided, if not then set some 
+    defaults that will be leveraged
+    """
+    compressed_types = tools.format_file_ext(compressed_filetypes)
+    video_types = tools.format_file_ext(video_filetypes)
+
+    if not compressed_types:
+        compressed_types = ['.rar']
+
+    if not video_types:
+        video_types = ['.avi', '.mp4']
+
+    return compressed_types, video_types
 
 def perform_db_cleanup(resource_path, torrent_location, reset_flag=False):
     """
@@ -460,7 +477,7 @@ def perform_db_cleanup(resource_path, torrent_location, reset_flag=False):
     
     log.trace('perform_db_cleanup completed')    
 
-def load_torrents(torrent_location, media_locations, inprogress_location):
+def load_torrents(torrent_location, media_locations, inprogress_location, compressed_types, video_types):
     """
     Find all the torrents in the specified directory, verify it is a valid
     torrent file (via parsing) and capture the relevant details. Next create
@@ -497,7 +514,7 @@ def load_torrents(torrent_location, media_locations, inprogress_location):
                         log.trace('torrent still downloading, next...')
                         continue
 
-                    media_files = _parse_torrent(media_locations, media_items)
+                    media_files = _parse_torrent(media_locations, media_items, compressed_types, video_types)
                     add_files_to_torrent(torrent, media_files)
                 except MalformedTorrentError as mte:
                     torrent.invalid = 1
@@ -583,7 +600,7 @@ def _is_torrent_downloading(inprogress_location, media_items):
     return found
 
 
-def _parse_torrent(media_locations, media_items):
+def _parse_torrent(media_locations, media_items, compressed_types, video_types):
     """
     Handles interacting with torrent parser and getting required details
     from the parser.
@@ -616,14 +633,14 @@ def _parse_torrent(media_locations, media_items):
             details['missing'] = 0
 
             # if ends with rar, then it is a compressed file;
-            if in_ext in ('.rar'):
+            if in_ext in compressed_types:
                 details['compressed'] = 1
                 log.debug('adding compressed file: %s', filename)
 
             # if the file is a video type, but less than 75Mb then
             # the file is just a sample video and as such we will
             # skip the file
-            elif in_ext in ('.mp4', '.avi'):
+            elif in_ext in video_types:
                 if filesize < 75000000:
                     details['skipped'] = 1
                     log.debug(

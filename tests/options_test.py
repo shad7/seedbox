@@ -121,6 +121,9 @@ class TestOptions(unittest.TestCase):
         self.assertIsInstance(core_configs.media_paths, list)
         self.assertIsInstance(core_configs.plugin_paths, list)
         self.assertIsInstance(core_configs.disabled_phases, list)
+        self.assertIsInstance(core_configs.compressed_filetypes, list)
+        self.assertIsInstance(core_configs.video_filetypes, list)
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestOptions)

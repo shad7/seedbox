@@ -143,6 +143,27 @@ class TestTools(unittest.TestCase):
         self.assertIsNotNone(tools.get_exec_path('ls'))
         self.assertIsNone(tools.get_exec_path('dummy-cmd-test-junk'))
 
+    def test_format_file_ext(self):
+        """
+        make sure it is able to process the different types of extension lists properly
+        """
+        self.assertIsInstance(tools.format_file_ext([]), list)
+        self.assertEqual(len(tools.format_file_ext([])), 0)
+        self.assertIsInstance(tools.format_file_ext(''), list)
+        self.assertEqual(len(tools.format_file_ext('')), 0)
+        self.assertIsInstance(tools.format_file_ext(None), list)
+        self.assertEqual(len(tools.format_file_ext(None)), 0)
+        self.assertEqual(len(tools.format_file_ext(['.avi', None, '.mp4', None, ''])), 2)
+        self.assertEqual(len(tools.format_file_ext(['.avi', '.mp4'])), 2)
+        self.assertEqual(len(tools.format_file_ext(['avi', 'mp4'])), 2)
+        self.assertEqual(len(tools.format_file_ext(['avi', '.mp4'])), 2)
+        self.assertEqual(len(tools.format_file_ext(['.avi', 'mp4'])), 2)
+
+        for ext in ['.avi', '.mp4', 'avi', 'mp4']:
+            ext_list = tools.format_file_ext([ext])
+            self.assertEqual(len(ext_list[0]), 4)
+
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestTools)
     unittest.TextTestRunner(verbosity=2).run(suite)
