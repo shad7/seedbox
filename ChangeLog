@@ -1,0 +1,349 @@
+commit 4dc8c14f4ec7391d3f4ac40324ce52c7c6d1713e
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sat May 25 11:51:38 2013 -0400
+
+    added ability for user to specifiy filetypes in configuration file to reduce
+    hardcoding of filetypes. The initial values are still supported by default.
+
+commit 3c1636533f354e799de819003715351aa8f4beb6
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 21 17:30:26 2013 -0400
+
+    fixed typo
+
+commit ef15f2d12297a44be9c9392d4cdfc8c64bdfad69
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 21 17:20:48 2013 -0400
+
+    reved to next release version
+
+commit fb6a8a9afd5c61a487dde28e87732d2dc83c7db1
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 21 17:19:41 2013 -0400
+
+    added logging of stacktrace in plugins
+
+commit dd3cf59b659f315b45fc34e57c1c51d17243a5bb
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 17 01:07:50 2013 -0400
+
+    bug fix: format() got messed up some where along the way
+
+commit 782b9e674e17e7be7906255cea702532cc36694c
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 17 00:34:46 2013 -0400
+
+    bug fix: forgot to escape sql input when doing select statement
+
+commit 0103021261f913dc8778d0dc27ed01cfb19217f4
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 17 00:09:48 2013 -0400
+
+    Reduced excess info logging to avoid growing logs while in cron mode. Added validate_phase plugin.
+    The new plugin will make sure all torrents are in the proper state before allowing them to continue to
+    the next phase.
+    Optimized torrentparser; added dependency on Bittorrent-bencode as after performance testing
+    it was substantially more efficient but also stricter. Therefore it will work 98% of the time
+    and the remaiing 2% of the time we'll leverage the custom parser to extract files associated with
+    torrent.
+
+commit 8d45a0d9dc463e1c1335cdb2757250bb175241b8
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 14 00:48:50 2013 -0400
+
+    bumping version for next upload
+
+commit 014d395be35a462117059bc0861994fea430b840
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 14 00:45:36 2013 -0400
+
+    added patch to make sure using loglevel option was case insensitive.
+
+commit 3dfbf7065640b6da6bfe58479318ca0778ffc7ca
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 19:59:44 2013 -0400
+
+    added unittest for action module and resulted in bug fixes.
+
+commit 4ef7dc355da4008eaed545fcacb159aef445e27e
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 14:19:18 2013 -0400
+
+    lockfile on pypi is out of date by nearly 2 years. I pulled from GitHub to get latest version.
+    No longered required extension to lockfile.
+
+commit 8e67d65ef3f55c885b58194698ebd40114038bc3
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 13:03:27 2013 -0400
+
+    updated README
+
+commit 7c6b2ac110a8cf1ff5331e1ada7664da1cb04e68
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 12:37:35 2013 -0400
+
+    updated README
+
+commit 70545073f5b53514944c4469d35a4824ce9a217d
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 12:36:06 2013 -0400
+
+    updated README
+
+commit 31dae63e5ecb48f8e64a11ffdf8dc60ac9d5da42
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 12:12:54 2013 -0400
+
+    bugfix: date calculation to determine when to perform db back
+
+commit 6df33b69fe1a8cf90f517b7fd0e0d573a4d04c78
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:39:36 2013 -0400
+
+    updated README
+
+commit ed3185566d741ca21326dd512c3ae8e0ff5212ea
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:37:59 2013 -0400
+
+    updated README
+
+commit 8bc8e741b102c81e29b3e247747e1e94288870fe
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:35:56 2013 -0400
+
+    updated README
+
+commit 8c3efe16dfae80c97194e705075f0b63227885f0
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:34:41 2013 -0400
+
+    updated README
+
+commit 071a7cebf64f6e4061f15c70863d8498bb3544d5
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:29:05 2013 -0400
+
+    updated README
+
+commit cd1348607a497110c4226d49afdf2e27957a7dce
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:26:49 2013 -0400
+
+    updated README info
+
+commit 81e7f7f28caaab7d9cd985adc2765ba6142d253b
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:20:30 2013 -0400
+
+    fixed bug related to how frequently to do backups of db
+
+commit 9ff9ab58a97b848cac7ab2e8f4bba4ed14849708
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 13 01:08:16 2013 -0400
+
+    added lockfile support to make sure that when running as a cron that multiple instances do not run
+    at the same time.
+
+commit 504afd8fc9f39c035ca97ca90ff1bd69c4380b68
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 23:27:37 2013 -0400
+
+    undo change to filesync
+
+commit b66253c1b487151cde9b44b309f33f60b894e69b
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 20:28:45 2013 -0400
+
+    general cleanup
+
+commit c719c833b4edae2649d3866659553e88b50153a9
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 11:52:37 2013 -0400
+
+    removed commented code
+
+commit f114351e70fe2e860817fd4d7f253c90c9e18975
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 11:50:35 2013 -0400
+
+    bug fix: variable name changed but didn't change all locations
+
+commit cdd0f0b16fcb7bddb48f77dfe4b2d2b087cc9125
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 11:29:43 2013 -0400
+
+    updated the backup db routine to work similar to RotatingLogFiles
+
+commit 5ff248ef10d01a893672b99015a5f581d3634e85
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 00:57:02 2013 -0400
+
+    renamed test folder to tests
+
+commit 04e575a5e6b2cecbee05230f700313a74972486a
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 00:18:55 2013 -0400
+
+    added shutilwhich to setup.py as dependency
+
+commit 7431ec5c532fe28af1dbe420466ae58e1b2e02de
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun May 12 00:09:07 2013 -0400
+
+    moved purge from plugin to internals of datamanager. Deleted actual filepurge.py as it is no longer needed.
+    Also added in dependency on shutilwhich since running as a cron made it difficult to find unrar.
+
+commit 3f1ea57028550a567a3942bed6ab835f2eaa6854
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sat May 11 01:32:36 2013 -0400
+
+    bumped the rev
+
+commit 55548123cba50f30e1199723169770ab3ef9b447
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sat May 11 01:31:21 2013 -0400
+
+    updated logext to default to user folder/directory if available; else cwd
+
+commit d3877d87ad7ed96017aa69762bd25a528fa709ee
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 10 21:44:48 2013 -0400
+
+    updated README; added new required attribute to configfile
+
+commit 51c453f4d004fb535c18e98daede9f1b2cb15e89
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 10 21:31:39 2013 -0400
+
+    found bug where if torrent was still downloading it would be marked as missing and then purged
+    without ever doing sync. Added check to make sure it waits and checks again later. (automation will really
+    help you find issues)
+
+commit 143814aed8bed906d9b9abef38eb6999de7c9d77
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 10 20:37:26 2013 -0400
+
+    forgot to include ez_setup.py in distribution
+
+commit b569bc5a163de0b80398b9c1a1d312c5c82e375a
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 10 20:19:05 2013 -0400
+
+    no longer needed with setuptools model
+
+commit c7e0705a0d3e1426a5f35f118da537c0583f0d51
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 10 19:50:43 2013 -0400
+
+    Changes to support packaging and distribution
+
+commit c91c045d2fa178f227a2d45d6fe13269d4b14569
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri May 10 10:34:00 2013 -0400
+
+    added LICENSE; MIT
+
+commit b8e0c75114114edeea3013796219811053d7d351
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Wed May 8 18:36:16 2013 -0400
+
+    removed logfile option from filesync given it is now redundant since logging from the subprocess
+    is now directly supported
+
+commit 84d5f56d6130a10732f0b874f42c9c661d575e3f
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Wed May 8 18:30:46 2013 -0400
+
+    subprocess module will output to stdout/stderr but I wanted everything consistently going to logging
+    so it can be properly controlled. So I added an extension to subprocess to handle attaching
+    logging to the child process and created unit testing for the new module. Then updated filesync
+    which uses rsync for remote syncing of files to leverage new module.
+
+commit b5a27002c32a0ac0caa3001b08e1fc93edd2fd54
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 7 20:51:49 2013 -0400
+
+    updated distribution related files
+
+commit 4fff463d11ac46da8617bc4dd015b131abe93b09
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 7 20:13:10 2013 -0400
+
+    deleted old test files since they are replaced will real unit test modules
+
+commit af8ca2af8c7cd22c06167251ab2601d407d32755
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 7 20:05:54 2013 -0400
+
+    added sample config files to support testing
+
+commit 0b7fd51eb7da79cbbbc35b207f6b7f965879e2bb
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 7 20:04:15 2013 -0400
+
+    Added another test set related to processing options and command line.
+
+commit e2f057fb1d1119104eb93cb151eaeaec51ab6173
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue May 7 17:50:30 2013 -0400
+
+    Started using unittest module for doing proper testing and converting some of the scripts
+    I had been using to do proper unit testing. This was the first one.
+
+commit 740f25962a740e08d7248b942289b78f82e68949
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 6 19:54:56 2013 -0400
+
+    updated readme
+
+commit 24ce85fbcefc01aed51b7df483f0f64d50f00a49
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 6 19:53:59 2013 -0400
+
+    updated readme
+
+commit a5697c7a49d740c5341e4a1039d4be3169e730e4
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 6 19:50:01 2013 -0400
+
+    Updated readme
+
+commit ec28929cbca8ae4428ec12433e99c67dfb924ae9
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon May 6 13:17:30 2013 -0400
+
+    made adjustment so that filecopy works the same as fileunrar, after copy create a new entry
+    for syncing. And then within delete, simply ignore any file that does not exist to avoid
+    any exceptions.
+
+commit 97e8f7d724f12a57c9d1a349c2dde8c4f08ec773
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Apr 29 14:37:40 2013 -0400
+
+    Bug fixes related to database backup, some extra logging
+
+commit 7f9937ffe0111523f5d610db9ae15b8fa33bf9d9
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun Apr 28 21:11:32 2013 -0400
+
+    adding setup/distribution related files
+
+commit b34182b80cdff5375138ce9d792e8b97c6590d22
+Merge: 2c19b83 ec30c42
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun Apr 28 20:32:28 2013 -0400
+
+    Merge branch 'master' of github.com:shad7/seedbox
+
+commit 2c19b83aa66afc4d7970078548e6aba7f619b2a5
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun Apr 28 20:08:13 2013 -0400
+
+    Initial creation
+
+commit ec30c4220e9611f3afb1f6413474a64d656441f8
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun Apr 28 16:45:22 2013 -0700
+
+    Initial commit
