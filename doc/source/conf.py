@@ -105,7 +105,7 @@ def write_autodoc_index():
             if not os.access(generated_file, os.F_OK) or \
                     os.stat(generated_file).st_mtime < \
                     os.stat(source_file).st_mtime:
-                print("Module %s updated, generating new documentation.",
+                print("Module %s updated, generating new documentation."
                       % module)
                 FILEOUT = open(generated_file, "w")
                 header = "The :mod:`%s` Module" % module
