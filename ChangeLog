@@ -1,3 +1,10 @@
+commit 52b25e9558f76ce0bf2cf0effd5f6e3fe57d3acf
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun Jan 12 18:44:26 2014 -0500
+
+    added cli option --gen-sample so that generation of sample configuration can be
+    accomplished via seedmgr as well as shell script stored with project.
+
 commit d2f8b6d09212064d883685e2b552d3258bbef7a9
 Author: shad7 <kenny.shad7@gmail.com>
 Date:   Sun Jan 12 12:13:20 2014 -0500

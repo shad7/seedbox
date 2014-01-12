@@ -5,4 +5,4 @@ Leverages pbr (Python Build Reasonableness)
 
 import pbr.version
 
-version_info = pbr.version.VersionInfo('seedbox')
+version_info = pbr.version.VersionInfo('SeedboxManager')
