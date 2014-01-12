@@ -1,3 +1,22 @@
+commit b69f3b5555b7565593c3bc98e4526c9100a71790
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sat Jan 11 20:58:33 2014 -0500
+
+    see previous commit with details. Moving to version 2.0
+
+commit 9dbb352a560bcb50dbc8fc719055e5603554a6f8
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sat Jan 11 20:50:04 2014 -0500
+
+    Changed approach for configuration to simplify code and setup. Included is a generator to create
+    a sample configuration file with help, all available options, their type, default value, and what is required.
+    
+    Added version 2 of the CopyTask, UnrarTask, and SyncTask. Supporting storage check to avoid using
+    too much storage during the process. Supporting parallel sync to optimize throughput of files back to
+    home library.
+    
+    Additional testing and code coverage performed. Performed PEP8 using flake8. Sphinx documentation generated.
+
 commit 4dc8c14f4ec7391d3f4ac40324ce52c7c6d1713e
 Author: shad7 <kenny.shad7@gmail.com>
 Date:   Sat May 25 11:51:38 2013 -0400
