@@ -106,8 +106,6 @@ class _Prepare(BasePlugin):
         self.slot_10cent = self.slotsize * .1
         self.default_threshold = min(DEFAULT_MIN_STORAGE, self.slot_10cent)
 
-        log.debug(self)
-
     def _get_avail_storage(self):
 
         total_used = tools.get_home_disk_usage(self.system)

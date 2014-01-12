@@ -68,6 +68,10 @@ class TraceLogger(logging.Logger):
 logging.setLoggerClass(TraceLogger)
 logging.addLevelName(TraceLogger.TRACE, 'TRACE')
 
+# add default handler to make sure that cli only actions do not
+# generate logging handler errors
+logging.getLogger().addHandler(logging.NullHandler())
+
 
 def configure():
     """

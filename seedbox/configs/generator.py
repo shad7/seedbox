@@ -227,7 +227,54 @@ def _import_module(mod_str):
         return None
 
 
-def generate(srcfiles, outputfile=None):
+def _gen_output(opts_by_group, outputfile):
+
+    output = []
+    map(output.append, _gen_group_opts_output(DEFAULT_GROUP,
+                                              opts_by_group.pop(DEFAULT_GROUP,
+                                                                [])))
+    for group in sorted(opts_by_group.keys()):
+        map(output.append, _gen_group_opts_output(group,
+                                                  opts_by_group[group]))
+
+    _write_output(output, outputfile)
+
+
+def _gen_opts_by_group(mods, opts_by_group):
+
+    for mod_str in mods:
+        if mod_str.endswith('.__init__'):
+            mod_str = mod_str[:mod_str.rfind('.')]
+
+        mod_obj = _import_module(mod_str)
+        if not mod_obj:
+            raise RuntimeError('Unable to import module %s' % mod_str)
+
+        for group, opts in _list_opts(mod_obj):
+            opts_by_group.setdefault(group, []).append((mod_str, opts))
+
+    return opts_by_group
+
+
+def generate_by_module(option_modules, outputfile):
+    """
+    Generates a sample configuration file based on a list of modules
+    that it will reference options registered from each module.
+
+    :param list option_modules: modules that register options
+    :param str outputfile:  the file to write the sample configuration
+    """
+
+    # opts_by_group is a mapping of group name to an options list
+    # The options list is a list of (module, options) tuples
+    opts_by_group = {DEFAULT_GROUP: []}
+    option_modules.sort()
+
+    opts_by_group = _gen_opts_by_group(option_modules, opts_by_group)
+    _gen_output(opts_by_group, outputfile)
+
+
+def generate(srcfiles):
     """
     Generates a sample configuration file based on a list of source files
     that it will reference options registered from each module.
@@ -256,26 +303,9 @@ def generate(srcfiles, outputfile=None):
     for pkg_name in pkg_names:
         mods = mods_by_pkg.get(pkg_name)
         mods.sort()
-        for mod_str in mods:
-            if mod_str.endswith('.__init__'):
-                mod_str = mod_str[:mod_str.rfind('.')]
+        opts_by_group = _gen_opts_by_group(mods, opts_by_group)
 
-            mod_obj = _import_module(mod_str)
-            if not mod_obj:
-                raise RuntimeError('Unable to import module %s' % mod_str)
-
-            for group, opts in _list_opts(mod_obj):
-                opts_by_group.setdefault(group, []).append((mod_str, opts))
-
-    output = []
-    map(output.append, _gen_group_opts_output(DEFAULT_GROUP,
-                                              opts_by_group.pop(DEFAULT_GROUP,
-                                                                [])))
-    for group in sorted(opts_by_group.keys()):
-        map(output.append, _gen_group_opts_output(group,
-                                                  opts_by_group[group]))
-
-    _write_output(output, outputfile)
+    _gen_output(opts_by_group, None)
 
 
 def main():

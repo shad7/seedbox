@@ -47,7 +47,8 @@ OPTS = [
     cfg.ListOpt('disabled_phases',
                 default=[],
                 deprecated_group='DEFAULT',
-                help='List of phases to disable for execution (prepare, activate, complete)'),  # noqa
+                help='List of phases to disable for execution '
+                     '(prepare, activate, complete)'),
     cfg.ListOpt('video_filetypes',
                 default=['.avi', '.mp4', '.mkv', '.mpg'],
                 deprecated_group='DEFAULT',
@@ -55,7 +56,8 @@ OPTS = [
     cfg.ListOpt('compressed_filetypes',
                 default=['.rar'],
                 deprecated_group='DEFAULT',
-                help='List of compressed filetypes to support. (ignore others)'),  # noqa
+                help='List of compressed filetypes to support. '
+                     '(ignore others)'),
     cfg.IntOpt('max_retry',
                default=5,
                deprecated_group='DEFAULT',
@@ -65,9 +67,9 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 CLI_OPTS = [
-#   cfg.BoolOpt('gen_config_sample',
-#               default=False,
-#               help='Generate a sample configuration file to resource path'),
+    cfg.BoolOpt('gen-sample',
+                default=False,
+                help='Generate a sample configuration file to resource path'),
     cfg.BoolOpt('purge',
                 default=False,
                 help='DANGER: deletes the database cache and \
@@ -80,113 +82,22 @@ CLI_OPTS = [
 cfg.CONF.register_cli_opts(CLI_OPTS)
 
 
-def _build_group_opts(group_name):
-
-    opts = []
-    for opt_name in sorted(cfg.CONF._groups[group_name]._opts):
-        print(group_name, opt_name)
-        opts.append(cfg.CONF._get_opt_info(opt_name, group_name)['opt'])
-    return opts
-
-
 def _gen_config_sample():
 
+    opt_modules = [
+        'seedbox.logext',
+        'seedbox.options',
+        'seedbox.tasks.filecopy',
+        'seedbox.tasks.filedelete',
+        'seedbox.tasks.fileunrar',
+        'seedbox.tasks.validate_phase',
+        'seedbox.tasks.prepare',
+        'seedbox.tasks.filesync',
+    ]
 
-    opts_by_group = {generator.DEFAULT_GROUP: []}
-
-    opts = []
-    for opt_name in sorted(cfg.CONF._opts):
-        print('DEFAULT', opt_name)
-        opts.append(cfg.CONF._get_opt_info(opt_name)['opt'])
-
-    opts_by_group.setdefault(generator.DEFAULT_GROUP, []).append(
-        (generator.DEFAULT_GROUP, opts))
-
-    cfg.CONF.import_group('plugins', 'seedbox.tasks.filecopy')
-    opts_by_group.setdefault('plugins', []).append(
-        ('seedbox.tasks.filecopy', _build_group_opts('plugins')))
-
-    cfg.CONF.import_group('plugins', 'seedbox.tasks.filedelete')
-    opts_by_group.setdefault('plugins', []).append(
-        ('seedbox.tasks.filedelete', _build_group_opts('plugins')))
-
-    cfg.CONF.import_group('plugins', 'seedbox.tasks.fileunrar')
-    opts_by_group.setdefault('plugins', []).append(
-        ('seedbox.tasks.fileunrar', _build_group_opts('plugins')))
-
-    cfg.CONF.import_group('plugins', 'seedbox.tasks.validate_phase')
-    opts_by_group.setdefault('plugins', []).append(
-        ('seedbox.tasks.validate_phase', _build_group_opts('plugins')))
-
-    cfg.CONF.import_group('plugins', 'seedbox.tasks.prepare')
-    opts_by_group.setdefault('plugins', []).append(
-        ('seedbox.tasks.prepare', _build_group_opts('plugins')))
-
-    cfg.CONF.import_group('prepare', 'seedbox.tasks.prepare')
-    opts_by_group.setdefault('prepare', []).append(
-        ('seedbox.tasks.prepare', _build_group_opts('prepare')))
-
-    cfg.CONF.import_group('plugins', 'seedbox.tasks.filesync')
-    opts_by_group.setdefault('plugins', []).append(
-        ('seedbox.tasks.filesync', _build_group_opts('plugins')))
-
-    cfg.CONF.import_group('filesync', 'seedbox.tasks.filesync')
-    opts_by_group.setdefault('filesync', []).append(
-        ('seedbox.tasks.filesync', _build_group_opts('filesync')))
-
-    cfg.CONF.import_group('prsync', 'seedbox.tasks.filesync')
-    opts_by_group.setdefault('prsync', []).append(
-        ('seedbox.tasks.filesync', _build_group_opts('prsync')))
-
-
-#   for opt_name in sorted(cfg.CONF._opts):
-#       opt = cfg.CONF._get_opt_info(opt_name)['opt']
-#       value = cfg.CONF[opt_name]
-#       print(opt_name, value, 'dest:', opt.dest, 'default:', opt.default, 'help:', opt.help, 'req:', opt.required, 'opt:', opt)
-#
-#   for group_name in cfg.CONF._groups:
-#       print(group_name)
-#       group_attr = cfg.CONF.GroupAttr(cfg.CONF, cfg.CONF._get_group(group_name))
-#       print(group_attr)
-#       for opt_name in sorted(cfg.CONF._groups[group_name]._opts):
-#           print(opt_name)
-#           opt = cfg.CONF._get_opt_info(opt_name, group_name)['opt']
-#           value = cfg.CONF[group_name][opt_name]
-#           print(group_name, opt_name, value, 'dest:', opt.dest, 'default:', opt.default, 'help:', opt.help, 'req:', opt.required, 'group_attr:', group_attr, 'opt:', opt)
-
-
-    output = []
-    map(output.append,
-        generator._gen_group_opts_output(generator.DEFAULT_GROUP,
-                                         opts_by_group.pop(generator.DEFAULT_GROUP,
-                                                           [])))
-    for group in sorted(opts_by_group.keys()):
-        map(output.append, generator._gen_group_opts_output(group,
-                                                            opts_by_group[group]))
-
-    generator._write_output(output, os.path.join(cfg.CONF.config_dir,
-                                                 PROJECT_NAME + '.conf.sample'))
-
-#   src_dir = os.path.dirname(os.path.abspath(__file__))
-#
-#   srcfiles = []
-#   for root, dirs, files in os.walk(src_dir):
-#
-#       if (os.path.basename(root) == 'tests' or
-#           os.path.dirname(root).endswith('tests')):
-#           continue
-#
-#       for name in files:
-#           ext = os.path.splitext(name)[1]
-#           if ext == generator.PY_EXT:
-#               srcfiles.append(os.path.join(root, name))
-#
-#   for name in srcfiles:
-#       print(name)
-#
-#   generator.generate(srcfiles,
-#                      os.path.join(cfg.CONF.config_dir,
-#                      PROJECT_NAME + '.conf.sample'))
+    generator.generate_by_module(opt_modules,
+                                 os.path.join(cfg.CONF.config_dir,
+                                              PROJECT_NAME + '.conf.sample'))
 
 
 def _find_config_files():
@@ -266,9 +177,9 @@ def initialize(args):
     if not cfg.CONF.config_dir:
         cfg.CONF.config_dir = os.path.dirname(cfg.CONF.config_file[-1])
 
-#   if cfg.CONF.gen_config_sample:
-#       _gen_config_sample()
-#       sys.exit(0)
+        if cfg.CONF.gen_sample:
+            _gen_config_sample()
+            sys.exit(0)
 
     # validate the know directory locations that we depend on within
     # the application to make sure we have valid paths
