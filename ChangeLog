@@ -1,3 +1,9 @@
+commit 5eaa27da532799de2a2c13146651c00493b22956
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sat Jan 11 21:10:43 2014 -0500
+
+    fixed setup.cfg to support upload into PyPi; ChangeLog automatic
+
 commit b69f3b5555b7565593c3bc98e4526c9100a71790
 Author: shad7 <kenny.shad7@gmail.com>
 Date:   Sat Jan 11 20:58:33 2014 -0500

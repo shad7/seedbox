@@ -4,22 +4,22 @@
 # Options defined in seedbox.options
 #
 
-# **REQUIRED**  Base path (string value)
+# **REQUIRED** Base path (string value)
 #base_path=<None>
 
 # Location torrent client stores data files (string value)
 #base_client_path=<None>
 
-# **REQUIRED**  Location of the .torrent files (string value)
+# **REQUIRED** Location of the .torrent files (string value)
 #torrent_path=<None>
 
-# **REQUIRED**  Location(s) of the media files (list value)
+# **REQUIRED** Location(s) of the media files (list value)
 #media_paths=<None>
 
-# **REQUIRED**  Location of the downloading torrents (string value)
+# **REQUIRED** Location of the downloading torrents (string value)
 #incomplete_path=<None>
 
-# **REQUIRED**  Location to temp media copies for syncing to library (string value)
+# **REQUIRED** Location to temp media copies for syncing to library (string value)
 #sync_path=<None>
 
 # Location(s) of additional plugins (list value)

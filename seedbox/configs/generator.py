@@ -55,59 +55,108 @@ OPTION_REGEX = re.compile(r'(%s)' % '|'.join([STROPT, BOOLOPT, INTOPT,
 
 PY_EXT = '.py'
 WORDWRAP_WIDTH = 77
+DEFAULT_GROUP = 'DEFAULT'
 
 
-def generate(srcfiles):
-    """
-    Generates a sample configuration file based on a list of source files
-    that it will reference options registered from each module.
+def _write_output(output, outputfile):
 
-    :param list srcfiles:   source files within project
-    :returns:   sample configuration file
-    :rtype:     sys.stdout
-    """
-    mods_by_pkg = dict()
-    for filepath in srcfiles:
-        pkg_name = filepath.split(os.sep)[1]
-        mod_str = '.'.join(['.'.join(filepath.split(os.sep)[:-1]),
-                            os.path.basename(filepath).split('.')[0]])
-        mods_by_pkg.setdefault(pkg_name, list()).append(mod_str)
-    # NOTE(lzyeval): place top level modules before packages
-    pkg_names = filter(lambda x: x.endswith(PY_EXT), mods_by_pkg.keys())
-    pkg_names.sort()
-    ext_names = filter(lambda x: x not in pkg_names, mods_by_pkg.keys())
-    ext_names.sort()
-    pkg_names.extend(ext_names)
+    if outputfile is None:
+        file = sys.stdout
+    else:
+        file = open(outputfile, 'w')
 
-    # opts_by_group is a mapping of group name to an options list
-    # The options list is a list of (module, options) tuples
-    opts_by_group = {'DEFAULT': []}
-
-    for pkg_name in pkg_names:
-        mods = mods_by_pkg.get(pkg_name)
-        mods.sort()
-        for mod_str in mods:
-            if mod_str.endswith('.__init__'):
-                mod_str = mod_str[:mod_str.rfind('.')]
-
-            mod_obj = _import_module(mod_str)
-            if not mod_obj:
-                raise RuntimeError('Unable to import module %s' % mod_str)
-
-            for group, opts in _list_opts(mod_obj):
-                opts_by_group.setdefault(group, []).append((mod_str, opts))
-
-    _print_group_opts('DEFAULT', opts_by_group.pop('DEFAULT', []))
-    for group in sorted(opts_by_group.keys()):
-        _print_group_opts(group, opts_by_group[group])
+    for line in output:
+        print(line, file=file)
 
 
-def _import_module(mod_str):
+def _sanitize_default(name, value):
+    if value.startswith(sys.prefix):
+        # NOTE(jd) Don't use os.path.join, because it is likely to think the
+        # second part is an absolute pathname and therefore drop the first
+        # part.
+        value = os.path.normpath(
+            os.getenv('VIRTUAL_ENV',
+                      os.path.expanduser('~')) + value[len(sys.prefix):])
+    elif value.strip() != value:
+        return '"%s"' % value
+    return value
+
+
+def _gen_opt_output(opt):
+    output = []
+    opt_name, opt_default, opt_help = opt.dest, opt.default, opt.help
+    if not opt_help:
+        sys.stderr.write('WARNING: [%s] is missing help string.\n' % opt_name)
+        opt_help = ''
+    opt_type = None
     try:
-        return importutils.import_module(mod_str)
-    except Exception as e:
-        sys.stderr.write('Error importing module %s: %s\n' % (mod_str, str(e)))
-        return None
+        opt_type = OPTION_REGEX.search(str(type(opt))).group(0)
+    except (ValueError, AttributeError) as err:
+        sys.stderr.write('%s\n' % str(err))
+        sys.exit(1)
+    opt_help += ' (' + OPT_TYPES[opt_type] + ')'
+    if opt.required:
+        output.append('# **REQUIRED** ' + '\n# '.join(textwrap.wrap(opt_help,
+                                                           WORDWRAP_WIDTH)))
+    else:
+        output.append('# ' + '\n# '.join(textwrap.wrap(opt_help,
+                                                    WORDWRAP_WIDTH)))
+    if opt.deprecated_opts:
+        for deprecated_opt in opt.deprecated_opts:
+            if deprecated_opt.name:
+                deprecated_group = (deprecated_opt.group if
+                                    deprecated_opt.group else DEFAULT_GROUP)
+                output.append('# Deprecated group/name - [%s]/%s' %
+                             (deprecated_group, deprecated_opt.name))
+    try:
+        if opt_default is None:
+            output.append('#%s=<None>' % opt_name)
+        elif opt_type == STROPT:
+            assert(isinstance(opt_default, six.string_types))
+            output.append('#%s=%s' % (opt_name,
+                                     _sanitize_default(opt_name,
+                                                       opt_default)))
+        elif opt_type == BOOLOPT:
+            assert(isinstance(opt_default, bool))
+            output.append('#%s=%s' % (opt_name, str(opt_default).lower()))
+        elif opt_type == INTOPT:
+            assert(isinstance(opt_default, int) and
+                   not isinstance(opt_default, bool))
+            output.append('#%s=%s' % (opt_name, opt_default))
+        elif opt_type == FLOATOPT:
+            assert(isinstance(opt_default, float))
+            output.append('#%s=%s' % (opt_name, opt_default))
+        elif opt_type == LISTOPT:
+            assert(isinstance(opt_default, list))
+            output.append('#%s=%s' % (opt_name, ','.join(opt_default)))
+        elif opt_type == MULTISTROPT:
+            assert(isinstance(opt_default, list))
+            if not opt_default:
+                opt_default = ['']
+            for default in opt_default:
+                output.append('#%s=%s' % (opt_name, default))
+        output.append('')
+    except Exception:
+        sys.stderr.write('Error in option [%s]\n' % opt_name)
+        sys.exit(1)
+
+    return output
+
+
+def _gen_group_opts_output(group, opts_by_module):
+    output = []
+    output.append('[{0}]'.format(group))
+    output.append('')
+    for mod, opts in opts_by_module:
+        output.append('#')
+        output.append('# Options defined in {0}'.format(mod))
+        output.append('#')
+        output.append('')
+        for opt in opts:
+            map(output.append, _gen_opt_output(opt))
+        output.append('')
+
+    return output
 
 
 def _is_in_group(opt, group):
@@ -123,7 +172,7 @@ def _is_in_group(opt, group):
 def _guess_groups(opt, mod_obj):
     # is it in the DEFAULT group?
     if _is_in_group(opt, cfg.CONF):
-        return 'DEFAULT'
+        return DEFAULT_GROUP
 
     # what other groups is it in?
     for key, value in cfg.CONF.items():
@@ -170,87 +219,63 @@ def _list_opts(obj):
     return ret.items()
 
 
-def _print_group_opts(group, opts_by_module):
-    print('[%s]' % group)
-    print('')
-    for mod, opts in opts_by_module:
-        print('#')
-        print('# Options defined in %s' % mod)
-        print('#')
-        print('')
-        for opt in opts:
-            _print_opt(opt)
-        print('')
-
-
-def _sanitize_default(name, value):
-    if value.startswith(sys.prefix):
-        # NOTE(jd) Don't use os.path.join, because it is likely to think the
-        # second part is an absolute pathname and therefore drop the first
-        # part.
-        value = os.path.normpath(
-            os.getenv('VIRTUAL_ENV',
-                      os.path.expanduser('~')) + value[len(sys.prefix):])
-    elif value.strip() != value:
-        return '"%s"' % value
-    return value
-
-
-def _print_opt(opt):
-    opt_name, opt_default, opt_help = opt.dest, opt.default, opt.help
-    if not opt_help:
-        sys.stderr.write('WARNING: [%s] is missing help string.\n' % opt_name)
-        opt_help = ''
-    opt_type = None
+def _import_module(mod_str):
     try:
-        opt_type = OPTION_REGEX.search(str(type(opt))).group(0)
-    except (ValueError, AttributeError) as err:
-        sys.stderr.write('%s\n' % str(err))
-        sys.exit(1)
-    opt_help += ' (' + OPT_TYPES[opt_type] + ')'
-    if opt.required:
-        print('# **REQUIRED** ', '\n# '.join(textwrap.wrap(opt_help,
-                                                           WORDWRAP_WIDTH)))
-    else:
-        print('#', '\n# '.join(textwrap.wrap(opt_help, WORDWRAP_WIDTH)))
-    if opt.deprecated_opts:
-        for deprecated_opt in opt.deprecated_opts:
-            if deprecated_opt.name:
-                deprecated_group = (deprecated_opt.group if
-                                    deprecated_opt.group else 'DEFAULT')
-                print('# Deprecated group/name - [%s]/%s' %
-                      (deprecated_group,
-                       deprecated_opt.name))
-    try:
-        if opt_default is None:
-            print('#%s=<None>' % opt_name)
-        elif opt_type == STROPT:
-            assert(isinstance(opt_default, six.string_types))
-            print('#%s=%s' % (opt_name, _sanitize_default(opt_name,
-                                                          opt_default)))
-        elif opt_type == BOOLOPT:
-            assert(isinstance(opt_default, bool))
-            print('#%s=%s' % (opt_name, str(opt_default).lower()))
-        elif opt_type == INTOPT:
-            assert(isinstance(opt_default, int) and
-                   not isinstance(opt_default, bool))
-            print('#%s=%s' % (opt_name, opt_default))
-        elif opt_type == FLOATOPT:
-            assert(isinstance(opt_default, float))
-            print('#%s=%s' % (opt_name, opt_default))
-        elif opt_type == LISTOPT:
-            assert(isinstance(opt_default, list))
-            print('#%s=%s' % (opt_name, ','.join(opt_default)))
-        elif opt_type == MULTISTROPT:
-            assert(isinstance(opt_default, list))
-            if not opt_default:
-                opt_default = ['']
-            for default in opt_default:
-                print('#%s=%s' % (opt_name, default))
-        print('')
-    except Exception:
-        sys.stderr.write('Error in option [%s]\n' % opt_name)
-        sys.exit(1)
+        return importutils.import_module(mod_str)
+    except Exception as e:
+        sys.stderr.write('Error importing module %s: %s\n' % (mod_str, str(e)))
+        return None
+
+
+def generate(srcfiles, outputfile=None):
+    """
+    Generates a sample configuration file based on a list of source files
+    that it will reference options registered from each module.
+
+    :param list srcfiles:   source files within project
+    :returns:   sample configuration file
+    :rtype:     sys.stdout
+    """
+    mods_by_pkg = dict()
+    for filepath in srcfiles:
+        pkg_name = filepath.split(os.sep)[1]
+        mod_str = '.'.join(['.'.join(filepath.split(os.sep)[:-1]),
+                            os.path.basename(filepath).split('.')[0]])
+        mods_by_pkg.setdefault(pkg_name, list()).append(mod_str)
+    # NOTE(lzyeval): place top level modules before packages
+    pkg_names = filter(lambda x: x.endswith(PY_EXT), mods_by_pkg.keys())
+    pkg_names.sort()
+    ext_names = filter(lambda x: x not in pkg_names, mods_by_pkg.keys())
+    ext_names.sort()
+    pkg_names.extend(ext_names)
+
+    # opts_by_group is a mapping of group name to an options list
+    # The options list is a list of (module, options) tuples
+    opts_by_group = {DEFAULT_GROUP: []}
+
+    for pkg_name in pkg_names:
+        mods = mods_by_pkg.get(pkg_name)
+        mods.sort()
+        for mod_str in mods:
+            if mod_str.endswith('.__init__'):
+                mod_str = mod_str[:mod_str.rfind('.')]
+
+            mod_obj = _import_module(mod_str)
+            if not mod_obj:
+                raise RuntimeError('Unable to import module %s' % mod_str)
+
+            for group, opts in _list_opts(mod_obj):
+                opts_by_group.setdefault(group, []).append((mod_str, opts))
+
+    output = []
+    map(output.append, _gen_group_opts_output(DEFAULT_GROUP,
+                                              opts_by_group.pop(DEFAULT_GROUP,
+                                                                [])))
+    for group in sorted(opts_by_group.keys()):
+        map(output.append, _gen_group_opts_output(group,
+                                                  opts_by_group[group]))
+
+    _write_output(output, outputfile)
 
 
 def main():
