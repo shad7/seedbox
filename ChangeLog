@@ -1,3 +1,10 @@
+commit 75b5e452a0d91b2e616574b0ce9053f18c119175
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun Jan 12 11:46:03 2014 -0500
+
+    Updated release info and started work on making sample config generation a cli
+    option instead of through a shell script
+
 commit 5eaa27da532799de2a2c13146651c00493b22956
 Author: shad7 <kenny.shad7@gmail.com>
 Date:   Sat Jan 11 21:10:43 2014 -0500
