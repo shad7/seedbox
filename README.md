@@ -3,8 +3,7 @@ SeedboxManager
 
 **Current status:**
 
-.. image:: https://travis-ci.org/shad7/seedbox.png?branch=master
-    :target: https://travis-ci.org/shad7/seedbox
+![](https://travis-ci.org/shad7/seedbox.png?branch=master) (https://travis-ci.org/shad7/seedbox)
 
 
 Documentation
