@@ -66,8 +66,7 @@ class SubprocessExtTest(test.BaseTestCase):
         in succession
         """
         for cmd in [['ls', '-laR', self.py_lib],
-                    ['ls', '-laR', '/bin'], ['ls', '-laR', '/dev'],
-                    ['ls', '-laR', '/var']]:
+                    ['ls', '-laR', '~']]:
             subprocessext.ProcessLogging.execute(cmd, self.logger)
             # it will complete with no return value or an exception
             self.assertTrue(True)
