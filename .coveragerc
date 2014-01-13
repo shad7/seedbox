@@ -1,7 +1,7 @@
 [run]
 branch = True
 debug = trace
-source = seedbox/
+source = seedbox
 omit = seedbox/tests/*
 
 [report]

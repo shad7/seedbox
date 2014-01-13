@@ -1,7 +1,9 @@
 from __future__ import absolute_import
+import os
 import logging
 import subprocess
 import testtools
+from distutils.sysconfig import get_python_lib
 
 # required since we leverage custom logging levels
 from seedbox import logext as logmgr
@@ -23,6 +25,7 @@ class SubprocessExtTest(test.BaseTestCase):
         super(SubprocessExtTest, self).setUp()
         logmgr.configure()
         self.logger = logging.getLogger('subproc-ext')
+        self.py_lib = os.path.abspath(os.path.join(get_python_lib(), '..'))
 
     def test_short_single_cmd(self):
         """
@@ -39,7 +42,7 @@ class SubprocessExtTest(test.BaseTestCase):
         using a single command that takes atleast a few seconds to execute to
         make sure longer running commands work successfully.
         """
-        cmd = ['ls', '-laR', '/lib/python2.7']
+        cmd = ['ls', '-laR', self.py_lib]
         subprocessext.ProcessLogging.execute(cmd, self.logger)
         # it will complete with no return value or an exception
         self.assertTrue(True)
@@ -62,9 +65,9 @@ class SubprocessExtTest(test.BaseTestCase):
         to demonstrate how it works subprocess is executed multiple
         in succession
         """
-        for cmd in [['ls', '-laR', '/usr/lib/python2.7'],
+        for cmd in [['ls', '-laR', self.py_lib],
                     ['ls', '-laR', '/bin'], ['ls', '-laR', '/dev'],
-                    ['ls', '-laR', '/etc'], ['ls', '-laR', '/lib/perl5']]:
+                    ['ls', '-laR', '/var']]:
             subprocessext.ProcessLogging.execute(cmd, self.logger)
             # it will complete with no return value or an exception
             self.assertTrue(True)
