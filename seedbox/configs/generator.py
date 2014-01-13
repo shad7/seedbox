@@ -96,11 +96,11 @@ def _gen_opt_output(opt):
         sys.exit(1)
     opt_help += ' (' + OPT_TYPES[opt_type] + ')'
     if opt.required:
-        output.append('# **REQUIRED** ' + '\n# '.join(textwrap.wrap(opt_help,
-                                                           WORDWRAP_WIDTH)))
+        output.append('# **REQUIRED** ' + '\n# '.join(
+            textwrap.wrap(opt_help, WORDWRAP_WIDTH)))
     else:
-        output.append('# ' + '\n# '.join(textwrap.wrap(opt_help,
-                                                    WORDWRAP_WIDTH)))
+        output.append('# ' + '\n# '.join(
+            textwrap.wrap(opt_help, WORDWRAP_WIDTH)))
     if opt.deprecated_opts:
         for deprecated_opt in opt.deprecated_opts:
             if deprecated_opt.name:
@@ -114,8 +114,8 @@ def _gen_opt_output(opt):
         elif opt_type == STROPT:
             assert(isinstance(opt_default, six.string_types))
             output.append('#%s=%s' % (opt_name,
-                                     _sanitize_default(opt_name,
-                                                       opt_default)))
+                                      _sanitize_default(opt_name,
+                                                        opt_default)))
         elif opt_type == BOOLOPT:
             assert(isinstance(opt_default, bool))
             output.append('#%s=%s' % (opt_name, str(opt_default).lower()))
