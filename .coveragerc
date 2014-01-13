@@ -1,4 +1,8 @@
-[report]
-# exclude the following
-#omit =
+[run]
+branch = True
+debug = trace
+source = seedbox/
+omit = seedbox/tests/*
 
+[report]
+ignore-errors = True
