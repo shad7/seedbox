@@ -3,5 +3,5 @@ include ChangeLog
 exclude .gitignore
 exclude .gitreview
 
-global-exclude *.py
+global-exclude *.pyc
 

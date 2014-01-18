@@ -1,3 +1,46 @@
+commit af7ec6deef64711f882a1f82660b77689fbc3df0
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Jan 13 01:35:29 2014 -0500
+
+    updated README
+
+commit 2c9e700732f8910abc41619cc17d02f61b5cbc62
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Jan 13 01:24:17 2014 -0500
+
+    added reference to travis-cli
+
+commit 000670009b7e0ca68c4c95d025c270248a8c24d6
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Jan 13 01:15:00 2014 -0500
+
+    travis still
+
+commit 09390c5475ef8be352abdec318b331f4a53b3357
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Jan 13 01:11:05 2014 -0500
+
+    fixing travis
+
+commit c036a50cc437c3a662ec8f318a365e989039dd11
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Jan 13 01:07:05 2014 -0500
+
+    small change to get travis to work
+
+commit 47fe42e28a6a2f0523bb2f3557ed67d87cbfdedc
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Jan 13 00:29:15 2014 -0500
+
+    updated travis config and coverage config
+
+commit d43313d5769aa57289f2a1b90bfa9080e008f415
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Sun Jan 12 23:53:16 2014 -0500
+
+    pep8 compliance
+    integration with travis-ci
+
 commit 2dc35715008df0685166b9e781cd60502b153f5c
 Author: shad7 <kenny.shad7@gmail.com>
 Date:   Sun Jan 12 18:55:12 2014 -0500
