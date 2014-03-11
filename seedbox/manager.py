@@ -3,6 +3,7 @@
 The main program that is the entry point for the SeedboxManager application.
 Provides the ability to configure and start up processing.
 """
+from __future__ import absolute_import
 import logging
 import os
 import sys
