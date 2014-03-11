@@ -121,15 +121,10 @@ class Manager(object):
         # signal is ignored).
         signal.signal(signal.SIGCHLD, self.handle_sigchld)
         # This should keep reads and writes from getting EINTR.
-        if hasattr(signal, 'siginterrupt'):
-            signal.siginterrupt(signal.SIGCHLD, False)
+        signal.siginterrupt(signal.SIGCHLD, False)
 
     def handle_sigchld(self, number, frame):
         """Apparently we need a sigchld handler to make set_wakeup_fd work."""
-        # Write to the signal pipe (only for Python <2.5, where the
-        # set_wakeup_fd method doesn't exist).
-        if self.iomap.wakeup_writefd:
-            os.write(self.iomap.wakeup_writefd, '\0')
         for task in self.running:
             if task.proc:
                 task.proc.poll()
@@ -243,12 +238,8 @@ class IOMap(object):
         # Setup the wakeup file descriptor to avoid hanging on lost signals.
         wakeup_readfd, wakeup_writefd = os.pipe()
         self.register_read(wakeup_readfd, self.wakeup_handler)
-        # TODO: remove test when we stop supporting Python <2.5
-        if hasattr(signal, 'set_wakeup_fd'):
-            signal.set_wakeup_fd(wakeup_writefd)
-            self.wakeup_writefd = None
-        else:
-            self.wakeup_writefd = wakeup_writefd
+        signal.set_wakeup_fd(wakeup_writefd)
+        self.wakeup_writefd = None
 
     def register_read(self, fd, handler):
         """Registers an IO handler for a file descriptor for reading."""
