@@ -1,19 +1,16 @@
 # Copyright (c) 2009-2012, Andrew McNabb
 
-from errno import EINTR
-from subprocess import Popen, PIPE
+import errno
 import os
 import signal
+import subprocess
 import sys
 import time
 import traceback
 
-BUFFER_SIZE = 1 << 16
+import six
 
-try:
-    bytes
-except NameError:
-    bytes = str
+BUFFER_SIZE = 1 << 16
 
 
 class Task(object):
@@ -45,8 +42,8 @@ class Task(object):
         self.timestamp = None
         self.failures = []
         self.killed = False
-        self.outputbuffer = bytes()
-        self.errorbuffer = bytes()
+        self.outputbuffer = six.binary_type()
+        self.errorbuffer = six.binary_type()
 
         self.stdout = None
         self.stderr = None
@@ -71,8 +68,9 @@ class Task(object):
 
         # Create the subprocess.  Since we carefully call set_cloexec() on
         # all open files, we specify close_fds=False.
-        self.proc = Popen(self.cmd, stdout=PIPE, stderr=PIPE,
-                          close_fds=False, preexec_fn=os.setsid)
+        self.proc = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE, close_fds=False,
+                                     preexec_fn=os.setsid)
         self.timestamp = time.time()
         self.stdout = self.proc.stdout
         iomap.register_read(self.stdout.fileno(), self.handle_stdout)
@@ -149,7 +147,7 @@ class Task(object):
                 self.close_stdout(iomap)
         except (OSError, IOError):
             _, e, _ = sys.exc_info()
-            if e.errno != EINTR:
+            if e.errno != errno.EINTR:
                 self.close_stdout(iomap)
                 self.log_exception(e)
 
@@ -175,7 +173,7 @@ class Task(object):
                 self.close_stderr(iomap)
         except (OSError, IOError):
             _, e, _ = sys.exc_info()
-            if e.errno != EINTR:
+            if e.errno != errno.EINTR:
                 self.close_stderr(iomap)
                 self.log_exception(e)
 

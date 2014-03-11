@@ -1,20 +1,16 @@
 # Copyright (c) 2009-2012, Andrew McNabb
-
-from errno import EINTR
+import errno
 import fcntl
+import logging
 import os
 import select
 import signal
 import sys
 import threading
-import logging
+
+from six.moves import queue
 
 from seedbox.common import timeutil
-
-try:
-    import queue
-except ImportError:
-    import Queue as queue
 
 READ_SIZE = 1 << 16
 
@@ -267,7 +263,7 @@ class IOMap(object):
         except select.error:
             _, e, _ = sys.exc_info()
             errno = e.args[0]
-            if errno == EINTR:
+            if errno == errno.EINTR:
                 return
             else:
                 raise
@@ -288,7 +284,7 @@ class IOMap(object):
         except (OSError, IOError):
             _, e, _ = sys.exc_info()
             errno, message = e.args
-            if errno != EINTR:
+            if errno != errno.EINTR:
                 sys.stderr.write('Fatal error reading from wakeup pipe: %s\n'
                                  % message)
                 raise FatalError
@@ -328,7 +324,7 @@ class PollIOMap(IOMap):
         except select.error:
             _, e, _ = sys.exc_info()
             errno = e.args[0]
-            if errno == EINTR:
+            if errno == errno.EINTR:
                 return
             else:
                 raise
