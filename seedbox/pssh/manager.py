@@ -262,8 +262,7 @@ class IOMap(object):
             rlist, wlist, _ = select.select(rlist, wlist, [], timeout)
         except select.error:
             _, e, _ = sys.exc_info()
-            errno = e.args[0]
-            if errno == errno.EINTR:
+            if e.args[0] == errno.EINTR:
                 return
             else:
                 raise
@@ -283,10 +282,9 @@ class IOMap(object):
             os.read(fd, READ_SIZE)
         except (OSError, IOError):
             _, e, _ = sys.exc_info()
-            errno, message = e.args
-            if errno != errno.EINTR:
+            if e.errno != errno.EINTR:
                 sys.stderr.write('Fatal error reading from wakeup pipe: %s\n'
-                                 % message)
+                                 % e.args[1])
                 raise FatalError
 
 
@@ -323,8 +321,7 @@ class PollIOMap(IOMap):
             event_list = self._poller.poll(timeout)
         except select.error:
             _, e, _ = sys.exc_info()
-            errno = e.args[0]
-            if errno == errno.EINTR:
+            if e.args[0] == errno.EINTR:
                 return
             else:
                 raise
