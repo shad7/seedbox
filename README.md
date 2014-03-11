@@ -2,8 +2,7 @@ SeedboxManager
 ==============
 
 **Current status:**
-
-![](https://travis-ci.org/shad7/seedbox.png?branch=master) (https://travis-ci.org/shad7/seedbox)
+[![Build Status](https://travis-ci.org/shad7/seedbox.png?branch=master)](https://travis-ci.org/shad7/seedbox)
 
 
 Documentation
