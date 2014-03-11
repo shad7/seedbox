@@ -3,12 +3,12 @@
 The main program that is the entry point for the SeedboxManager application.
 Provides the ability to configure and start up processing.
 """
-from __future__ import absolute_import, print_function
+import logging
 import os
 import sys
-import logging
+
 import lockfile
-from lockfile.pidlockfile import PIDLockFile
+from lockfile import pidlockfile
 from oslo.config import cfg
 
 from seedbox import logext as logmgr
@@ -31,17 +31,16 @@ def main():
     # the info
     options.initialize(sys.argv[1:])
 
+    # configure our logging
+    logmgr.configure()
+    cfg.CONF.log_opt_values(log, logging.DEBUG)
+
     # need to create a lock to make sure multiple instances do not start at
     # the sametime because we are running as a cron.
     filelock = os.path.join(cfg.CONF.config_dir, 'seedmgr.lock')
-    lock = PIDLockFile(filelock, timeout=10)
+    lock = pidlockfile.PIDLockFile(filelock, timeout=10)
     try:
         with lock:
-
-            # configure our logging
-            logmgr.configure()
-
-            cfg.CONF.log_opt_values(log, logging.DEBUG)
 
             # load up all task plugins; if no plugins load then we could have
             # a problem; and initialize the map between our process
@@ -60,9 +59,7 @@ def main():
         # if we have managed timeout, it means there is another instance
         # already running so we will simply bow out and let the existing
         # one still run.
-        print(
-            'Already running; if not delete lock file: {0}'.format(lockerr),
-            file=sys.stderr)
+        log.info('Already running; if not delete lock file: %s', lockerr)
 
 
 if __name__ == '__main__':
