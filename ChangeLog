@@ -1,3 +1,58 @@
+commit 01a669e3adb6a55a2d9a085c841d0366eba34b6b
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue Mar 25 01:43:39 2014 -0400
+
+    significant refactor to simplify and become more DRY.
+    Also reshaping the structure to align to future plans to replace
+    the entire workflow approach currently leveraged.
+
+commit 52b5a7c29679c98a114874e2fb1c19bfc6014fc8
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue Mar 11 01:10:11 2014 -0400
+
+    Updated reference to travis ci
+
+commit cbc7c1870576cfbc0d42a5f33c1a001e53bf0a66
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue Mar 11 01:00:54 2014 -0400
+
+    Updating import from __future__ entries
+
+commit 0cb3e451ebe8395b1f3668c8f0ce37e00666416a
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue Mar 11 00:53:24 2014 -0400
+
+    Instead of printing to stderr when the lockfile is there, simply write
+    to the standard log to avoid having to check logs in multiple locations.
+    Also a few pep8 updates.
+
+commit b045d4bdaf86b6d510c212f64f5c8ae7a8b5f470
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Tue Mar 11 00:26:33 2014 -0400
+
+    Seems a variable named errno was used which took over the namespace
+    of the imported errno module. Needed to remove the local variable to
+    avoid clash.
+
+commit ce1be23bbdbeaf140fc3384b398319eb77d89aff
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Mar 10 20:18:08 2014 -0400
+
+    Moved to leverage six instead of doing manual checks for PY2/PY3
+    and fixed some basic pep8 issues.
+
+commit 2d13bc50ebdfbe5ca5016033454592da9bd88bf1
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Mon Mar 10 20:01:17 2014 -0400
+
+    Removed old code left over as part of pssh
+
+commit a20c3299a225a741cc8056b41016203297e6df89
+Author: shad7 <kenny.shad7@gmail.com>
+Date:   Fri Jan 17 19:12:33 2014 -0500
+
+    MANIFEST.in had a missing 'c' so it was excluding all .py files instead of .pyc
+
 commit af7ec6deef64711f882a1f82660b77689fbc3df0
 Author: shad7 <kenny.shad7@gmail.com>
 Date:   Mon Jan 13 01:35:29 2014 -0500
