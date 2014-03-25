@@ -4,6 +4,8 @@ Holds a group of tools useful by all modules.
 import logging
 import os
 import re
+
+import six
 from six import moves
 
 log = logging.getLogger(__name__)
@@ -32,9 +34,9 @@ def to_bool(value):
     """
     if isinstance(value, bool):
         return value
-    if isinstance(value, basestring) and value.lower() in BOOLEAN_STATES:
+    if isinstance(value, six.string_types) and value.lower() in BOOLEAN_STATES:
         return BOOLEAN_STATES[value.lower()]
-    if isinstance(value, int) and value in [0, 1]:
+    if isinstance(value, six.integer_types) and value in [0, 1]:
         return (True if value else False)
 
     # if value wasn't a boolean or a boolean like value
@@ -56,7 +58,7 @@ def to_list(value, separator=None):
     if isinstance(value, list):
         return value
     # if we got a string then we will need to split it
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         # check for the following list of separators
         # if found in string, then split it; else try
         # the next one.
@@ -86,7 +88,8 @@ def list_to_str(values):
         result = ','.join(values)
 
     # if the values are already a delimited list of values then use as-is
-    elif values and isinstance(values, basestring) and values.find(',') != -1:
+    elif (values and isinstance(values, six.string_types) and
+          values.find(',') != -1):
         result = values
 
     # if the values missing or not of correct format; we could throw
@@ -98,10 +101,10 @@ def to_int(value):
     """
     makes sure the value is an int, if not result will be a default int
     """
-    if value is not None and isinstance(value, int):
+    if value is not None and isinstance(value, six.integer_types):
         return value
     # ok so we got a string that needs to become an int
-    elif isinstance(value, basestring):
+    elif isinstance(value, six.string_types):
         # remove any whitespace
         use_value = value.strip()
         # if we have a value then we will convert to int
@@ -164,7 +167,7 @@ def format_file_ext(filetypes):
         for filetype in filetypes:
             # make sure None or some other garbage was not put into
             # the list
-            if not filetype or not isinstance(filetype, basestring):
+            if not filetype or not isinstance(filetype, six.string_types):
                 continue
             # if someone configured it but left off the '.', then we will
             # simply add it for them; otherwise use as-is

@@ -7,14 +7,15 @@ from __future__ import absolute_import
 import logging
 import os
 import traceback
-import rarfile
+
 from oslo.config import cfg
+import rarfile
 
-from seedbox.tasks.base import BasePlugin
+from .base import BasePlugin
 
-from seedbox import helpers
 from seedbox.common import tools
-from seedbox.pluginmanager import register_plugin, phase
+from seedbox.workflow import helpers
+from seedbox.workflow.pluginmanager import register_plugin, phase
 
 __version__ = '1'
 
@@ -73,10 +74,11 @@ class UnrarFile(BasePlugin):
                                 media_file.file_path,
                                 media_file.filename)) as compressed_file:
                         archived_files = compressed_file.namelist()
-                        compressed_file.extractall(path=cfg.CONF.sync_path)
-                        helpers.add_mediafiles_to_torrent(torrent,
-                                                          cfg.CONF.sync_path,
-                                                          archived_files)
+                        compressed_file.extractall(
+                            path=cfg.CONF.plugins.sync_path)
+                        helpers.add_mediafiles_to_torrent(
+                            torrent, cfg.CONF.plugins.sync_path,
+                            archived_files)
                         # need to show we completed the unrar process;
                         # so show it as synced which is technically true since
                         # we synced it to the sync path.

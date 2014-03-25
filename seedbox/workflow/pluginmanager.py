@@ -2,25 +2,24 @@
 Plugin Loading & Management.
 """
 from __future__ import absolute_import
+import logging
 import os
+import pkgutil
 import sys
 import re
-import logging
-import time
-import pkgutil
-import itertools
-import ordereddict
 
 from oslo.config import cfg
+import six
+from six import moves
 
-from seedbox.action import add_action_handler
-from seedbox import processmap
-from seedbox import tasks as plugins_pkg
+from seedbox.common import timeutil
+from seedbox.workflow.action import add_action_handler
+from seedbox.workflow import tasks as plugins_pkg
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 __all__ = ['PluginWarning', 'PluginError', 'register_plugin', 'phase',
-           'get_plugin_by_name', 'get_plugins']
+           'load_plugins', 'get_plugins']
 
 
 class DependencyError(Exception):
@@ -84,7 +83,7 @@ class DisabledPluginError(Exception):
         additional loading efforts.
 
     """
-    def __init__(self, value, logger=log, **kwargs):
+    def __init__(self, value, logger=LOG, **kwargs):
         """
         :param str value:       a message to provide additional details
         :param object logger:   an instance of logger
@@ -109,7 +108,7 @@ class PluginWarning(Warning):
         enables standard warning messages for plugins
 
     """
-    def __init__(self, value, logger=log, **kwargs):
+    def __init__(self, value, logger=LOG, **kwargs):
         """
         :param str value:       a message to provide additional details
         :param object logger:   an instance of logger
@@ -134,7 +133,7 @@ class PluginError(Exception):
         enables standard error messages for plugins
 
     """
-    def __init__(self, value, logger=log, **kwargs):
+    def __init__(self, value, logger=LOG, **kwargs):
         """
         :param str value:       a message to provide additional details
         :param object logger:   an instance of logger
@@ -208,14 +207,14 @@ class PluginInfo(dict):
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. %s' %
+            LOG.critical('Error while registering plugin %s. %s' %
                          (self.name,
                              ('Plugin name %s is already registered'
                                  % self.name)))
         else:
             # don't even load the plugin if disabled
             if self.instance.disabled:
-                log.info('during configuration %s was disabled', self.name)
+                LOG.info('during configuration %s was disabled', self.name)
                 raise DisabledPluginError(
                     'disabled plugin based on configuration (%s)' % self.name)
 
@@ -231,16 +230,16 @@ class PluginInfo(dict):
         import inspect
 
         plugin_valid = False
-        log.trace('Check plugin for action methods [%s]',
+        LOG.trace('Check plugin for action methods [%s]',
                   self.plugin_class.__name__)
         for class_method in inspect.getmembers(self.plugin_class,
                                                predicate=inspect.ismethod):
             method_name = class_method[0]
-            log.trace('method=[%s]', method_name)
+            LOG.trace('method=[%s]', method_name)
             # ignore any method name that is private, doesn't matter if it is
             # single or double underscore. Just go to next method
             if method_name.startswith('_'):
-                log.trace('method=[%s] is private; skipping', method_name)
+                LOG.trace('method=[%s] is private; skipping', method_name)
                 continue
 
             # now we need to convert method_name to an object, so that we
@@ -249,7 +248,7 @@ class PluginInfo(dict):
             # check hasattr or set a default value on getattr
             method = getattr(self.instance, method_name)
             if not callable(method):
-                log.trace('method=[%s] is not callable; skipping',
+                LOG.trace('method=[%s] is not callable; skipping',
                           method_name)
                 continue
 
@@ -258,34 +257,34 @@ class PluginInfo(dict):
             # then we will ignore the corresponding error and just continue
             # to the next method in the list
             try:
-                log.trace('method=[%s] checking for decorated attributes',
+                LOG.trace('method=[%s] checking for decorated attributes',
                           method_name)
                 handler_prio = _check_value('priority', method.priority)
                 handler_phase = _check_value('phase', method.phase_name)
-                if not handler_phase in processmap.get_run_phases():
-                    raise ValueError(
-                        'attribute [%s] has unsupported value [%s]; \
-                         supported values: %s' % ('phase',
-                                                  handler_phase,
-                                                  processmap.get_run_phases())
-                        )
-                log.trace('method=[%s] decorated attributes found',
+#               if not handler_phase in processmap.get_run_phases():
+#                   raise ValueError(
+#                       'attribute [%s] has unsupported value [%s]; \
+#                        supported values: %s' % ('phase',
+#                                                 handler_phase,
+#                                                 processmap.get_run_phases())
+#                       )
+                LOG.trace('method=[%s] decorated attributes found',
                           method_name)
                 plugin_valid = True
             except ValueError as valerr:
-                log.debug('method=[%s] decorated attribute has ValueError: %s',
+                LOG.debug('method=[%s] decorated attribute has ValueError: %s',
                           method_name, valerr)
                 continue
             except TypeError as tyerr:
-                log.debug('method=[%s] decorated attribute has TypeErorr: %s',
+                LOG.debug('method=[%s] decorated attribute has TypeErorr: %s',
                           method_name, tyerr)
                 continue
             except AttributeError as aterr:
-                log.debug('method=[%s] not decorated; AttributeError: %s',
+                LOG.debug('method=[%s] not decorated; AttributeError: %s',
                           method_name, aterr)
                 continue
             except Exception as err:
-                log.debug('method=[%s] not decorated; generic error: %s',
+                LOG.debug('method=[%s] not decorated; generic error: %s',
                           method_name, err)
                 continue
 
@@ -293,14 +292,14 @@ class PluginInfo(dict):
             action = add_action_handler('%s.%s' % (handler_phase, self.name),
                                         method, handler_prio)
             self.phase_handlers[handler_phase] = action
-            log.trace('method=[%s] linked to action [%s] with priority [%d]',
+            LOG.trace('method=[%s] linked to action [%s] with priority [%d]',
                       method_name, action.name, handler_prio)
 
         if not plugin_valid:
             errmsg = ('class [%s] is not a valid plugin; no methods defined \
                        for a supported phase. Check @phase for proper \
                        configuration.' % self.plugin_class.__name__)
-            log.trace(errmsg)
+            LOG.trace(errmsg)
             raise PluginError(errmsg)
 
     def __getattr__(self, attr):
@@ -334,12 +333,12 @@ def _check_value(name, val):
     Need to verify if we have actual values of the correct type
     provided as inputs to our action decorator
     """
-    if not isinstance(val, (basestring, int)):
+    if not isinstance(val, (six.string_types, six.integer_types)):
         raise TypeError(
             'attribute [%s] value not string/int: [%s]' %
             (name, type(val).__name__))
 
-    if isinstance(val, basestring):
+    if isinstance(val, six.string_types):
         if not val:
             raise ValueError('attribute [%s] has no value [%s]' % (name, val))
 
@@ -387,7 +386,7 @@ def get_standard_plugins_path(user_paths=None):
         if os.path.exists(user_path):
             paths.append(user_path)
         else:
-            log.warning('plugin-path specified not found [%s]', user_path)
+            LOG.warning('plugin-path specified not found [%s]', user_path)
 
     return paths
 
@@ -397,7 +396,7 @@ def _load_plugins_from_dirs(dirs):
     performs the actual loading of plugins from specified directory
     """
 
-    log.trace('Trying to load plugins from: %s' % dirs)
+    LOG.trace('Trying to load plugins from: %s' % dirs)
     # add all dirs to plugins_pkg load path so that plugins are loaded
     # from provided directories
     plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
@@ -423,43 +422,33 @@ def _load_plugins_from_dirs(dirs):
                     deperr.issued_by or name,
                     deperr.missing or 'N/A')
             if not deperr.silent:
-                log.warning(msg)
+                LOG.warning(msg)
             else:
-                log.debug(msg)
+                LOG.debug(msg)
         except DisabledPluginError as dperr:
-            log.warning('Plugin %s was not loaded. %s', name, dperr)
+            LOG.warning('Plugin %s was not loaded. %s', name, dperr)
         except PluginError as plugerr:
-            log.critical('Plugin %s was not loaded. %s', name, plugerr)
-            log.exception(plugerr)
+            LOG.critical('Plugin %s was not loaded. %s', name, plugerr)
+            LOG.exception(plugerr)
         except ImportError as imperr:
-            log.critical('Plugin `%s` failed to import dependencies', name)
-            log.exception(imperr)
+            LOG.critical('Plugin `%s` failed to import dependencies', name)
+            LOG.exception(imperr)
         except Exception as err:
-            log.critical('Exception while loading plugin %s', name)
-            log.exception(err)
+            LOG.critical('Exception while loading plugin %s', name)
+            LOG.exception(err)
             raise
         else:
-            log.debug('Loaded module %s from %s',
+            LOG.debug('Loaded module %s from %s',
                       name, loaded_module.__file__)
 
 
+@timeutil.timed(logger=LOG)
 def load_plugins():
     """
     Load plugins from the standard plugin paths.
     """
-
-    start_time = time.time()
-    _load_plugins_from_dirs(get_standard_plugins_path(cfg.CONF.plugin_paths))
-    took = time.time() - start_time
-    log.trace('Plugins took %.2f seconds to load' % took)
-
-    # generate a map by phase of each of the plugins we just
-    # loaded so the Manager knows what we have to offer
-    phasemap = ordereddict.OrderedDict()
-    for phase in processmap.get_run_phases():
-        phasemap[phase] = get_plugins(phase)
-
-    return phasemap
+    _load_plugins_from_dirs(
+        get_standard_plugins_path(cfg.CONF.workflow.plugin_paths))
 
 
 def get_plugins(phase=None):
@@ -478,20 +467,7 @@ def get_plugins(phase=None):
         filters out plugins that don't match
         """
         if phase and not phase in plugin.phase_handlers:
-            log.trace('Phase resulted in filtering out plugin: [%s]', plugin)
+            LOG.trace('Phase resulted in filtering out plugin: [%s]', plugin)
             return False
         return True
-    return itertools.ifilter(matches, plugins.itervalues())
-
-
-def get_plugin_by_name(name):
-    """
-    Get plugin by name, preferred way since this structure may be changed at
-    some point.
-    @UNUSED
-
-    :param str name:    name of a plugin
-    """
-    if not name in plugins:
-        raise DependencyError(missing=name, message='Unknown plugin %s' % name)
-    return plugins[name]
+    return moves.filter(matches, plugins.itervalues())

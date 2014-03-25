@@ -23,6 +23,8 @@ import tempfile
 
 from seedbox import options  # noqa
 from seedbox import logext as logmgr  # noqa
+from seedbox.torrent import loader  # noqa
+from seedbox.workflow.tasks import base as plugins  # noqa
 from seedbox.fixture import config
 
 _TRUE_VALUES = ('True', 'true', '1', 'yes')
@@ -52,14 +54,18 @@ class BaseTestCase(testtools.TestCase):
 
         # provide values for the required configs
         self.CONF.set_override('torrent_path',
-                               os.mkdir(os.path.join(start_dir, 'torrent')))
+                               os.mkdir(os.path.join(start_dir, 'torrent')),
+                               'torrent')
         self.CONF.set_override('media_paths',
                                [os.mkdir(os.path.join(start_dir, 'complete')),
-                                os.mkdir(os.path.join(start_dir, 'seedLT'))])
+                                os.mkdir(os.path.join(start_dir, 'seedLT'))],
+                               'torrent')
         self.CONF.set_override('incomplete_path',
-                               os.mkdir(os.path.join(start_dir, 'inprogress')))
+                               os.mkdir(os.path.join(start_dir, 'inprogress')),
+                               'torrent')
         self.CONF.set_override('sync_path',
-                               os.mkdir(os.path.join(start_dir, 'toSync')))
+                               os.mkdir(os.path.join(start_dir, 'toSync')),
+                               'plugins')
 
     def _set_timeout(self):
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)

@@ -4,15 +4,22 @@ is a class that defines the contents of a torrent file, ie some media
 files typically.
 """
 from __future__ import absolute_import
-import sqlobject
 import logging
 import os
 import shutil
-from oslo.config import cfg
 
-log = logging.getLogger(__name__)
+from oslo.config import cfg
+import sqlobject
+
+LOG = logging.getLogger(__name__)
+
 DB_NAME = 'torrent.db'
-MAX_BACKUP_COUNT = 12
+
+INIT = 'init'
+READY = 'ready'
+ACTIVE = 'active'
+DONE = 'done'
+CANCELLED = 'cancelled'
 
 
 class Torrent(sqlobject.SQLObject):
@@ -43,12 +50,12 @@ class Torrent(sqlobject.SQLObject):
     """
     name = sqlobject.StringCol(unique=True)
     create_date = sqlobject.DateCol(default=sqlobject.DateTimeCol.now)
-    state = sqlobject.EnumCol(enumValues=['init',
-                                          'ready',
-                                          'active',
-                                          'done',
-                                          'cancelled'],
-                              default='init')
+    state = sqlobject.EnumCol(enumValues=[INIT,
+                                          READY,
+                                          ACTIVE,
+                                          DONE,
+                                          CANCELLED],
+                              default=INIT)
     retry_count = sqlobject.IntCol(default=0)
     failed = sqlobject.BoolCol(default=False)
     error_msg = sqlobject.StringCol(default=None)
@@ -82,9 +89,7 @@ class MediaFile(sqlobject.SQLObject):
     .. py:attribute:: torrent
         foreign key reference to the associated Torrent
     """
-
     filename = sqlobject.StringCol()
-    """the name of the file associated with media"""
     file_ext = sqlobject.StringCol()
     file_path = sqlobject.StringCol(default=None)
     size = sqlobject.IntCol(default=0)
@@ -114,7 +119,6 @@ class AppState(sqlobject.SQLObject):
     .. py:attribute:: val_date
         a value of type date
     """
-
     name = sqlobject.StringCol(unique=True)
     val_str = sqlobject.StringCol(default=None)
     val_int = sqlobject.IntCol(default=-99999)
@@ -123,35 +127,20 @@ class AppState(sqlobject.SQLObject):
     val_date = sqlobject.DateTimeCol(default=sqlobject.DateTimeCol.now)
 
 
-def init():
-    """
-    Establish a connection and make sure all structures are in place
-    """
+def _get_db_file():
+    return os.path.abspath(os.path.join(cfg.CONF.config_dir, DB_NAME))
 
-    dbloc = os.path.join(cfg.CONF.config_dir, DB_NAME)
-    log.trace('location of database will be: [%s]', dbloc)
-    db_exists = False
-    if os.path.exists(dbloc):
-        db_exists = True
-        log.debug('loading database [%s]', dbloc)
-    else:
-        log.info('database does not exist; creating database....[%s]', dbloc)
+
+def _init_connection(dbloc):
 
     connect_str = '{0}{1}{2}'.format('sqlite:', dbloc, '?driver=sqlite3')
-    log.trace('establishing connection to database: [%s]', connect_str)
+    LOG.trace('establishing connection to database: [%s]', connect_str)
     # create connection to the database
     sqlobject.sqlhub.processConnection = sqlobject.connectionForURI(
         connect_str)
 
-    # if the database already existed and a purge was requested then
-    # we drop all the tables
-    if db_exists and cfg.CONF.purge:
-        log.info('purge requested; deleting database cache.')
-        Torrent.dropTable(ifExists=True)
-        MediaFile.dropTable(ifExists=True)
-        AppState.dropTable(ifExists=True)
-        log.info('recreating database cache....')
 
+def _init_tables():
     # we have defined the class, so create the table if it doesn't exist
     Torrent.createTable(ifNotExists=True)
 
@@ -161,25 +150,54 @@ def init():
     # we have defined the class, so create the table if it doesn't exist
     AppState.createTable(ifNotExists=True)
 
-    if log.isEnabledFor(logging.DEBUG):
-        log.trace('Torrent table: [%s]', Torrent.sqlmeta.table)
-        log.trace('Torrent Columns: [%s]', Torrent.sqlmeta.columns.keys())
 
-        log.trace('MediaFile table: [%s]', MediaFile.sqlmeta.table)
-        log.trace('MediaFile Columns: [%s]', MediaFile.sqlmeta.columns.keys())
+def init():
+    """
+    Establish a connection and make sure all structures are in place
+    """
 
-        log.trace('AppState table: [%s]', AppState.sqlmeta.table)
-        log.trace('AppState Columns: [%s]', AppState.sqlmeta.columns.keys())
+    dbloc = _get_db_file()
+    LOG.trace('location of database will be: [%s]', dbloc)
+    if os.path.exists(dbloc):
+        LOG.debug('loading database [%s]', dbloc)
+    else:
+        LOG.info('database does not exist; creating database....[%s]', dbloc)
+
+    _init_connection(dbloc)
+    _init_tables()
+
+
+def purge():
+    """
+    Purge the database cache
+    """
+    LOG.info('purging database cache...')
+    if os.path.exists(_get_db_file()):
+
+        _init_connection(_get_db_file())
+
+        # if the database already existed and a purge was requested then
+        # we drop all the tables
+        Torrent.dropTable(ifExists=True)
+        MediaFile.dropTable(ifExists=True)
+        AppState.dropTable(ifExists=True)
+
+        # need to create tables
+        _init_tables()
+
+    LOG.info('purge complete.')
 
 
 def backup():
     """
     create a backup copy of the database file.
     """
-    log.trace('starting database backup process')
-    default_db_name = os.path.abspath(os.path.join(cfg.CONF.config_dir,
-                                                   DB_NAME))
-    log.trace('location of database: [%s]', default_db_name)
+    # total of 8 weeks/2 months of backups
+    MAX_BACKUP_COUNT = 8
+
+    LOG.trace('starting database backup process')
+    default_db_name = _get_db_file()
+    LOG.trace('location of database: [%s]', default_db_name)
     if os.path.exists(default_db_name):
         for i in range(MAX_BACKUP_COUNT - 1, 0, -1):
             sfn = '%s.%d' % (default_db_name, i)
@@ -189,9 +207,22 @@ def backup():
                     os.remove(dfn)
                 os.rename(sfn, dfn)
         dfn = default_db_name + '.1'
-        log.info('backing up db [%s] to [%s]', default_db_name, dfn)
+        LOG.info('backing up db [%s] to [%s]', default_db_name, dfn)
         shutil.copy2(default_db_name, dfn)
-        log.info('backup complete')
+        LOG.info('backup complete')
     else:
-        log.warn('Database [%s] does not exist, no backup taken.',
+        LOG.warn('Database [%s] does not exist, no backup taken.',
                  default_db_name)
+
+
+def dump_structure(loglvl=logging.DEBUG):
+
+    LOG.log(loglvl, 'Torrent table: [%s]', Torrent.sqlmeta.table)
+    LOG.log(loglvl, 'Torrent Columns: [%s]', Torrent.sqlmeta.columns.keys())
+
+    LOG.log(loglvl, 'MediaFile table: [%s]', MediaFile.sqlmeta.table)
+    LOG.log(loglvl, 'MediaFile Columns: [%s]',
+            MediaFile.sqlmeta.columns.keys())
+
+    LOG.log(loglvl, 'AppState table: [%s]', AppState.sqlmeta.table)
+    LOG.log(loglvl, 'AppState Columns: [%s]', AppState.sqlmeta.columns.keys())

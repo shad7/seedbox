@@ -1,15 +1,17 @@
 from __future__ import absolute_import
-import os
-import glob
 from datetime import datetime
+import glob
+import os
 import tempfile
+
+import six
 
 from seedbox.tests import test
 # required since we leverage custom logging levels
 from seedbox import logext as logmgr  # noqa
 
 # now include what we need to test
-import seedbox.model.schema as schema
+import seedbox.db.schema as schema
 
 
 def get_db_location():
@@ -25,7 +27,7 @@ class ModelSchemaTest(test.BaseTestCase):
 
     def setUp(self):
         super(ModelSchemaTest, self).setUp()
-        self.CONF.set_override('purge', False)
+        self.CONF.set_override('purge', False, 'db')
 
     def test_add_torrents(self):
         """
@@ -362,9 +364,7 @@ class ModelSchemaTest(test.BaseTestCase):
         search = schema.Torrent.selectBy(failed=False)
         self.assertEqual(len(tornames), len(list(search)))
 
-        self.CONF.set_override('purge', True)
-
-        schema.init()
+        schema.purge()
         search = schema.Torrent.selectBy(failed=False)
         self.assertEqual(0, len(list(search)))
 
@@ -388,12 +388,12 @@ class ModelSchemaTest(test.BaseTestCase):
             if cnt == 0:
                 self.assertEqual(len(glob.glob(
                     os.path.join(db_loc, schema.DB_NAME+'*'))), 1)
-            elif cnt >= 1 and cnt <= 12:
+            elif cnt >= 1 and cnt <= 8:
                 self.assertEqual(len(glob.glob(
                     os.path.join(db_loc, schema.DB_NAME+'*'))), 1+cnt)
             else:
                 self.assertEqual(len(glob.glob(
-                    os.path.join(db_loc, schema.DB_NAME+'*'))), 13)
+                    os.path.join(db_loc, schema.DB_NAME+'*'))), 9)
 
             # perform backup
             schema.backup()
@@ -414,7 +414,7 @@ class ModelSchemaTest(test.BaseTestCase):
         self.assertIsInstance(str_state, schema.AppState)
 
         str_state.val_str = 'Just a simple string'
-        self.assertIsInstance(str_state.val_str, basestring)
+        self.assertIsInstance(str_state.val_str, six.string_types)
         self.assertIsNotNone(str_state.val_str)
 
         int_state = schema.AppState(name='key_int')
@@ -422,7 +422,7 @@ class ModelSchemaTest(test.BaseTestCase):
         self.assertIsInstance(int_state, schema.AppState)
 
         int_state.val_int = 7
-        self.assertIsInstance(int_state.val_int, int)
+        self.assertIsInstance(int_state.val_int, six.integer_types)
         self.assertIsNotNone(int_state.val_int)
 
         list_state = schema.AppState(name='key_list')
@@ -482,9 +482,9 @@ class ModelSchemaTest(test.BaseTestCase):
             self.assertIsNotNone(entry)
 
             if key == 'key_str':
-                self.assertIsInstance(entry.val_str, basestring)
+                self.assertIsInstance(entry.val_str, six.string_types)
             elif key == 'key_int':
-                self.assertIsInstance(entry.val_int, int)
+                self.assertIsInstance(entry.val_int, six.integer_types)
             elif key == 'key_list':
                 self.assertIsInstance(entry.val_list.split(','), list)
             elif key == 'key_flag':

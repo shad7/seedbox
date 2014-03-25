@@ -6,15 +6,16 @@ cache of the file and corresponding state.
 from __future__ import absolute_import
 import logging
 import os
-import traceback
 import shutil
+import traceback
+
 from oslo.config import cfg
 
-from seedbox.tasks.base import BasePlugin
+from .base import BasePlugin
 
-from seedbox import helpers
 from seedbox.common import tools
-from seedbox.pluginmanager import register_plugin, phase
+from seedbox.workflow import helpers
+from seedbox.workflow.pluginmanager import register_plugin, phase
 
 __version__ = '1'
 
@@ -53,15 +54,16 @@ class CopyFile(BasePlugin):
 
             try:
                 log.debug('copying media files for torrent %s', torrent)
-                media_files = helpers.get_media_files(
-                    torrent, file_exts=tools.format_file_ext(
-                        cfg.CONF.video_filetypes))
+                media_files = helpers.get_media_files(torrent)
+#               media_files = helpers.get_media_files(
+#                   torrent, file_exts=tools.format_file_ext(
+#                       cfg.CONF.video_filetypes))
 
                 # now loop through the files we got back, if none then
                 # no files were in need of copying
                 for media_file in media_files:
 
-                    if media_file.file_path == cfg.CONF.sync_path:
+                    if media_file.file_path == cfg.CONF.plugins.sync_path:
                         log.debug('media file %s already copied; skipping',
                                   media_file)
                         continue
@@ -69,7 +71,7 @@ class CopyFile(BasePlugin):
                     shutil.copy2(
                         os.path.join(media_file.file_path,
                                      media_file.filename),
-                        cfg.CONF.sync_path)
+                        cfg.CONF.plugins.sync_path)
 
                     # we are copying the files not the paths; if the filename
                     # includes path information we will need to strip it for
@@ -77,7 +79,7 @@ class CopyFile(BasePlugin):
                     # The helper method expects a list but in our case it is
                     # just a single file so wrap it up!
                     helpers.add_mediafiles_to_torrent(
-                        torrent, cfg.CONF.sync_path,
+                        torrent, cfg.CONF.plugins.sync_path,
                         [os.path.basename(media_file.filename)])
                     # need to show we completed the copy process;
                     # so show it as synced which is technically true since

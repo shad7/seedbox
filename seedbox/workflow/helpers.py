@@ -5,12 +5,14 @@ or even what the process flow is. By hiding all of these details we can keep
 internals private.
 """
 from __future__ import absolute_import
-from itertools import ifilter
 import logging
 import os
-from seedbox import datamanager
 
-log = logging.getLogger(__name__)
+from six import moves
+
+from seedbox.db import api as dbapi
+
+LOG = logging.getLogger(__name__)
 
 
 def set_torrent_failed(torrent, error):
@@ -25,7 +27,7 @@ def set_torrent_failed(torrent, error):
     else:
         msg = error
 
-    datamanager.set_failed(torrent, msg)
+    dbapi.set_failed(torrent, msg)
 
 
 def get_media_files(torrent, file_exts=None, file_path=None, compressed=False,
@@ -49,27 +51,26 @@ def get_media_files(torrent, file_exts=None, file_path=None, compressed=False,
                             torrent or empty torrent)
     """
 
-    log.trace('looking for media files for torrent %s', torrent)
+    LOG.trace('looking for media files for torrent %s', torrent)
 
     if not torrent or not torrent.id:
         raise ValueError('missing input: torrent is a required input')
 
-    media_files = datamanager.get_media_files(torrent, file_path, compressed,
-                                              synced, missing, skipped)
+    media_files = dbapi.get_media_files(torrent, file_path, compressed,
+                                        synced, missing, skipped)
     if not media_files:
-        log.debug('no mediafiles found for specified torrent')
+        LOG.debug('no mediafiles found for specified torrent')
         # no results found
         return []
 
     if file_exts:
-        log.trace('filtering list of results using list of exts %s',
+        LOG.trace('filtering list of results using list of exts %s',
                   file_exts)
         ext_check = lambda media: media.file_ext in file_exts
         # now filter out any files that don't match the supplied file_ext list
-        # also need to perform list otherwise it is an ifilter iterable
-        return list(ifilter(ext_check, media_files))
+        return list(moves.filter(ext_check, media_files))
 
-    log.debug('found %d media files', len(media_files))
+    LOG.debug('found %d media files', len(media_files))
     return media_files
 
 
@@ -91,11 +92,11 @@ def is_torrent_processed(torrent):
 
     flag = False
     # how many files are associated with torrent
-    total_files = len(datamanager.get_files_by_torrent(torrent))
+    total_files = len(dbapi.get_files_by_torrent(torrent))
     # how many files have already been processed
-    total_processed = len(datamanager.get_processed_media_files(torrent))
+    total_processed = len(dbapi.get_processed_media_files(torrent))
 
-    log.trace('total files [%d] vs. total processed [%d]',
+    LOG.trace('total files [%d] vs. total processed [%d]',
               total_files, total_processed)
     # if the two totals are the same then torrent is fully processed
     # if the torrent has already been purged or is invalid (has no files)
@@ -118,9 +119,9 @@ def synced_media_file(media_file):
     if not media_file or not media_file.id:
         raise ValueError('missing input: torrent is a required input')
 
-    log.trace('syncing media file to cache %s', media_file)
+    LOG.trace('syncing media file to cache %s', media_file)
     media_file.synced = True
-    log.trace('synced to cache %s', media_file)
+    LOG.trace('synced to cache %s', media_file)
 
 
 def set_media_files_path(file_location, media_files):
@@ -149,12 +150,12 @@ def set_media_files_path(file_location, media_files):
         raise TypeError(
             'invalid input type for media_files provided: expected a list')
 
-    log.trace('setting location [%s] for %d media files',
+    LOG.trace('setting location [%s] for %d media files',
               file_location, len(media_files))
     for media_file in media_files:
         media_file.file_path = file_location
 
-    log.trace('location set')
+    LOG.trace('location set')
 
 
 def add_mediafiles_to_torrent(torrent, file_location, added_files):
@@ -188,7 +189,7 @@ def add_mediafiles_to_torrent(torrent, file_location, added_files):
 
     media_files = []
 
-    log.trace('start processing files to be added to torrent %s', torrent)
+    LOG.trace('start processing files to be added to torrent %s', torrent)
     for added_file in added_files:
 
         media = {}
@@ -206,8 +207,8 @@ def add_mediafiles_to_torrent(torrent, file_location, added_files):
 
         media_files.append(media)
 
-    log.trace('total media files to add %d', len(media_files))
+    LOG.trace('total media files to add %d', len(media_files))
     if media_files:
-        log.trace('adding files to torrent')
-        datamanager.add_files_to_torrent(torrent, media_files)
-        log.trace('files added')
+        LOG.trace('adding files to torrent')
+        dbapi.add_files_to_torrent(torrent, media_files)
+        LOG.trace('files added')

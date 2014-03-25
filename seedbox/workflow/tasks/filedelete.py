@@ -7,13 +7,14 @@ from __future__ import absolute_import
 import logging
 import os
 import traceback
+
 from oslo.config import cfg
 
-from seedbox.tasks.base import BasePlugin
+from .base import BasePlugin
 
-from seedbox import helpers
 from seedbox.common import tools
-from seedbox.pluginmanager import register_plugin, phase
+from seedbox.workflow import helpers
+from seedbox.workflow.pluginmanager import register_plugin, phase
 
 __version__ = '1'
 
@@ -53,17 +54,17 @@ class DeleteFile(BasePlugin):
             try:
                 log.debug('deleting media files for torrent %s', torrent)
                 media_files = helpers.get_media_files(
-                    torrent, file_path=cfg.CONF.sync_path, synced=True)
+                    torrent, file_path=cfg.CONF.plugins.sync_path, synced=True)
 
                 # now loop through the files we got back, if none then no
                 # files were in need of deleting
                 for media_file in media_files:
                     # if for some reason it doesn't exist then no worries
                     # just skip over it and continue; otherwise delete it
-                    if os.path.exists(os.path.join(cfg.CONF.sync_path,
+                    if os.path.exists(os.path.join(cfg.CONF.plugins.sync_path,
                                                    media_file.filename)):
                         log.trace('delete file: %s', media_file.filename)
-                        os.remove(os.path.join(cfg.CONF.sync_path,
+                        os.remove(os.path.join(cfg.CONF.plugins.sync_path,
                                                media_file.filename))
 
                 # after we are done processing the torrent added it the list

@@ -5,13 +5,14 @@ based on certain validation rules.
 """
 from __future__ import absolute_import
 import logging
+
 from oslo.config import cfg
 
-from seedbox.tasks.base import BasePlugin
+from .base import BasePlugin
 
-from seedbox import helpers
 from seedbox.common import tools
-from seedbox.pluginmanager import register_plugin, phase
+from seedbox.workflow import helpers
+from seedbox.workflow.pluginmanager import register_plugin, phase
 
 __version__ = '1'
 
@@ -57,7 +58,7 @@ class PhaseValidator(BasePlugin):
             # did not successfully complete this phase and should not be
             # moved to the next phase.
             media_files = helpers.get_media_files(
-                torrent, file_path=cfg.CONF.sync_path, compressed=None,
+                torrent, file_path=cfg.CONF.plugins.sync_path, compressed=None,
                 synced=False)
 
             if media_files:

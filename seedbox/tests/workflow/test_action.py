@@ -6,7 +6,7 @@ import testtools
 from seedbox import logext as logmgr  # noqa
 
 from seedbox.tests import test
-from seedbox import action
+from seedbox.workflow import action
 
 
 def dummy_func(*args, **kwargs):

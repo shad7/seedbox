@@ -6,17 +6,18 @@ cache of the file and corresponding state.
 from __future__ import absolute_import
 import logging
 import os
-import traceback
 import shutil
-from six import moves
-import rarfile
+import traceback
+
 from oslo.config import cfg
+import rarfile
+from six import moves
 
-from seedbox.tasks.base import BasePlugin
+from .base import BasePlugin
 
-from seedbox import helpers
 from seedbox.common import tools
-from seedbox.pluginmanager import register_plugin, phase
+from seedbox.workflow import helpers
+from seedbox.workflow.pluginmanager import register_plugin, phase
 
 __version__ = '2'
 
@@ -219,7 +220,7 @@ class _Prepare(BasePlugin):
                     # left the previous files in place and created new
                     # ones for the purposes of further procesing later.
                     helpers.add_mediafiles_to_torrent(
-                        torrent, cfg.CONF.sync_path, files)
+                        torrent, cfg.CONF.plugins.sync_path, files)
 
                     # need to show we completed the process;
                     # so show it as synced which is technically true since
@@ -263,15 +264,17 @@ class CopyFile(_Prepare):
             # if the path is sync_path then it was
             # already processed so remove it from the
             # list of possible media files to process
-            if media_file.file_path == cfg.CONF.sync_path:
+            if media_file.file_path == cfg.CONF.plugins.sync_path:
                 return False
             return True
 
         return list(moves.filter(matches,
-                                 helpers.get_media_files(
-                                     torrent,
-                                     file_exts=tools.format_file_ext(
-                                         cfg.CONF.video_filetypes))))
+                                 helpers.get_media_files(torrent)))
+#       return list(moves.filter(matches,
+#                                helpers.get_media_files(
+#                                    torrent,
+#                                    file_exts=tools.format_file_ext(
+#                                        cfg.CONF.video_filetypes))))
 
     def _execute(self, media_file):
 
@@ -282,7 +285,7 @@ class CopyFile(_Prepare):
         shutil.copy2(
             os.path.join(media_file.file_path,
                          media_file.filename),
-            cfg.CONF.sync_path)
+            cfg.CONF.plugins.sync_path)
 
         # we are copying the files not the paths; if the filename
         # includes path information we will need to strip it for
@@ -323,7 +326,7 @@ class UnrarFile(_Prepare):
                 compressed_file.infolist())
 
             archived_files = compressed_file.namelist()
-            compressed_file.extractall(path=cfg.CONF.sync_path)
+            compressed_file.extractall(path=cfg.CONF.plugins.sync_path)
 
         return archived_files
 

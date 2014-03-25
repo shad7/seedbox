@@ -8,22 +8,21 @@ seedboxes where things stay for extended periods but the destination files
 are usually moved into media libraries.
 """
 from __future__ import absolute_import
+from collections import namedtuple
 import logging
 import os
 import traceback
-from collections import namedtuple
 
 from oslo.config import cfg
 
-from seedbox.tasks.base import BasePlugin
+from .base import BasePlugin
+from .subprocessext import ProcessLogging
 
-from seedbox import helpers
 from seedbox.common import tools
-from seedbox.pluginmanager import register_plugin, phase
-from seedbox.subprocessext import ProcessLogging
 from seedbox.pssh import manager
 from seedbox.pssh import task
-
+from seedbox.workflow import helpers
+from seedbox.workflow.pluginmanager import register_plugin, phase
 
 __version__ = '1'
 
@@ -152,13 +151,13 @@ class SyncFile(BasePlugin):
 
         if cfg.CONF.filesync.enable_parallel:
             impl = ParallelSync(torrents=torrents, cmd=cmd,
-                                local_path=cfg.CONF.sync_path,
+                                local_path=cfg.CONF.plugins.sync_path,
                                 remote_path=cfg.CONF.filesync.remote_path,
                                 host=cfg.CONF.filesync.remote_host,
                                 user=cfg.CONF.filesync.remote_user)
         else:
             impl = SequentialSync(torrents=torrents, cmd=cmd,
-                                  local_path=cfg.CONF.sync_path,
+                                  local_path=cfg.CONF.plugins.sync_path,
                                   remote_path=cfg.CONF.filesync.remote_path,
                                   host=cfg.CONF.filesync.remote_host,
                                   user=cfg.CONF.filesync.remote_user)

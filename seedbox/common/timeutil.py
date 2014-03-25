@@ -22,6 +22,8 @@ import logging
 
 import datetime
 
+ONE_WEEK = datetime.timedelta(weeks=1).total_seconds()
+
 
 class AfterDelta(object):
     """
@@ -108,6 +110,11 @@ def timed(method=None, logger=None, loglvl=None):
         return result
 
     return timer
+
+
+def nvl_date(dt, default=None):
+    _default = default if default else utcnow()
+    return dt if dt and isinstance(dt, datetime.datetime) else _default
 
 
 def utcnow():

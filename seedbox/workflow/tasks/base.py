@@ -3,11 +3,18 @@ Provides a base plugin definition for registering options available to all
 plugins and the ability to disable any specific plugin via configuration.
 """
 from __future__ import absolute_import
+
 from oslo.config import cfg
+
 from seedbox.common import tools
 
-cfg.CONF.register_group(cfg.OptGroup('plugins',
-                                     help='Group of common plugin options'))
+OPTS = [
+    cfg.StrOpt('sync_path',
+               required=True,
+               help='Location to temp media copies for syncing to library'),
+]
+
+cfg.CONF.register_opts(OPTS, group='plugins')
 
 
 class BasePlugin(object):

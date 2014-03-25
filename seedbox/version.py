@@ -2,7 +2,10 @@
 Access to the version as configured as part of installation package.
 Leverages pbr (Python Build Reasonableness)
 """
+from pbr import version as pbr_version
 
-import pbr.version
+version_info = pbr_version.VersionInfo('SeedboxManager')
 
-version_info = pbr.version.VersionInfo('SeedboxManager')
+
+def version_string():
+    return version_info.version_string()

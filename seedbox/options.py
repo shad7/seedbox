@@ -9,7 +9,6 @@ import sys
 from six import moves
 from oslo.config import cfg
 
-from seedbox.common import tools
 from seedbox import version
 from seedbox.configs import generator
 
@@ -22,46 +21,7 @@ OPTS = [
                required=True,
                help='Base path'),
     cfg.StrOpt('base_client_path',
-               deprecated_group='DEFAULT',
                help='Location torrent client stores data files'),
-    cfg.StrOpt('torrent_path',
-               deprecated_group='DEFAULT',
-               required=True,
-               help='Location of the .torrent files'),
-    cfg.ListOpt('media_paths',
-                deprecated_group='DEFAULT',
-                required=True,
-                help='Location(s) of the media files'),
-    cfg.StrOpt('incomplete_path',
-               deprecated_group='DEFAULT',
-               required=True,
-               help='Location of the downloading torrents'),
-    cfg.StrOpt('sync_path',
-               deprecated_group='DEFAULT',
-               required=True,
-               help='Location to temp media copies for syncing to library'),
-    cfg.ListOpt('plugin_paths',
-                default=[],
-                deprecated_group='DEFAULT',
-                help='Location(s) of additional plugins'),
-    cfg.ListOpt('disabled_phases',
-                default=[],
-                deprecated_group='DEFAULT',
-                help='List of phases to disable for execution '
-                     '(prepare, activate, complete)'),
-    cfg.ListOpt('video_filetypes',
-                default=['.avi', '.mp4', '.mkv', '.mpg'],
-                deprecated_group='DEFAULT',
-                help='List of video filetypes to support. (ignore others)'),
-    cfg.ListOpt('compressed_filetypes',
-                default=['.rar'],
-                deprecated_group='DEFAULT',
-                help='List of compressed filetypes to support. '
-                     '(ignore others)'),
-    cfg.IntOpt('max_retry',
-               default=5,
-               deprecated_group='DEFAULT',
-               help='Maximum number of times to retry a failed torrent'),
 ]
 
 cfg.CONF.register_opts(OPTS)
@@ -70,13 +30,6 @@ CLI_OPTS = [
     cfg.BoolOpt('gen-sample',
                 default=False,
                 help='Generate a sample configuration file to resource path'),
-    cfg.BoolOpt('purge',
-                default=False,
-                help='DANGER: deletes the database cache and \
-                     everything starts over'),
-    cfg.BoolOpt('retry',
-                default=False,
-                help='only executes entries that failed previously'),
 ]
 
 cfg.CONF.register_cli_opts(CLI_OPTS)
@@ -87,12 +40,16 @@ def _gen_config_sample():
     opt_modules = [
         'seedbox.logext',
         'seedbox.options',
-        'seedbox.tasks.filecopy',
-        'seedbox.tasks.filedelete',
-        'seedbox.tasks.fileunrar',
-        'seedbox.tasks.validate_phase',
-        'seedbox.tasks.prepare',
-        'seedbox.tasks.filesync',
+        'seedbox.db.api',
+        'seedbox.torrent',
+        'seedbox.workflow',
+        'seedbox.workflow.tasks.base',
+        'seedbox.workflow.tasks.filecopy',
+        'seedbox.workflow.tasks.filedelete',
+        'seedbox.workflow.tasks.fileunrar',
+        'seedbox.workflow.tasks.validate_phase',
+        'seedbox.workflow.tasks.prepare',
+        'seedbox.workflow.tasks.filesync',
     ]
 
     generator.generate_by_module(opt_modules,
@@ -154,12 +111,12 @@ def initialize(args):
 
 
         * /etc/
-        * /etc/seedbox
+        * /etc/seedbox/
         * ~/VIRTUAL_ENV/etc/
         * ~/VIRTUAL_ENV/etc/seedbox/
         * ~/
         * ~/.seedbox/
-        * . (current working directory)
+        * ./ (current working directory)
 
 
     :param list args:   command line inputs
@@ -168,7 +125,7 @@ def initialize(args):
     cfg.CONF(
         args,
         project=PROJECT_NAME,
-        version=version.version_info.version_string(),
+        version=version.version_string(),
         default_config_files=_find_config_files(),
     )
 
@@ -177,23 +134,6 @@ def initialize(args):
     if not cfg.CONF.config_dir:
         cfg.CONF.config_dir = os.path.dirname(cfg.CONF.config_file[-1])
 
-        if cfg.CONF.gen_sample:
-            _gen_config_sample()
-            sys.exit(0)
-
-    # validate the know directory locations that we depend on within
-    # the application to make sure we have valid paths
-    validate_paths = [cfg.CONF.base_path, cfg.CONF.base_client_path,
-                      cfg.CONF.torrent_path, cfg.CONF.incomplete_path,
-                      cfg.CONF.sync_path]
-    map(validate_paths.append, cfg.CONF.media_paths)
-    map(validate_paths.append, cfg.CONF.plugin_paths)
-
-    invalid_paths = []
-    for entry in validate_paths:
-        if tools.verify_path(entry) is None:
-            invalid_paths.append(entry)
-
-    if invalid_paths:
-        raise ValueError('Invalid paths provided in configuration file(s): %s',
-                         invalid_paths)
+    if cfg.CONF.gen_sample:
+        _gen_config_sample()
+        sys.exit(0)

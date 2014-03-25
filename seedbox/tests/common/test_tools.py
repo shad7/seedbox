@@ -2,6 +2,8 @@ from __future__ import absolute_import
 import os
 import sys
 
+import six
+
 from seedbox.tests import test
 # now include what we need to test
 from seedbox.common import tools
@@ -87,42 +89,43 @@ class ToolsTest(test.BaseTestCase):
         """
         make sure it converts all lists to a string
         """
-        self.assertIsInstance(tools.list_to_str(['']), basestring)
-        self.assertIsInstance(tools.list_to_str(['1', '2', '3']), basestring)
+        self.assertIsInstance(tools.list_to_str(['']), six.string_types)
+        self.assertIsInstance(tools.list_to_str(['1', '2', '3']),
+                              six.string_types)
         self.assertIsInstance(
-            tools.list_to_str('value1,value2,value3'), basestring)
+            tools.list_to_str('value1,value2,value3'), six.string_types)
         self.assertIsInstance(
-            tools.list_to_str('value1, value2, value3'), basestring)
+            tools.list_to_str('value1, value2, value3'), six.string_types)
 
-        self.assertIsNone(tools.list_to_str([]), basestring)
-        self.assertIsNone(tools.list_to_str(' '), basestring)
-        self.assertIsNone(tools.list_to_str('some value'), basestring)
-        self.assertIsNone(tools.list_to_str(''), basestring)
-        self.assertIsNone(tools.list_to_str(None), basestring)
+        self.assertIsNone(tools.list_to_str([]), six.string_types)
+        self.assertIsNone(tools.list_to_str(' '), six.string_types)
+        self.assertIsNone(tools.list_to_str('some value'), six.string_types)
+        self.assertIsNone(tools.list_to_str(''), six.string_types)
+        self.assertIsNone(tools.list_to_str(None), six.string_types)
 
     def test_to_int(self):
         """
         make sure it converts everything it should to an int
         """
-        self.assertIsInstance(tools.to_int(0), int)
+        self.assertIsInstance(tools.to_int(0), six.integer_types)
         self.assertEqual(tools.to_int(0), 0)
-        self.assertIsInstance(tools.to_int(1), int)
+        self.assertIsInstance(tools.to_int(1), six.integer_types)
         self.assertEqual(tools.to_int(1), 1)
-        self.assertIsInstance(tools.to_int('0'), int)
+        self.assertIsInstance(tools.to_int('0'), six.integer_types)
         self.assertEqual(tools.to_int('0'), 0)
-        self.assertIsInstance(tools.to_int('1'), int)
+        self.assertIsInstance(tools.to_int('1'), six.integer_types)
         self.assertEqual(tools.to_int('1'), 1)
-        self.assertIsInstance(tools.to_int('10'), int)
+        self.assertIsInstance(tools.to_int('10'), six.integer_types)
         self.assertEqual(tools.to_int('10'), 10)
-        self.assertIsInstance(tools.to_int(' 10 '), int)
+        self.assertIsInstance(tools.to_int(' 10 '), six.integer_types)
         self.assertEqual(tools.to_int(' 10 '), 10)
-        self.assertIsInstance(tools.to_int(' '), int)
+        self.assertIsInstance(tools.to_int(' '), six.integer_types)
         self.assertEqual(tools.to_int(' '), -99999)
-        self.assertIsInstance(tools.to_int('other'), int)
+        self.assertIsInstance(tools.to_int('other'), six.integer_types)
         self.assertEqual(tools.to_int('other'), -99999)
-        self.assertIsInstance(tools.to_int([]), int)
+        self.assertIsInstance(tools.to_int([]), six.integer_types)
         self.assertEqual(tools.to_int([]), -99999)
-        self.assertIsInstance(tools.to_int(None), int)
+        self.assertIsInstance(tools.to_int(None), six.integer_types)
         self.assertEqual(tools.to_int(None), -99999)
 
     def test_verify_path(self):

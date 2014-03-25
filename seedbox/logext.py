@@ -8,7 +8,21 @@ import logging
 import logging.config
 import logging.handlers
 import os
+
 from oslo.config import cfg
+
+try:
+    NullHandler = logging.NullHandler
+except AttributeError:  # NullHandler added in Python 2.7
+    class NullHandler(logging.Handler):
+        def handle(self, record):
+            pass
+
+        def emit(self, record):
+            pass
+
+        def createLock(self):
+            self.lock = None
 
 DEFAULT_LOG_FILENAME = 'seedbox.log'
 DEFAULT_LOG_LEVEL = 'info'
@@ -70,7 +84,7 @@ logging.addLevelName(TraceLogger.TRACE, 'TRACE')
 
 # add default handler to make sure that cli only actions do not
 # generate logging handler errors
-logging.getLogger().addHandler(logging.NullHandler())
+logging.getLogger().addHandler(NullHandler())
 
 
 def configure():

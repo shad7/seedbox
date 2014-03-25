@@ -13,14 +13,14 @@ Created on 2012-03-07
 @author: mohanr
 """
 from __future__ import absolute_import
-import bencode
-from BTL import BTFailure
-
 from datetime import datetime
-from StringIO import StringIO
 import logging
 import os
 import string
+
+import bencode
+from bencode import BTL
+import six
 
 
 def humanize_bytes(in_bytes, precision=1):
@@ -126,7 +126,7 @@ class TorrentParser(object):
         INT_END = 'e'
 
         def __init__(self, torr_str):
-            self.torr_str = StringIO(torr_str)
+            self.torr_str = six.StringIO(torr_str)
             self.curr_char = None
 
         def next_char(self):
@@ -238,7 +238,7 @@ class TorrentParser(object):
         # correspondingly.
         try:
             self.parsed_content = bencode.bdecode(self.torrent_content)
-        except BTFailure as bterr:
+        except BTL.BTFailure as bterr:
             logging.debug(
                 'bencode.bdecode failed: ({0}); \
                 trying alternate approach'.format(bterr))

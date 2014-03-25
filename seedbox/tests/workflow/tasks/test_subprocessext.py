@@ -10,7 +10,7 @@ from seedbox import logext as logmgr
 
 from seedbox.tests import test
 # now include what we need to test
-from seedbox import subprocessext
+from seedbox.workflow.tasks import subprocessext
 
 
 class SubprocessExtTest(test.BaseTestCase):
