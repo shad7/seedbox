@@ -5,9 +5,6 @@ import subprocess
 import testtools
 from distutils.sysconfig import get_python_lib
 
-# required since we leverage custom logging levels
-from seedbox import logext as logmgr
-
 from seedbox.tests import test
 # now include what we need to test
 from seedbox.workflow.tasks import subprocessext
@@ -23,7 +20,6 @@ class SubprocessExtTest(test.BaseTestCase):
         create a logger
         """
         super(SubprocessExtTest, self).setUp()
-        logmgr.configure()
         self.logger = logging.getLogger('subproc-ext')
         self.py_lib = os.path.abspath(os.path.join(get_python_lib(), '..'))
 

@@ -2,9 +2,6 @@ from __future__ import print_function
 
 import testtools
 
-# required since we leverage custom logging levels
-from seedbox import logext as logmgr  # noqa
-
 from seedbox.tests import test
 from seedbox.workflow import action
 

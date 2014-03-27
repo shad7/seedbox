@@ -2,13 +2,12 @@ from __future__ import absolute_import
 from datetime import datetime
 import glob
 import os
+import shutil
 import tempfile
 
 import six
 
 from seedbox.tests import test
-# required since we leverage custom logging levels
-from seedbox import logext as logmgr  # noqa
 
 # now include what we need to test
 import seedbox.db.schema as schema
@@ -27,21 +26,20 @@ class ModelSchemaTest(test.BaseTestCase):
 
     def setUp(self):
         super(ModelSchemaTest, self).setUp()
-        self.CONF.set_override('purge', False, 'db')
+
+        self.db_dir = get_db_location()
+        self.CONF.set_override('config_dir', self.db_dir)
+        # initialize the database and schema details.
+        schema.init()
+
+    def tearDown(self):
+        super(ModelSchemaTest, self).tearDown()
+        shutil.rmtree(self.db_dir, ignore_errors=True)
 
     def test_add_torrents(self):
         """
         Test adding torrents to the databases
         """
-        self.CONF.set_override('config_dir', get_db_location())
-
-        # initialize the database and schema details.
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
                     'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
 
@@ -70,14 +68,6 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Test adding media files to the database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         # create the torrent
         torrent = schema.Torrent(name='test.torrent')
         mediafiles = ['vid11.mp4', 'vid2.mp4', 'vid3.mp4',
@@ -108,14 +98,6 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing fetching torrents from database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details.
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
                     'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
 
@@ -134,14 +116,6 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing fetching media files from database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         # create the torrent
         torrent = schema.Torrent(name='test.torrent')
         mediafiles = ['vid11.mp4', 'vid2.mp4', 'vid3.mp4',
@@ -170,14 +144,6 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing updating torrents in database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         # create the torrent
         torrent = schema.Torrent(name='test.torrent')
 
@@ -217,14 +183,6 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing updating mediafiles in database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         # create the torrent
         torrent = schema.Torrent(name='test.torrent')
         other_torrent = schema.Torrent(name='othertest.torrent')
@@ -272,14 +230,6 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing deleting torrents from database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         # create the torrent
         torrent = schema.Torrent(name='test.torrent')
         self.assertIsInstance(torrent, schema.Torrent)
@@ -309,14 +259,6 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing deleting media files from database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
-        # did not think I would need to do this; hrmmm
-        schema.MediaFile.clearTable()
-
         # create the torrent
         torrent = schema.Torrent(name='test.torrent')
         mediafiles = ['vid1.mp4', 'vid2.mp4', 'vid3.mp4']
@@ -345,11 +287,7 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing resetting the database
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.Torrent.clearTable()
+        schema.dump_structure()
 
         tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
                     'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
@@ -372,43 +310,42 @@ class ModelSchemaTest(test.BaseTestCase):
         """
         Testing backing up the database
         """
-        db_loc = get_db_location()
-        self.CONF.set_override('config_dir', db_loc)
-        # make sure we remove any from a previous test
-        for dbfile in glob.glob(
-                os.path.join(db_loc, schema.DB_NAME+'*')):
-            try:
-                os.remove(dbfile)
-            except:
-                pass
-        # initialize the database and schema details
-        schema.init()
-
         for cnt in range(0, 15):
             if cnt == 0:
                 self.assertEqual(len(glob.glob(
-                    os.path.join(db_loc, schema.DB_NAME+'*'))), 1)
+                    os.path.join(self.db_dir, schema.DB_NAME+'*'))), 1)
             elif cnt >= 1 and cnt <= 8:
                 self.assertEqual(len(glob.glob(
-                    os.path.join(db_loc, schema.DB_NAME+'*'))), 1+cnt)
+                    os.path.join(self.db_dir, schema.DB_NAME+'*'))), 1+cnt)
             else:
                 self.assertEqual(len(glob.glob(
-                    os.path.join(db_loc, schema.DB_NAME+'*'))), 9)
+                    os.path.join(self.db_dir, schema.DB_NAME+'*'))), 9)
 
             # perform backup
             schema.backup()
+
+    def test_backup_missing_database(self):
+        self.CONF.set_override('config_dir', get_db_location())
+        if os.path.exists(os.path.join(self.CONF.config_dir, schema.DB_NAME)):
+            shutil.rmtree(self.CONF.config_dir)
+        # perform backup
+        schema.backup()
+
+    def test_purge_missing_database(self):
+        self.CONF.set_override('config_dir', get_db_location())
+        if os.path.exists(os.path.join(self.CONF.config_dir, schema.DB_NAME)):
+            shutil.rmtree(self.CONF.config_dir)
+        schema.purge()
+
+    def test_db_multiple_init(self):
+        # one more time to see response of multiple calls to init
+        schema.init()
 
     def test_set_appstate(self):
         """
         AppState is just a key:value pair caching. So test out setting each
         'type' in one test case.
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.AppState.clearTable()
-
         str_state = schema.AppState(name='key_str')
         # verify we have an instance
         self.assertIsInstance(str_state, schema.AppState)
@@ -453,12 +390,6 @@ class ModelSchemaTest(test.BaseTestCase):
         AppState is just a key:value pair caching. So test out getting each
         'type' in one test case.
         """
-        self.CONF.set_override('config_dir', get_db_location())
-        # initialize the database and schema details
-        schema.init()
-        # make sure the table is really empty before we start
-        schema.AppState.clearTable()
-
         # first need to actually create some data
         str_state = schema.AppState(name='key_str')
         str_state.val_str = 'Just a simple string'
