@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+2.1
+---
+
+* updating changelog and increasing version
 * code fixes and cleanup
 * made several updates to clean up code and added significant amount of test code to finally reach ~75% code coverage
 * added test cases for options module
