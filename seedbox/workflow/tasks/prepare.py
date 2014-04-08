@@ -270,11 +270,6 @@ class CopyFile(_Prepare):
 
         return list(moves.filter(matches,
                                  helpers.get_media_files(torrent)))
-#       return list(moves.filter(matches,
-#                                helpers.get_media_files(
-#                                    torrent,
-#                                    file_exts=tools.format_file_ext(
-#                                        cfg.CONF.video_filetypes))))
 
     def _execute(self, media_file):
 

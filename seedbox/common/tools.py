@@ -167,7 +167,11 @@ def format_file_ext(filetypes):
         for filetype in filetypes:
             # make sure None or some other garbage was not put into
             # the list
-            if not filetype or not isinstance(filetype, six.string_types):
+            if not isinstance(filetype, six.string_types):
+                continue
+
+            filetype = filetype.strip()
+            if not filetype:
                 continue
             # if someone configured it but left off the '.', then we will
             # simply add it for them; otherwise use as-is
@@ -187,10 +191,7 @@ def get_system(system):
     :returns:           system value (1024, 1000) default: 1024
     :rtype:             int
     """
-    if system in SYSTEM_MAP:
-        return SYSTEM_MAP[system]
-    else:
-        return DEFAULT_SYSTEM
+    return SYSTEM_MAP.get(system, DEFAULT_SYSTEM)
 
 
 def byte_to_gb(size, precision=2, system=SYS_TRADITIONAL):
@@ -203,8 +204,7 @@ def byte_to_gb(size, precision=2, system=SYS_TRADITIONAL):
     :returns:       number in gigabytes based on system to specified precision
     :rtype:         float
     """
-    gb_offset = system ** 3
-    return round(float(size)/gb_offset, precision)
+    return round(float(size)/system ** 3, precision)
 
 
 def get_home_disk_usage(system=None):
@@ -245,7 +245,7 @@ def get_home_disk_usage(system=None):
         # can access it later
         my_size = dirs_dict[root] = size + subdir_size
 
-    log.debug('home usage: %s --> GB %s', my_size, byte_to_gb(my_size, system=system))
+    log.debug('home usage: %s', my_size)
     # requested to convert bytes (default size type) to gigabyte
     # using either the traditional or si system
     if system is not None:

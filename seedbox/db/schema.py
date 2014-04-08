@@ -226,3 +226,22 @@ def dump_structure(loglvl=logging.DEBUG):
 
     LOG.log(loglvl, 'AppState table: [%s]', AppState.sqlmeta.table)
     LOG.log(loglvl, 'AppState Columns: [%s]', AppState.sqlmeta.columns.keys())
+
+
+def clean_db():
+    import sqlite3
+
+    LOG.debug('cleaning database...')
+    _dbconn = None
+    try:
+        _dbconn = sqlite3.connect(_get_db_file())
+        _dbconn.execute('VACUUM')
+        _dbconn.close()
+        LOG.debug('database clean')
+    except:
+        LOG.info('database cleanup failed; trying to close connection')
+        if _dbconn:
+            try:
+                _dbconn.close()
+            except:
+                LOG.info('failed to close connection')

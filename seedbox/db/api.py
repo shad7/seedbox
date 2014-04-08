@@ -490,7 +490,7 @@ def get_flag(name, default=None):
     :rtype:             bool
     """
     entry = _fetch(name)
-    return default if not entry else entry.val_flag
+    return default if entry is None else entry.val_flag
 
 
 def get_date(name, default=None):
@@ -523,6 +523,7 @@ def initialize():
         schema.purge()
         _set_last_purge_date()
     else:
+        schema.clean_db()
         schema.init()
         # step to clean up database
         _perform_db_cleanup()

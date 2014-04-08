@@ -375,7 +375,7 @@ class ParallelSync(_BaseSync):
 
     def _add_torrent_task(self, torrent, media_file):
 
-        if not torrent.name in self.torrent_tasks:
+        if torrent.name not in self.torrent_tasks:
             self.torrent_tasks[torrent.name] = _TorrentTask(torrent,
                                                             set([]),
                                                             False)

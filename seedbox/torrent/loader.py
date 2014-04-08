@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import logging
+import glob
 import os
 
 from oslo.config import cfg
@@ -17,52 +18,35 @@ def load_torrents():
     torrent file (via parsing) and capture the relevant details. Next create
     a record in the cache for each torrent.
     """
-    known_skip_files = ['torrents.fastresume', 'torrents.state']
-    torrent_files = os.listdir(u""+cfg.CONF.torrent.torrent_path)
 
-    LOG.trace('torrent files found [%d] processing', len(torrent_files))
+    for torrent_file in glob.glob(os.path.join(cfg.CONF.torrent.torrent_path,
+                                               '*.torrent')):
 
-    for torrent_file in torrent_files:
-        ext = os.path.splitext(torrent_file)[1]
-        # some torrents don't always end with .torrent,
-        # so let the parser reject it
-        if not ext or ext == '.torrent':
-            # get the entry in the cache or creates it if it doesn't exist
-            torrent = dbapi.fetch_or_create_torrent(torrent_file)
+        # get the entry in the cache or creates it if it doesn't exist
+        torrent = dbapi.fetch_or_create_torrent(
+            os.path.basename(torrent_file))
 
-            if _is_parsing_required(torrent):
+        if _is_parsing_required(torrent):
 
-                try:
-                    torparser = parser.TorrentParser(
-                        os.path.join(cfg.CONF.torrent.torrent_path,
-                                     torrent.name))
-                    media_items = torparser.get_files_details()
-                    LOG.trace('Total files in torrent %d', len(media_items))
+            try:
+                torparser = parser.TorrentParser(torrent_file)
+                media_items = torparser.get_files_details()
+                LOG.trace('Total files in torrent %d', len(media_items))
 
-                    # determine if any of the files are still inprogress of
-                    # being downloaded; if so then go to next torrent.
-                    # Because no files were added to the cache for the torrent
-                    # we will once again parse and attempt to process it.
-                    if _is_torrent_downloading(media_items):
-                        LOG.trace('torrent still downloading, next...')
-                        continue
+                # determine if any of the files are still inprogress of
+                # being downloaded; if so then go to next torrent.
+                # Because no files were added to the cache for the torrent
+                # we will once again parse and attempt to process it.
+                if _is_torrent_downloading(media_items):
+                    LOG.trace('torrent still downloading, next...')
+                    continue
 
-                    dbapi.add_files_to_torrent(torrent,
-                                               _filter_media(media_items))
-                except parser.MalformedTorrentError as mte:
-                    dbapi.set_invalid(torrent)
-                    LOG.error(
-                        'Malformed Torrent: [%s] [%s]', torrent_file, mte)
-                except parser.ParsingError as ape:
-                    dbapi.set_invalid(torrent)
-                    LOG.error('Torrent Parsing Error: [%s] [%s]',
-                              torrent_file, ape)
-
-        else:
-            if torrent_file not in known_skip_files:
-                LOG.warn('Skipping unknown file: [%s]', torrent_file)
-            else:
-                LOG.debug('Skipping known skippable file: [%s]', torrent_file)
+                dbapi.add_files_to_torrent(torrent,
+                                           _filter_media(media_items))
+            except parser.ParsingError as ape:
+                dbapi.set_invalid(torrent)
+                LOG.error('Torrent Parsing Error: [%s] [%s]',
+                          torrent_file, ape)
 
 
 def _is_parsing_required(torrent):
@@ -197,8 +181,7 @@ def _filter_media(media_items):
             LOG.trace('Added file to torrent with details: [%s]', details)
 
         else:
-            raise parser.MalformedTorrentError(
-                'No indexed files found in torrent.')
+            LOG.warn('No indexed files found in torrent.')
 
     return file_list
 

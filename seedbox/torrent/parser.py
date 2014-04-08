@@ -23,63 +23,9 @@ from bencode import BTL
 import six
 
 
-def humanize_bytes(in_bytes, precision=1):
-    """
-    Return a humanized string representation of a number of bytes.
-
-    >>> humanize_bytes(1)
-    '1 byte'
-    >>> humanize_bytes(1024)
-    '1.0 kB'
-    >>> humanize_bytes(1024*123)
-    '123.0 kB'
-    >>> humanize_bytes(1024*12342)
-    '12.1 MB'
-    >>> humanize_bytes(1024*12342,2)
-    '12.05 MB'
-    >>> humanize_bytes(1024*1234,2)
-    '1.21 MB'
-    >>> humanize_bytes(1024*1234*1111,2)
-    '1.31 GB'
-    >>> humanize_bytes(1024*1234*1111,1)
-    '1.3 GB'
-    """
-    abbrevs = (
-        (1 << 50L, 'PB'),
-        (1 << 40L, 'TB'),
-        (1 << 30L, 'GB'),
-        (1 << 20L, 'MB'),
-        (1 << 10L, 'kB'),
-        (1, 'bytes')
-    )
-
-    if in_bytes == 1:
-        return '1 byte'
-
-    factor = None
-    suffix = None
-    for factor, suffix in abbrevs:
-        if in_bytes >= factor:
-            break
-
-    return '%.*f %s' % (precision, in_bytes / factor, suffix)
-
-
 class ParsingError(Exception):
     """ Error class representing errors that occur while parsing
     the torrent content.
-    """
-    def __init__(self, error_msg):
-        Exception.__init__(self)
-        self.error_msg = error_msg
-
-    def __str__(self):
-        return repr(self.error_msg)
-
-
-class MalformedTorrentError(Exception):
-    """ Error class representing a malformed torrent when required
-    attributes are missing
     """
     def __init__(self, error_msg):
         Exception.__init__(self)
@@ -221,6 +167,10 @@ class TorrentParser(object):
         :param str torrent_file_path: Path to the torrent file to be parsed
         :raises IOError:    when a torrent_file_path does not exists
         """
+        if not torrent_file_path or not isinstance(torrent_file_path,
+                                                   six.string_types):
+            raise ValueError('Path of the torrent file not provided')
+
         if not os.path.exists(torrent_file_path):
             raise IOError('No file found at %s'.format(torrent_file_path))
 
@@ -328,7 +278,7 @@ class TorrentParser(object):
         parsed_char = self.torrent_str.next_char()
 
         if not parsed_char:
-             # EOF
+            # EOF
             return
 
         # Parsing logic

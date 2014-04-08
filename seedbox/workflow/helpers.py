@@ -23,7 +23,7 @@ def set_torrent_failed(torrent, error):
     :param str error:       an exception message
     """
     if torrent.error_msg:
-        msg = '+&+'.join(torrent.error_msg, error)
+        msg = '{0}+&+{1}'.format(torrent.error_msg, error)
     else:
         msg = error
 

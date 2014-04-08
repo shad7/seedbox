@@ -103,7 +103,7 @@ class Manager(object):
 
         task_statuses = {}
         for task in self.done:
-            if not task.torrent in task_statuses:
+            if task.torrent not in task_statuses:
                 task_statuses[task.torrent] = []
             task_statuses[task.torrent].append((task.media, task.exitstatus))
         return task_statuses

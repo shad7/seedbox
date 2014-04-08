@@ -55,9 +55,6 @@ class CopyFile(BasePlugin):
             try:
                 log.debug('copying media files for torrent %s', torrent)
                 media_files = helpers.get_media_files(torrent)
-#               media_files = helpers.get_media_files(
-#                   torrent, file_exts=tools.format_file_ext(
-#                       cfg.CONF.video_filetypes))
 
                 # now loop through the files we got back, if none then
                 # no files were in need of copying

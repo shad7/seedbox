@@ -10,7 +10,6 @@ from six import moves
 from oslo.config import cfg
 
 from seedbox import version
-from seedbox.configs import generator
 
 PROJECT_NAME = 'seedbox'
 
@@ -25,36 +24,6 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS)
-
-CLI_OPTS = [
-    cfg.BoolOpt('gen-sample',
-                default=False,
-                help='Generate a sample configuration file to resource path'),
-]
-
-cfg.CONF.register_cli_opts(CLI_OPTS)
-
-
-def _gen_config_sample():
-
-    opt_modules = [
-        'seedbox.logext',
-        'seedbox.options',
-        'seedbox.db.api',
-        'seedbox.torrent',
-        'seedbox.workflow',
-        'seedbox.workflow.tasks.base',
-        'seedbox.workflow.tasks.filecopy',
-        'seedbox.workflow.tasks.filedelete',
-        'seedbox.workflow.tasks.fileunrar',
-        'seedbox.workflow.tasks.validate_phase',
-        'seedbox.workflow.tasks.prepare',
-        'seedbox.workflow.tasks.filesync',
-    ]
-
-    generator.generate_by_module(opt_modules,
-                                 os.path.join(cfg.CONF.config_dir,
-                                              PROJECT_NAME + '.conf.sample'))
 
 
 def _find_config_files():
@@ -133,7 +102,3 @@ def initialize(args):
     # path of the most specific config file found.
     if not cfg.CONF.config_dir:
         cfg.CONF.config_dir = os.path.dirname(cfg.CONF.config_file[-1])
-
-    if cfg.CONF.gen_sample:
-        _gen_config_sample()
-        sys.exit(0)

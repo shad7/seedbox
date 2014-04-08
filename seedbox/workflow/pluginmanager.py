@@ -5,8 +5,8 @@ from __future__ import absolute_import
 import logging
 import os
 import pkgutil
-import sys
 import re
+import sys
 
 from oslo.config import cfg
 import six
@@ -18,61 +18,8 @@ from seedbox.workflow import tasks as plugins_pkg
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ['PluginWarning', 'PluginError', 'register_plugin', 'phase',
+__all__ = ['PluginError', 'register_plugin', 'phase',
            'load_plugins', 'get_plugins']
-
-
-class DependencyError(Exception):
-    """
-
-    .. py:exception:: DependencyError
-        Plugin depends on a module that cannot be loaded.
-
-    """
-
-    def __init__(self, issued_by=None, missing=None, message=None,
-                 silent=False):
-        """
-
-        :param str issued_by:   name of the plugin trying to do the import
-        :param str missing:     name of the plugin or library that is missing
-        :param str message:     user readable error message
-        :param bool silent:     flag indicating how loudly to share
-        """
-        super(DependencyError, self).__init__()
-        self.issued_by = issued_by
-        self.missing = missing
-        self._message = message
-        self.silent = silent
-
-    def _get_message(self):
-        """
-        retrieve message
-        """
-        if self._message:
-            return self._message
-        else:
-            return 'Plugin `%s` requires dependency `%s`' % (self.issued_by,
-                                                             self.missing)
-
-    def _set_message(self, message):
-        """
-        sets message
-        """
-        self._message = message
-
-    def has_message(self):
-        """
-        checks message exists
-        """
-        return self._message is not None
-
-    message = property(_get_message, _set_message)
-
-    def __str__(self):
-        return '<DependencyError(issued_by=%r,missing=%r,\
-                message=%r,silent=%r)>' % \
-            (self.issued_by, self.missing, self.message, self.silent)
 
 
 class DisabledPluginError(Exception):
@@ -90,31 +37,6 @@ class DisabledPluginError(Exception):
         :param dict kwargs:     key-value inputs
         """
         super(DisabledPluginError, self).__init__()
-        self.value = value
-        self.log = logger
-        self.kwargs = kwargs
-
-    def __str__(self):
-        return unicode(self).encode('utf-8')
-
-    def __unicode__(self):
-        return self.value
-
-
-class PluginWarning(Warning):
-    """
-
-    .. py:exception:: PluginWarning
-        enables standard warning messages for plugins
-
-    """
-    def __init__(self, value, logger=LOG, **kwargs):
-        """
-        :param str value:       a message to provide additional details
-        :param object logger:   an instance of logger
-        :param dict kwargs:     key-value inputs
-        """
-        super(PluginWarning, self).__init__()
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -261,13 +183,6 @@ class PluginInfo(dict):
                           method_name)
                 handler_prio = _check_value('priority', method.priority)
                 handler_phase = _check_value('phase', method.phase_name)
-#               if not handler_phase in processmap.get_run_phases():
-#                   raise ValueError(
-#                       'attribute [%s] has unsupported value [%s]; \
-#                        supported values: %s' % ('phase',
-#                                                 handler_phase,
-#                                                 processmap.get_run_phases())
-#                       )
                 LOG.trace('method=[%s] decorated attributes found',
                           method_name)
                 plugin_valid = True
@@ -414,17 +329,6 @@ def _load_plugins_from_dirs(dirs):
             continue
         try:
             loaded_module = loader.load_module(name)
-        except DependencyError as deperr:
-            if deperr.has_message():
-                msg = deperr.message
-            else:
-                msg = 'Plugin `%s` requires `%s` to load.' % (
-                    deperr.issued_by or name,
-                    deperr.missing or 'N/A')
-            if not deperr.silent:
-                LOG.warning(msg)
-            else:
-                LOG.debug(msg)
         except DisabledPluginError as dperr:
             LOG.warning('Plugin %s was not loaded. %s', name, dperr)
         except PluginError as plugerr:
@@ -466,7 +370,7 @@ def get_plugins(phase=None):
         """
         filters out plugins that don't match
         """
-        if phase and not phase in plugin.phase_handlers:
+        if phase and phase not in plugin.phase_handlers:
             LOG.trace('Phase resulted in filtering out plugin: [%s]', plugin)
             return False
         return True

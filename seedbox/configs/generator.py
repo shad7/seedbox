@@ -30,8 +30,6 @@ import textwrap
 from oslo.config import cfg
 import six
 
-from seedbox.configs import importutils
-
 
 STROPT = 'StrOpt'
 BOOLOPT = 'BoolOpt'
@@ -107,7 +105,7 @@ def _gen_opt_output(opt):
                 deprecated_group = (deprecated_opt.group if
                                     deprecated_opt.group else DEFAULT_GROUP)
                 output.append('# Deprecated group/name - [%s]/%s' %
-                             (deprecated_group, deprecated_opt.name))
+                              (deprecated_group, deprecated_opt.name))
     try:
         if opt_default is None:
             output.append('#%s=<None>' % opt_name)
@@ -161,7 +159,7 @@ def _gen_group_opts_output(group, opts_by_module):
 
 def _is_in_group(opt, group):
     """Check if opt is in group."""
-    for key, value in group._opts.items():
+    for value in group._opts.values():
         # NOTE(llu): Temporary workaround for bug #1262148, wait until
         # newly released oslo.config support '==' operator.
         if not(value['opt'] != opt):
@@ -175,7 +173,7 @@ def _guess_groups(opt, mod_obj):
         return DEFAULT_GROUP
 
     # what other groups is it in?
-    for key, value in cfg.CONF.items():
+    for value in cfg.CONF.values():
         if isinstance(value, cfg.CONF.GroupAttr):
             if _is_in_group(opt, value._group):
                 return value._group.name
@@ -221,8 +219,9 @@ def _list_opts(obj):
 
 def _import_module(mod_str):
     try:
-        return importutils.import_module(mod_str)
-    except Exception as e:
+        __import__(mod_str)
+        return sys.modules[mod_str]
+    except ImportError as e:
         sys.stderr.write('Error importing module %s: %s\n' % (mod_str, str(e)))
         return None
 
@@ -256,24 +255,6 @@ def _gen_opts_by_group(mods, opts_by_group):
     return opts_by_group
 
 
-def generate_by_module(option_modules, outputfile):
-    """
-    Generates a sample configuration file based on a list of modules
-    that it will reference options registered from each module.
-
-    :param list option_modules: modules that register options
-    :param str outputfile:  the file to write the sample configuration
-    """
-
-    # opts_by_group is a mapping of group name to an options list
-    # The options list is a list of (module, options) tuples
-    opts_by_group = {DEFAULT_GROUP: []}
-    option_modules.sort()
-
-    opts_by_group = _gen_opts_by_group(option_modules, opts_by_group)
-    _gen_output(opts_by_group, outputfile)
-
-
 def generate(srcfiles):
     """
     Generates a sample configuration file based on a list of source files
@@ -289,11 +270,10 @@ def generate(srcfiles):
         mod_str = '.'.join(['.'.join(filepath.split(os.sep)[:-1]),
                             os.path.basename(filepath).split('.')[0]])
         mods_by_pkg.setdefault(pkg_name, list()).append(mod_str)
+
     # NOTE(lzyeval): place top level modules before packages
-    pkg_names = filter(lambda x: x.endswith(PY_EXT), mods_by_pkg.keys())
-    pkg_names.sort()
-    ext_names = filter(lambda x: x not in pkg_names, mods_by_pkg.keys())
-    ext_names.sort()
+    pkg_names = sorted(pkg for pkg in mods_by_pkg if pkg.endswith(PY_EXT))
+    ext_names = sorted(pkg for pkg in mods_by_pkg if pkg not in pkg_names)
     pkg_names.extend(ext_names)
 
     # opts_by_group is a mapping of group name to an options list
