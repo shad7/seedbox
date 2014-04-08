@@ -3,7 +3,6 @@ from datetime import datetime
 import glob
 import os
 import shutil
-import tempfile
 
 import six
 
@@ -13,11 +12,7 @@ from seedbox.tests import test
 import seedbox.db.schema as schema
 
 
-def get_db_location():
-    return tempfile.gettempdir()
-
-
-class ModelSchemaTest(test.BaseTestCase):
+class ModelSchemaTest(test.ConfiguredBaseTestCase):
     """
     Tests all aspects of creating the database and its model.
     Adding data, removing data and fetching data.
@@ -27,14 +22,8 @@ class ModelSchemaTest(test.BaseTestCase):
     def setUp(self):
         super(ModelSchemaTest, self).setUp()
 
-        self.db_dir = get_db_location()
-        self.CONF.set_override('config_dir', self.db_dir)
         # initialize the database and schema details.
         schema.init()
-
-    def tearDown(self):
-        super(ModelSchemaTest, self).tearDown()
-        shutil.rmtree(self.db_dir, ignore_errors=True)
 
     def test_add_torrents(self):
         """
@@ -313,26 +302,24 @@ class ModelSchemaTest(test.BaseTestCase):
         for cnt in range(0, 15):
             if cnt == 0:
                 self.assertEqual(len(glob.glob(
-                    os.path.join(self.db_dir, schema.DB_NAME+'*'))), 1)
+                    os.path.join(self.base_dir, schema.DB_NAME+'*'))), 1)
             elif cnt >= 1 and cnt <= 8:
                 self.assertEqual(len(glob.glob(
-                    os.path.join(self.db_dir, schema.DB_NAME+'*'))), 1+cnt)
+                    os.path.join(self.base_dir, schema.DB_NAME+'*'))), 1+cnt)
             else:
                 self.assertEqual(len(glob.glob(
-                    os.path.join(self.db_dir, schema.DB_NAME+'*'))), 9)
+                    os.path.join(self.base_dir, schema.DB_NAME+'*'))), 9)
 
             # perform backup
             schema.backup()
 
     def test_backup_missing_database(self):
-        self.CONF.set_override('config_dir', get_db_location())
         if os.path.exists(os.path.join(self.CONF.config_dir, schema.DB_NAME)):
             shutil.rmtree(self.CONF.config_dir)
         # perform backup
         schema.backup()
 
     def test_purge_missing_database(self):
-        self.CONF.set_override('config_dir', get_db_location())
         if os.path.exists(os.path.join(self.CONF.config_dir, schema.DB_NAME)):
             shutil.rmtree(self.CONF.config_dir)
         schema.purge()

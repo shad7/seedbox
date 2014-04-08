@@ -16,8 +16,8 @@
 """Common utilities used in testing"""
 
 import os
-
 import fixtures
+import shutil
 import testtools
 import tempfile
 
@@ -40,33 +40,6 @@ class BaseTestCase(testtools.TestCase):
         self.useFixture(fixtures.NestedTempfile())
         self.useFixture(fixtures.TempHomeDir())
 
-        self.CONF = self.useFixture(config.Config()).conf
-        base_dir = tempfile.gettempdir()
-        self.set_required_options(base_dir)
-        self.CONF([], project='seedbox')
-        self.CONF.set_override('config_dir', base_dir)
-
-    def set_required_options(self, base_dir=None):
-
-        start_dir = base_dir
-        if not start_dir:
-            start_dir = tempfile.gettempdir()
-
-        # provide values for the required configs
-        self.CONF.set_override('torrent_path',
-                               os.mkdir(os.path.join(start_dir, 'torrent')),
-                               'torrent')
-        self.CONF.set_override('media_paths',
-                               [os.mkdir(os.path.join(start_dir, 'complete')),
-                                os.mkdir(os.path.join(start_dir, 'seedLT'))],
-                               'torrent')
-        self.CONF.set_override('incomplete_path',
-                               os.mkdir(os.path.join(start_dir, 'inprogress')),
-                               'torrent')
-        self.CONF.set_override('sync_path',
-                               os.mkdir(os.path.join(start_dir, 'toSync')),
-                               'plugins')
-
     def _set_timeout(self):
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
         try:
@@ -84,3 +57,44 @@ class BaseTestCase(testtools.TestCase):
         if os.environ.get('OS_STDERR_CAPTURE') in _TRUE_VALUES:
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
+
+    def _make_dir(self, dirname):
+        dirpath = os.path.join(self.base_dir, dirname)
+        os.mkdir(dirpath)
+        return dirpath
+
+
+class ConfiguredBaseTestCase(BaseTestCase):
+
+    def setUp(self):
+        super(ConfiguredBaseTestCase, self).setUp()
+
+        self.CONF = self.useFixture(config.Config()).conf
+        self.base_dir = tempfile.gettempdir()
+        self.set_required_options()
+        self.CONF([], project='seedbox')
+        self.CONF.set_override('config_dir', self.base_dir)
+        if self.base_dir != self.CONF.config_dir:
+            self.CONF.config_dir = self.base_dir
+
+    def tearDown(self):
+        shutil.rmtree(self.base_dir, ignore_errors=True)
+        self.CONF.reset()
+        super(ConfiguredBaseTestCase, self).tearDown()
+
+    def set_required_options(self):
+
+        # provide values for the required configs
+        self.CONF.set_override('torrent_path',
+                               self._make_dir('torrent'),
+                               group='torrent')
+        self.CONF.set_override('media_paths',
+                               [self._make_dir('complete'),
+                                self._make_dir('seedLT')],
+                               group='torrent')
+        self.CONF.set_override('incomplete_path',
+                               self._make_dir('inprogress'),
+                               group='torrent')
+        self.CONF.set_override('sync_path',
+                               self._make_dir('toSync'),
+                               group='plugins')

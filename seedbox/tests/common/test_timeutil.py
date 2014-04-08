@@ -45,7 +45,6 @@ class TimeutilTest(test.BaseTestCase):
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
 
-
         LOG.setLevel(logging.DEBUG)
         handler = logging.handlers.MemoryHandler(capacity=100,
                                                  flushLevel=logging.DEBUG,
@@ -70,7 +69,6 @@ class TimeutilTest(test.BaseTestCase):
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
 
-
         LOG.setLevel(logging.INFO)
         handler = logging.handlers.MemoryHandler(capacity=100,
                                                  target=CaptureOutput())
@@ -92,7 +90,6 @@ class TimeutilTest(test.BaseTestCase):
 
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
-
 
         LOG.setLevel(logging.INFO)
         handler = logging.handlers.MemoryHandler(capacity=100,
@@ -118,7 +115,6 @@ class TimeutilTest(test.BaseTestCase):
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
 
-
         LOG.setLevel(logging.INFO)
         handler = logging.handlers.MemoryHandler(capacity=100,
                                                  target=CaptureOutput())
@@ -140,7 +136,6 @@ class TimeutilTest(test.BaseTestCase):
 
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
-
 
         LOG.setLevel(logging.DEBUG)
         handler = logging.handlers.MemoryHandler(capacity=100,
@@ -166,7 +161,6 @@ class TimeutilTest(test.BaseTestCase):
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
 
-
         LOG.setLevel(logging.INFO)
         handler = logging.handlers.MemoryHandler(capacity=100,
                                                  target=CaptureOutput())
@@ -188,7 +182,6 @@ class TimeutilTest(test.BaseTestCase):
 
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
-
 
         LOG.setLevel(logging.DEBUG)
         handler = logging.handlers.MemoryHandler(capacity=100,
@@ -216,7 +209,6 @@ class TimeutilTest(test.BaseTestCase):
             def handle(self, record):
                 CaptureOutput.OUTPUT = self.format(record)
 
-
         LOG.setLevel(logging.INFO)
         handler = logging.handlers.MemoryHandler(capacity=100,
                                                  target=CaptureOutput())
@@ -239,7 +231,6 @@ class TimeutilTest(test.BaseTestCase):
             def get_delta(self):
                 return .5
 
-
         @ShortDelta
         def do_something():
             print 'do_something'
@@ -250,7 +241,7 @@ class TimeutilTest(test.BaseTestCase):
         while counter < 11:
             print 'working....', counter
             if do_something():
-                execs +=1
+                execs += 1
             print execs
             time.sleep(.1)
             counter += 1

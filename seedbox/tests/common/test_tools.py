@@ -149,7 +149,6 @@ class ToolsTest(test.BaseTestCase):
         make sure we are able to find different executables
         """
         self.assertIsNotNone(tools.get_exec_path('python'))
-#       self.assertIsNotNone(tools.get_exec_path('unrar'))
         self.assertIsNotNone(tools.get_exec_path('rsync'))
         self.assertIsNotNone(tools.get_exec_path('ls'))
         self.assertIsNone(tools.get_exec_path('dummy-cmd-test-junk'))
@@ -163,6 +162,8 @@ class ToolsTest(test.BaseTestCase):
         self.assertEqual(len(tools.format_file_ext([])), 0)
         self.assertIsInstance(tools.format_file_ext(''), list)
         self.assertEqual(len(tools.format_file_ext('')), 0)
+        self.assertIsInstance(tools.format_file_ext([' ']), list)
+        self.assertEqual(len(tools.format_file_ext([' '])), 0)
         self.assertIsInstance(tools.format_file_ext(None), list)
         self.assertEqual(len(tools.format_file_ext(None)), 0)
         self.assertEqual(
@@ -175,3 +176,20 @@ class ToolsTest(test.BaseTestCase):
         for ext in ['.avi', '.mp4', 'avi', 'mp4']:
             ext_list = tools.format_file_ext([ext])
             self.assertEqual(len(ext_list[0]), 4)
+
+    def test_get_plugin_name(self):
+        self.assertEqual(tools.get_plugin_name('FakeTestPlugin'),
+                         'fake_test_plugin')
+
+        self.assertEqual(tools.get_plugin_name('FakeTestPlugin', 2),
+                         'fake_test_plugin_v2')
+
+    def test_get_disable_optname(self):
+        self.assertEqual(tools.get_disable_optname('FakeTestPlugin'),
+                         'fake_test_plugin_disabled')
+        self.assertEqual(tools.get_disable_optname('FakeTestPlugin', 2),
+                         'fake_test_plugin_v2_disabled')
+
+    def test_get_home_disk_usage(self):
+        self.assertIsNotNone(tools.get_home_disk_usage())
+        self.assertIsNotNone(tools.get_home_disk_usage(tools.SYS_SI))
