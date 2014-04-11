@@ -104,10 +104,10 @@ Possible configuration file locations (General to specific)::
 
 Command line interface::
 
-        usage: seedmgr [-h] [--config-dir DIR] [--config-file PATH]
+        usage: seedmgr [-h] [--workflow-noretry] [--workflow-retry] [--db-nopurge]
+                       [--db-purge] [--config-dir DIR] [--config-file PATH]
                        [--logconfig LOG_CONFIG] [--logfile LOG_FILE]
-                       [--loglevel LOG_LEVEL] [--nopurge] [--noretry] [--purge]
-                       [--retry] [--version]
+                       [--loglevel LOG_LEVEL] [--version]
         
         optional arguments:
           -h, --help            show this help message and exit
@@ -119,18 +119,22 @@ Command line interface::
                                 over-ridden options in the directory take precedence.
           --config-file PATH    Path to a config file to use. Multiple config files
                                 can be specified, with values in later files taking
-                                precedence. The default files used are: None
+                                precedence. The default files used are: None.
           --logconfig LOG_CONFIG
                                 specific path and filename of logging configuration
                                 (override defaults)
           --logfile LOG_FILE    specify name of log file (location is resource path)
           --loglevel LOG_LEVEL  specify logging level to log messages at
-          --nopurge             The inverse of --purge
-          --noretry             The inverse of --retry
-          --purge               DANGER: deletes the database cache and everything
-                                starts over
-          --retry               only executes entries that failed previously
           --version             show program's version number and exit
+        
+        db options:
+          --db-nopurge          The inverse of --purge
+          --db-purge            DANGER: deletes the database cache and everything
+                                starts over
+        
+        workflow options:
+          --workflow-noretry    The inverse of --retry
+          --workflow-retry      only executes entries that failed previously
 
 
 :doc:`seedbox-config`

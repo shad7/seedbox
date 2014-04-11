@@ -8,45 +8,17 @@ Sample Configuration
         # Options defined in seedbox.options
         #
         
-        # **REQUIRED**  Base path (string value)
+        # **REQUIRED** Base path (string value)
         #base_path=<None>
         
         # Location torrent client stores data files (string value)
         #base_client_path=<None>
         
-        # **REQUIRED**  Location of the .torrent files (string value)
-        #torrent_path=<None>
-        
-        # **REQUIRED**  Location(s) of the media files (list value)
-        #media_paths=<None>
-        
-        # **REQUIRED**  Location of the downloading torrents (string value)
-        #incomplete_path=<None>
-        
-        # **REQUIRED**  Location to temp media copies for syncing to library (string value)
-        #sync_path=<None>
-        
-        # Location(s) of additional plugins (list value)
-        #plugin_paths=
-        
-        # List of phases to disable for execution (prepare, activate, complete) (list
-        # value)
-        #disabled_phases=
-        
-        # List of video filetypes to support. (ignore others) (list value)
-        #video_filetypes=.avi,.mp4,.mkv,.mpg
-        
-        # List of compressed filetypes to support. (ignore others) (list value)
-        #compressed_filetypes=.rar
-        
-        # Maximum number of times to retry a failed torrent (integer value)
-        #max_retry=5
-        
         
         [filesync]
         
         #
-        # Options defined in seedbox.tasks.filesync
+        # Options defined in seedbox.workflow.tasks.filesync
         #
         
         # rsync dryrun option (boolean value)
@@ -92,7 +64,15 @@ Sample Configuration
         [plugins]
         
         #
-        # Options defined in seedbox.tasks.filecopy
+        # Options defined in seedbox.workflow.tasks.base
+        #
+        
+        # **REQUIRED** Location to temp media copies for syncing to library (string value)
+        #sync_path=<None>
+        
+        
+        #
+        # Options defined in seedbox.workflow.tasks.filecopy
         #
         
         # disable this plugin (boolean value)
@@ -100,7 +80,7 @@ Sample Configuration
         
         
         #
-        # Options defined in seedbox.tasks.filedelete
+        # Options defined in seedbox.workflow.tasks.filedelete
         #
         
         # disable this plugin (boolean value)
@@ -108,7 +88,7 @@ Sample Configuration
         
         
         #
-        # Options defined in seedbox.tasks.filesync
+        # Options defined in seedbox.workflow.tasks.filesync
         #
         
         # disable this plugin (boolean value)
@@ -116,7 +96,7 @@ Sample Configuration
         
         
         #
-        # Options defined in seedbox.tasks.fileunrar
+        # Options defined in seedbox.workflow.tasks.fileunrar
         #
         
         # disable this plugin (boolean value)
@@ -124,7 +104,7 @@ Sample Configuration
         
         
         #
-        # Options defined in seedbox.tasks.prepare
+        # Options defined in seedbox.workflow.tasks.prepare
         #
         
         # disable this plugin (boolean value)
@@ -135,7 +115,7 @@ Sample Configuration
         
         
         #
-        # Options defined in seedbox.tasks.validate_phase
+        # Options defined in seedbox.workflow.tasks.validate_phase
         #
         
         # disable this plugin (boolean value)
@@ -145,7 +125,7 @@ Sample Configuration
         [prepare]
         
         #
-        # Options defined in seedbox.tasks.prepare
+        # Options defined in seedbox.workflow.tasks.prepare
         #
         
         # storage (GB) allocated to seedbox slot (integer value)
@@ -166,7 +146,7 @@ Sample Configuration
         [prsync]
         
         #
-        # Options defined in seedbox.tasks.filesync
+        # Options defined in seedbox.workflow.tasks.filesync
         #
         
         # Max number of parallel threads (integer value)
@@ -192,5 +172,46 @@ Sample Configuration
         
         # Output verbose details about exceptions (boolean value)
         #stderr_verbose=true
-
+        
+        
+        [torrent]
+        
+        #
+        # Options defined in seedbox.torrent
+        #
+        
+        # **REQUIRED** Location of the .torrent files (string value)
+        #torrent_path=<None>
+        
+        # **REQUIRED** Location(s) of the media files (list value)
+        #media_paths=<None>
+        
+        # **REQUIRED** Location of the downloading torrents (string value)
+        #incomplete_path=<None>
+        
+        # List of video filetypes to support. (ignore others) (list value)
+        #video_filetypes=.avi,.mp4,.mkv,.mpg
+        
+        # List of compressed filetypes to support. (ignore others) (list value)
+        #compressed_filetypes=.rar
+        
+        # Minimum file size of a media file (integer value)
+        #minimum_file_size=75000000
+        
+        
+        [workflow]
+        
+        #
+        # Options defined in seedbox.workflow
+        #
+        
+        # Location(s) of additional plugins (list value)
+        #plugin_paths=
+        
+        # List of phases to disable for execution (prepare, activate, complete) (list
+        # value)
+        #disabled_phases=
+        
+        # Maximum number of times to retry a failed torrent (integer value)
+        #max_retry=5
 

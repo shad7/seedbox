@@ -5,7 +5,7 @@
 #
 
 # **REQUIRED** Base path (string value)
-#base_path=/cygdrive/c/projects/gitrepo/seedbox
+#base_path=<None>
 
 # Location torrent client stores data files (string value)
 #base_client_path=<None>
