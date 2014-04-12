@@ -2,13 +2,16 @@ SeedboxManager
 ==============
 
 **Current status:**
+
 .. image:: https://travis-ci.org/shad7/seedbox.png?branch=master
     :target: https://travis-ci.org/shad7/seedbox
     :alt: Build status
 
+
 .. image:: https://coveralls.io/repos/shad7/seedbox/badge.png
     :target: https://coveralls.io/r/shad7/seedbox
     :alt: Coverage
+
 
 .. image:: https://pypip.in/version/SeedboxManager/badge.png
     :target: https://pypi.python.org/pypi/SeedboxManager/
