@@ -20,6 +20,9 @@ var/
 *.egg
 .installed.cfg
 
+# PBR
+AUTHORS
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

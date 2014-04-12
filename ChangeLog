@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* added sample config generation anoptoin within tox
+* some cleanup activities to reduce clutter and noise. Also small patch to version since my install library PBR seems to struggle with app name being different from package name
 * updated README to remove a badge
 * another fix to publish coverage results
 * updated README
