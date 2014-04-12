@@ -8,11 +8,4 @@ install:
 script: tox
 after_success:
   coveralls
-#deploy:
-#  provider: pypi
-#  user:
-#  password:
-#  distributions: "sdist bdist"
-#  on:
-#    tags: true
 

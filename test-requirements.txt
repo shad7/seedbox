@@ -11,6 +11,7 @@ fixtures>=0.3.14
 # Docs Requirements
 docutils>=0.9.1
 sphinx>=1.1.2,<1.2
+sphinxcontrib-httpdomain
 testtools>=0.9.32
 python-subunit
 testrepository>=0.0.17

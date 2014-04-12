@@ -56,7 +56,7 @@ def write_autodoc_index():
     RSTDIR = os.path.abspath(os.path.join(BASE_DIR, "sourcecode"))
     SRCS = {'seedbox': ROOT}
 
-    EXCLUDED_MODULES = ('seedbox.tests', 'seedbox.fixture',)
+    EXCLUDED_MODULES = ('seedbox.tests', 'seedbox.fixture', 'seedbox.configs',)
     CURRENT_SOURCES = {}
 
     if not(os.path.exists(RSTDIR)):
@@ -169,7 +169,7 @@ copyright = u'2014, shad7'
 # built documents.
 #
 # The short X.Y version.
-from seedbox.version import version_info as seedbox_version
+from seedbox import version as seedbox_version
 version = seedbox_version.version_string()
 # The full version, including alpha/beta/rc tags.
 release = seedbox_version.release_string()
@@ -310,7 +310,7 @@ htmlhelp_basename = 'seedboxdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
+#latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #'papersize': 'letterpaper',
 
@@ -319,14 +319,14 @@ latex_elements = {
 
     # Additional stuff for the LaTeX preamble.
     #'preamble': '',
-}
+#}
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    ('index', 'seedbox.tex', u'seedbox Documentation', u'shad7', 'manual'),
-]
+#latex_documents = [
+#    ('index', 'seedbox.tex', u'seedbox Documentation', u'shad7', 'manual'),
+#]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -367,11 +367,11 @@ latex_documents = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    ('index', 'seedbox', u'seedbox Documentation',
-     u'shad7', 'seedbox', 'One line description of project.',
-     'Miscellaneous'),
-]
+#texinfo_documents = [
+#    ('index', 'seedbox', u'seedbox Documentation',
+#     u'shad7', 'seedbox', 'One line description of project.',
+#     'Miscellaneous'),
+#]
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []

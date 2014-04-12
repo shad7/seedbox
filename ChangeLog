@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+* updated README to remove a badge
+* another fix to publish coverage results
+* updated README
+* tweaks for coverage
+* trying something
+* update settings for travis-ci
+* minor tweaks
 * documentation updates
 * updating changelog and increasing version
 
