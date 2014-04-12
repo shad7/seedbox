@@ -84,9 +84,3 @@ DEFAULT_MODULEPATH=seedbox.configs.generator
 MODULEPATH=${MODULEPATH:-$DEFAULT_MODULEPATH}
 OUTPUTFILE=$OUTPUTDIR/$PACKAGENAME.conf.sample
 python -m $MODULEPATH $FILES > $OUTPUTFILE
-
-# Hook to allow projects to append custom config file snippets
-CONCAT_FILES=$(ls $BASEDIR/*.conf.sample 2>/dev/null)
-for CONCAT_FILE in $CONCAT_FILES; do
-    cat $CONCAT_FILE >> $OUTPUTFILE
-done
