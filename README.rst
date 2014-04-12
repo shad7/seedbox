@@ -13,10 +13,6 @@ SeedboxManager
     :alt: Coverage
 
 
-.. image:: https://pypip.in/version/SeedboxManager/badge.png
-    :target: https://pypi.python.org/pypi/SeedboxManager/
-    :alt: Latest Version
-
 
 Links
 =====
