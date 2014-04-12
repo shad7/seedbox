@@ -5,7 +5,11 @@ install:
   - "pip install -r requirements.txt"
   - "pip install -r test-requirements.txt"
 # command to run tests
-script: tox
+script:
+    tox
+    coverage run setup.py test
+after_success:
+  coveralls
 #deploy:
 #  provider: pypi
 #  user:
