@@ -3,7 +3,6 @@ logging module that provides an extension to the python logging module
 by adding a more fine grained log level (TRACE), and then configures
 logging for the entire application.
 """
-from __future__ import absolute_import
 import logging
 import logging.config
 import logging.handlers
@@ -31,13 +30,11 @@ CLI_OPTS = [
     cfg.StrOpt('logfile',
                metavar='LOG_FILE',
                default=DEFAULT_LOG_FILENAME,
-               deprecated_group='DEFAULT',
-               help='specify name of log file (location is resource path)'),
+               help='specify name of log file default: %(default)s'),
     cfg.StrOpt('loglevel',
                metavar='LOG_LEVEL',
                default=DEFAULT_LOG_LEVEL,
-               deprecated_group='DEFAULT',
-               help='specify logging level to log messages at',
+               help='specify logging level to log messages: %(choices)s',
                choices=['none',
                         'critical',
                         'error',
@@ -47,40 +44,12 @@ CLI_OPTS = [
                         'trace']),
     cfg.StrOpt('logconfig',
                metavar='LOG_CONFIG',
-               deprecated_group='DEFAULT',
                help='specific path and filename of logging configuration \
                     (override defaults)'),
 ]
 
 cfg.CONF.register_cli_opts(CLI_OPTS)
 
-
-# adding logging extension here given how minimal this is
-# didn't seem to make sense to create a whole module for something
-# so simple; if things change later we can move it then
-class TraceLogger(logging.Logger):
-    """
-    Need to keep some low level logging messages included in case a bug
-    ever pops up in the future, but this gives me the ability to separate
-    tracing the propram from the actual basic debugging.
-    """
-
-    # a bit more detail than normal debug
-    TRACE = 5
-
-    def trace(self, msg, *args, **kwargs):
-        """
-        Log at TRACE level (more detailed than DEBUG).
-        """
-        self.log(TraceLogger.TRACE, msg, *args, **kwargs)
-
-
-# Set our custom logger class as default; need to make sure
-# the class has been defined before we set this; then add corresponding
-# level to be supported; then do the default configuring from our default
-# configuration file. all done
-logging.setLoggerClass(TraceLogger)
-logging.addLevelName(TraceLogger.TRACE, 'TRACE')
 
 # add default handler to make sure that cli only actions do not
 # generate logging handler errors
@@ -111,3 +80,12 @@ def configure():
         # shut off logging from 3rd party frameworks
         xlogger = logging.getLogger('xworkflows')
         xlogger.setLevel(logging.ERROR)
+
+        stevedore = logging.getLogger('stevedore')
+        stevedore.setLevel(logging.ERROR)
+
+        sa = logging.getLogger('sqlalchemy')
+        sa.setLevel(logging.ERROR)
+
+        migrate = logging.getLogger('migrate')
+        migrate.setLevel(logging.ERROR)

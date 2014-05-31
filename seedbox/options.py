@@ -2,7 +2,6 @@
 Defines all the common configurations for the application, and then
 manages loading all Options for system.
 """
-from __future__ import absolute_import
 import os
 import sys
 
@@ -16,7 +15,6 @@ PROJECT_NAME = 'seedbox'
 OPTS = [
     cfg.StrOpt('base_path',
                default=os.getcwd(),
-               deprecated_group='DEFAULT',
                required=True,
                help='Base path'),
     cfg.StrOpt('base_client_path',

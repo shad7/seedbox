@@ -52,7 +52,7 @@ class AfterDelta(object):
         :returns:   period of time (seconds)
         :rtype:     int
         """
-        return AfterDelta.DEFAULT_DELTA
+        return self.DEFAULT_DELTA
 
     def __call__(self, *args, **kwargs):
         # if the timer has not started, then start it

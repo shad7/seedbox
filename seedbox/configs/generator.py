@@ -68,14 +68,7 @@ def _write_output(output, outputfile):
 
 
 def _sanitize_default(name, value):
-    if value.startswith(sys.prefix):
-        # NOTE(jd) Don't use os.path.join, because it is likely to think the
-        # second part is an absolute pathname and therefore drop the first
-        # part.
-        value = os.path.normpath(
-            os.getenv('VIRTUAL_ENV',
-                      os.path.expanduser('~')) + value[len(sys.prefix):])
-    elif value.strip() != value:
+    if value.strip() != value:
         return '"%s"' % value
     return value
 
