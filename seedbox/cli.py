@@ -12,13 +12,12 @@ import lockfile
 from lockfile import pidlockfile
 from oslo.config import cfg
 
+from seedbox import db
 from seedbox import logext as logmgr
 from seedbox import options
-from seedbox import torrent
-from seedbox import workflow
-from seedbox.db import api as dbapi
+from seedbox import process
 
-LOG = logging.getLogger('seedbox.manager')
+LOG = logging.getLogger(__name__)
 
 
 def main():
@@ -43,20 +42,13 @@ def main():
         with lock:
 
             # setup database and initialize connection
-            dbapi.initialize()
-
-            # now check to see if there are any torrents to process
-            torrent.load()
+            db.dbapi(cfg.CONF)
 
             # time to start processing
-            workflow.start()
+            process.start()
 
     except lockfile.LockTimeout as lockerr:
         # if we have managed timeout, it means there is another instance
         # already running so we will simply bow out and let the existing
         # one still run.
         LOG.info('Already running; if not delete lock file: %s', lockerr)
-
-
-if __name__ == '__main__':
-    main()
