@@ -34,6 +34,9 @@ class FileUnrarTest(test.ConfiguredBaseTestCase):
     def setUp(self):
         super(FileUnrarTest, self).setUp()
 
+        if not os.path.exists(self.CONF.tasks.sync_path):
+            os.mkdir(self.CONF.tasks.sync_path)
+
         self.media_file = models.MediaFile.make_empty()
         self.media_file.compressed = 1
         self.media_file.filename = 'fake_copy.rar'

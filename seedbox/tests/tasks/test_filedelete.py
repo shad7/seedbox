@@ -10,6 +10,9 @@ class FileDeleteTest(test.ConfiguredBaseTestCase):
     def setUp(self):
         super(FileDeleteTest, self).setUp()
 
+        if not os.path.exists(self.CONF.tasks.sync_path):
+            os.mkdir(self.CONF.tasks.sync_path)
+
         self.media_file = models.MediaFile.make_empty()
         self.media_file.synced = 1
         self.media_file.filename = 'fake_copy.mp4'

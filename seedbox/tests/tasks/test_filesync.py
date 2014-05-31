@@ -10,11 +10,13 @@ class FileSyncTest(test.ConfiguredBaseTestCase):
     def setUp(self):
         super(FileSyncTest, self).setUp()
 
+        if not os.path.exists(self.CONF.tasks.sync_path):
+            os.mkdir(self.CONF.tasks.sync_path)
+
         self.media_file = models.MediaFile.make_empty()
         self.media_file.synced = 0
         self.media_file.filename = 'fake_sync.mp4'
         self.media_file.file_path = self.CONF.tasks.sync_path
-
         open(os.path.join(
             self.CONF.tasks.sync_path, 'fake_sync.mp4'), 'w').close()
 
