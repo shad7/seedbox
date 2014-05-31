@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+2.2.1
+-----
+
+* bumped to dot release
 * test on travis-ci seemed to fail when writing to /tmp/<dir> so added in logic to create the <dir> under /tmp before trying to create files within <dir>
 
 2.2
