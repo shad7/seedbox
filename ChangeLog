@@ -1,6 +1,29 @@
 CHANGES
 =======
 
+* added auto release of successfully built versions that include a tag
+* mades changes such that seedbox works as package name but pypi still sees it as SeedboxManager
+* updated sample configuration based on changes in the code and the removal of many unncessary options
+* updated documentation to reflect the changes
+* updated requirements based on changes from sqlobjects to sqlalchemy etc
+* generally replaced or rewrote majority of the modules to simplify for the long run
+* added test cases for cli to provide coverage
+* replaced manager with cli to better refelct the purpose of the module and remove unncessary code
+* added constants to hold flow states that are leveraged in multiple places throughout
+* removed workaround for name of package causing issues with version; solved by update from pbr
+* updated tests for common components
+* updated the common components to remove unncessary code, apply minor fixes
+* updated test cases to support changes within loader
+* updated torrent loader to leverage new database implementation and models, and minor clean up. minor tweaks to parser
+* added test cases to support the new process flow
+* simplified the process/workflow to get rid of the elaborate steps to find out which task(s) to execute next and in what order. Instead of only being able to execute sync in parallel, now all tasks are executed in parallel
+* added test cases for all tasks (plugins)
+* simplified plugin model by migrating to stevedore and providing a simple abstract base task such that a task must only implement execute() and/or the optional is_actionable() method
+* added testing to support new implementation based on sqlalchemy
+* replaced SQLObjects with sqlalchemy to lay the foundation for supporting multi-threaded/multi-process with databases that include actual multiple concurrent requests. Added public object model for interacting with data without resulting in direct database interactions (fetch, create, update). Included sqlalchemy-migration to handle version the database schema
+* moved gen_config to the tools directory to keep main directory clean
+* added other details to setup.cfg
+* PBR added '--use-mailcap' in the call to git log to load AUTHORS which is causing it to no longer be found as git log does not recognize the option. So removing the use of AUTHORS for a while
 * added sample config generation anoptoin within tox
 * some cleanup activities to reduce clutter and noise. Also small patch to version since my install library PBR seems to struggle with app name being different from package name
 * updated README to remove a badge
