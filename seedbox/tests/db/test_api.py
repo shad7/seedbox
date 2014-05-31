@@ -1,662 +1,387 @@
-from __future__ import absolute_import
 import datetime
 import os
 
-import six
-
+from seedbox import db
+from seedbox.db import models as api_model
 from seedbox.tests import test
-import seedbox.db.schema as schema
-
-# now include what we need to test
-import seedbox.db.api as dbapi
 
 
-class ApiDBTest(test.ConfiguredBaseTestCase):
+class ApiDBTestCase(test.ConfiguredBaseTestCase):
 
     def setUp(self):
-        super(ApiDBTest, self).setUp()
-        # initialize the database and schema details.
-        schema.init()
+        super(ApiDBTestCase, self).setUp()
 
-    def test_initialize(self):
+        self.patch(db, '_DBAPI', None)
+        self.dbapi = db.dbapi(self.CONF)
 
-        self.CONF.set_override('purge', True, group='db')
-        dbapi.initialize()
+    def test_list_opts(self):
+        opts = db.list_opts()
+        print opts
+        self.assertEqual(len(opts[0][1]), 3)
 
-        self.CONF.set_override('purge', False, group='db')
+    def test_clear(self):
+        self.dbapi.clear()
+        self.assertTrue(True)
 
-        search = schema.AppState.selectBy(name='last_purge_date')
-        last_purge_date = search.getOne(None)
-        if last_purge_date is not None:
-            schema.AppState.deleteBy(name='last_purge_date')
+    def test_backup(self):
+        self.dbapi.backup()
+        self.assertTrue(True)
 
-        # no existing last_purge_date
-        dbapi.initialize()
+    def test_shrink_db(self):
+        self.dbapi.shrink_db()
+        self.assertTrue(True)
 
-        # now with existing last_purge_date
-        dbapi.initialize()
+    def test_save_torrent(self):
 
-        # now with last_purge_date >= 1 week ago
-        dbapi.set_date('last_purge_date',
-                       datetime.datetime.utcnow() -
-                       datetime.timedelta(weeks=1))
-        dbapi.initialize()
+        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        _torrent = self.dbapi.save_torrent(torrent)
+        self.assertIsNotNone(_torrent.torrent_id)
 
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent',
-                    'test-a.torrent', 'myt.torrent', 'ant.torrent',
-                    'the-perfect-t.torrent']
+    def test_delete_torrent(self):
 
-        states = [schema.DONE,
-                  schema.CANCELLED,
-                  ]
-        # loop through and create the torrents
-        for i, name in enumerate(tornames):
-            torrent = dbapi.add_torrent(name=name)
-            torrent.state = states[i % 2]
+        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        _torrent = self.dbapi.save_torrent(torrent)
 
-        torpath = os.path.join(self.base_dir, 'torrent')
-        if not os.path.exists(torpath):
-            os.mkdir(torpath)
-        self.CONF.set_override('torrent_path',
-                               torpath,
-                               group='torrent')
-
-        dbapi.initialize()
-
-    def test_add_torrent(self):
-
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
-
-        counter = 0
-        # loop through and create the torrents
-        for name in tornames:
-            counter += 1
-            torrent = dbapi.add_torrent(name=name)
-            # verify we have an instance
-            self.assertIsInstance(torrent, schema.Torrent)
-            # verify the defaults are set correctly
-            self.assertEqual(torrent.name, name)
-            self.assertIsNotNone(torrent.create_date)
-            self.assertEqual(torrent.state, schema.INIT)
-            self.assertEqual(torrent.retry_count, 0)
-            self.assertFalse(torrent.failed)
-            self.assertIsNone(torrent.error_msg)
-            self.assertFalse(torrent.invalid)
-            self.assertFalse(torrent.purged)
-            self.assertEqual(len(list(torrent.media_files)), 0)
-
-        # make sure the total list size is the total number we processed
-        self.assertEqual(len(tornames), counter)
-
-    def test_update_state(self):
-
-        torrent = dbapi.add_torrent('xxxx.torrent')
-        self.assertEqual(torrent.state, schema.INIT)
-
-        dbapi.update_state([torrent], schema.READY)
-        self.assertEqual(torrent.state, schema.READY)
-        dbapi.update_state([torrent], schema.ACTIVE)
-        self.assertEqual(torrent.state, schema.ACTIVE)
-        torrent.failed = True
-        dbapi.update_state([torrent], schema.DONE)
-        self.assertEqual(torrent.state, schema.ACTIVE)
-        torrent.failed = False
-        dbapi.update_state([torrent], schema.DONE)
-        self.assertEqual(torrent.state, schema.DONE)
-        dbapi.update_state([torrent], schema.CANCELLED)
-        self.assertEqual(torrent.state, schema.CANCELLED)
-
-    def test_set_failed(self):
-
-        torrent = dbapi.add_torrent('xxxx.torrent')
-        self.assertFalse(torrent.failed)
-        self.assertIsNone(torrent.error_msg)
-
-        dbapi.set_failed(torrent, 'torrent failed to parse')
-        self.assertTrue(torrent.failed)
-        self.assertEqual(torrent.error_msg, 'torrent failed to parse')
-
-    def test_set_invalid(self):
-
-        torrent = dbapi.add_torrent('xxxx.torrent')
-        self.assertFalse(torrent.invalid)
-        self.assertEqual(torrent.state, schema.INIT)
-
-        dbapi.set_invalid(torrent)
-        self.assertTrue(torrent.invalid)
-        self.assertEqual(torrent.state, schema.CANCELLED)
-
-    def test_set_done(self):
-
-        torrent = dbapi.add_torrent('xxxx.torrent')
-        self.assertEqual(torrent.state, schema.INIT)
-
-        dbapi.set_done(torrent)
-        self.assertEqual(torrent.state, schema.DONE)
-
-    def test_reset_failed(self):
-
-        torrent = dbapi.add_torrent('xxxx.torrent')
-        dbapi.set_failed(torrent, 'torrent failed to parse')
-        self.assertTrue(torrent.failed)
-        self.assertEqual(torrent.error_msg, 'torrent failed to parse')
-
-        dbapi.reset_failed(torrent)
-        self.assertFalse(torrent.failed)
-        self.assertIsNone(torrent.error_msg)
-
-    def test_fetch_torrent_by_name(self):
-
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
-
-        created_torrents = []
-        # loop through and create the torrents
-        for name in tornames:
-            torrent = dbapi.add_torrent(name=name)
-            created_torrents.append(torrent)
-
-        for name in tornames:
-            torrent = dbapi.fetch_torrent_by_name(name=name)
-            self.assertTrue(torrent in created_torrents)
-
-    def test_fetch_or_create_torrent(self):
-
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
-
-        # loop through and create the torrents
-        for name in tornames:
-            torrent = dbapi.fetch_or_create_torrent(name=name)
-            self.assertIsNotNone(torrent)
-            other_torrent = dbapi.fetch_or_create_torrent(name=name)
-            self.assertIs(torrent, other_torrent)
-
-    def test_add_files_to_torrent(self):
-
-        torrent = dbapi.add_torrent('xxxx.torrent')
-
-        mediafiles = ['vid11.mp4', 'vid2.mp4', 'vid3.mp4',
-                      'vid4.mp4', 'vid5.avi']
-
-        media_list = []
-        # now create the media files
-        for media in mediafiles:
-            (name, ext) = media.split('.')
-
-            media_list.append({'filename': name,
-                               'file_ext': '.'+ext})
-
-        dbapi.add_files_to_torrent(torrent, media_list)
-
-        self.assertEqual(len(list(torrent.media_files)), len(mediafiles))
-
-    def test_get_files_by_torrent(self):
-
-        torrent = dbapi.add_torrent('xxxx.torrent')
-
-        mediafiles = ['vid11.mp4', 'vid2.mp4', 'vid3.mp4',
-                      'vid4.mp4', 'vid5.avi']
-
-        media_list = []
-        # now create the media files
-        for media in mediafiles:
-            (name, ext) = media.split('.')
-
-            media_list.append({'filename': name,
-                               'file_ext': '.'+ext})
-
-        dbapi.add_files_to_torrent(torrent, media_list)
-
-        self.assertEqual(len(dbapi.get_files_by_torrent(torrent)),
-                         len(mediafiles))
-
-    def test_get_torrents_by_state(self):
-
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
-
-        states = [(schema.INIT, False),
-                  (schema.READY, True),
-                  (schema.ACTIVE, False),
-                  (schema.INIT, False),
-                  (schema.READY, True),
-                  (schema.ACTIVE, False),
-                  ]
-
-        # loop through and create the torrents
-        for i, name in enumerate(tornames):
-            torrent = dbapi.add_torrent(name=name)
-            torrent.state = states[i][0]
-            torrent.failed = states[i][1]
-
-        torrents = dbapi.get_torrents_by_state(schema.INIT, False)
-        self.assertEqual(len(torrents), 2)
-
-        torrents = dbapi.get_torrents_by_state(schema.READY, True)
-        self.assertEqual(len(torrents), 2)
-
-        torrents = dbapi.get_torrents_by_state(schema.ACTIVE, False)
-        self.assertEqual(len(torrents), 2)
+        self.dbapi.delete_torrent(_torrent)
+        torrent = self.dbapi.get_torrent(_torrent.torrent_id)
+        self.assertIsNone(torrent)
 
     def test_delete_torrents(self):
 
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent']
+        torrent1 = self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='active'))
 
-        created_torrents = []
-        # loop through and create the torrents
-        for name in tornames:
-            torrent = dbapi.add_torrent(name=name)
-            created_torrents.append(torrent)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='active'))
 
-        dbapi.delete_torrents(created_torrents)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake3.torrent'))
 
-        found = []
-        for name in tornames:
-            torrent = dbapi.fetch_torrent_by_name(name=name)
-            if torrent:
-                found.append(torrent)
+        qfilter = {'=': {'state': 'active'}}
+        self.dbapi.delete_torrents(qfilter)
 
-        self.assertNotEqual(len(created_torrents), len(found))
-        self.assertEqual(len(found), 0)
+        self.assertIsNone(self.dbapi.get_torrent(torrent1.torrent_id))
 
-    def test_eligible_for_purging(self):
+    def test_get_torrents(self):
 
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent',
-                    'test-a.torrent', 'myt.torrent', 'ant.torrent',
-                    'the-perfect-t.torrent']
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='active'))
 
-        states = [schema.DONE,
-                  schema.CANCELLED,
-                  ]
-        # loop through and create the torrents
-        for i, name in enumerate(tornames):
-            torrent = dbapi.add_torrent(name=name)
-            torrent.state = states[i % 2]
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='active'))
 
-        torrent = dbapi.add_torrent('funnny.torrent')
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake3.torrent'))
 
-        purgable = dbapi.get_eligible_for_purging()
-        self.assertEqual(len(purgable), 10)
+        qfilter = {'=': {'state': 'active'}}
+        self.assertEqual(len(list(self.dbapi.get_torrents(qfilter))), 2)
 
-        torrent.state = schema.DONE
-        purgable = dbapi.get_eligible_for_purging()
-        self.assertEqual(len(purgable), 11)
+    def test_get_torrents_active(self):
 
-    def test_eligible_for_removal(self):
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='active'))
 
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent',
-                    'test-a.torrent', 'myt.torrent', 'ant.torrent',
-                    'the-perfect-t.torrent']
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='active'))
 
-        states = [schema.DONE,
-                  schema.CANCELLED,
-                  ]
-        # loop through and create the torrents
-        for i, name in enumerate(tornames):
-            torrent = dbapi.add_torrent(name=name)
-            torrent.state = states[i % 2]
-            torrent.purged = True
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake3.torrent'))
 
-        torrent = dbapi.add_torrent('funnny.torrent')
+        self.assertEqual(len(list(self.dbapi.get_torrents_active())), 3)
 
-        removeable = dbapi.get_eligible_for_removal()
-        self.assertEqual(len(removeable), 10)
+    def test_get_torrents_by_state(self):
 
-        torrent.state = schema.DONE
-        torrent.purged = True
-        removeable = dbapi.get_eligible_for_removal()
-        self.assertEqual(len(removeable), 11)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='active'))
 
-    def test_get_media_files(self):
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='active'))
 
-        torrent = dbapi.add_torrent('funnny.torrent')
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake3.torrent'))
 
-        mediafiles = [{'filename': 'vid11',
-                       'file_ext': '.rar',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 1,
-                       'synced': 0,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid2',
-                       'file_ext': '.mxx',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 0,
-                       'missing': 0,
-                       'skipped': 1,
-                       },
-                      {'filename': 'vid3',
-                       'file_ext': '.mp4',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 1,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid4',
-                       'file_ext': '.mp4',
-                       'file_path': None,
-                       'compressed': 0,
-                       'synced': 0,
-                       'missing': 1,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid5',
-                       'file_ext': '.mp4',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 1,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      ]
+        self.assertEqual(
+            len(list(self.dbapi.get_torrents_by_state('active'))), 2)
 
-        dbapi.add_files_to_torrent(torrent, mediafiles)
+    def test_torrents_eligible_for_purging(self):
 
-        # by path
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path='/etc/torrents/',
-                                               compressed=None,
-                                               synced=None,
-                                               missing=None,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 4)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='done'))
 
-        # by compressed (yes)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=1,
-                                               synced=None,
-                                               missing=None,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 1)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='done'))
 
-        # by compressed (no)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=0,
-                                               synced=None,
-                                               missing=None,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 4)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake3.torrent'))
 
-        # by synced (yes)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=None,
-                                               synced=1,
-                                               missing=None,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 2)
+        self.assertEqual(
+            len(list(self.dbapi.get_torrents_eligible_for_purging())), 2)
 
-        # by synced (no)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=None,
-                                               synced=0,
-                                               missing=None,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 3)
+    def test_torrents_eligible_for_removal(self):
 
-        # by missing (yes)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=None,
-                                               synced=None,
-                                               missing=1,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 1)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='done',
+                              purged=True))
 
-        # by missing (no)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=None,
-                                               synced=None,
-                                               missing=0,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 4)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='done',
+                              purged=True))
 
-        # by skipped (yes)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=None,
-                                               synced=None,
-                                               missing=None,
-                                               skipped=1)
-        self.assertEqual(len(found_torrents), 1)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake3.torrent'))
 
-        # by skipped (no)
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=None,
-                                               synced=None,
-                                               missing=None,
-                                               skipped=0)
-        self.assertEqual(len(found_torrents), 4)
+        self.assertEqual(
+            len(list(self.dbapi.get_torrents_eligible_for_removal())), 2)
 
-        # by mutli options 1
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path='/etc/torrents/',
-                                               compressed=0,
-                                               synced=1,
-                                               missing=None,
-                                               skipped=None)
-        self.assertEqual(len(found_torrents), 2)
+    def test_fetch_or_create_torrent(self):
 
-        # by mutli options 1
-        found_torrents = dbapi.get_media_files(torrent,
-                                               file_path=None,
-                                               compressed=None,
-                                               synced=None,
-                                               missing=1,
-                                               skipped=0)
-        self.assertEqual(len(found_torrents), 1)
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='done',
+                              purged=True))
 
-    def test_processed_media_files(self):
+        self.assertIsInstance(
+            self.dbapi.fetch_or_create_torrent('fake1.torrent'),
+            api_model.Torrent)
 
-        torrent = dbapi.add_torrent('funnny.torrent')
+        self.assertIsInstance(
+            self.dbapi.fetch_or_create_torrent('fake99.torrent'),
+            api_model.Torrent)
 
-        mediafiles = [{'filename': 'vid11',
-                       'file_ext': '.rar',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 1,
-                       'synced': 0,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid2',
-                       'file_ext': '.mxx',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 0,
-                       'missing': 0,
-                       'skipped': 1,
-                       },
-                      {'filename': 'vid3',
-                       'file_ext': '.mp4',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 1,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid4',
-                       'file_ext': '.mp4',
-                       'file_path': None,
-                       'compressed': 0,
-                       'synced': 0,
-                       'missing': 1,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid5',
-                       'file_ext': '.mp4',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 1,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      ]
+    def test_save_media(self):
+        media = api_model.MediaFile(media_id=None,
+                                    torrent_id=None,
+                                    filename='movie-1.mp4',
+                                    file_ext='.mp4',
+                                    file_path='/tmp/media')
+        media = self.dbapi.save_media(media)
 
-        dbapi.add_files_to_torrent(torrent, mediafiles)
+        self.assertIsNotNone(media.media_id)
 
-        processed = dbapi.get_processed_media_files(torrent)
-        self.assertEqual(len(processed), 4)
+    def test_bulk_create_medias(self):
 
-        torrent.invalid = 1
-        processed = dbapi.get_processed_media_files(torrent)
-        self.assertEqual(len(processed), 0)
+        _medias = []
+        for i in range(1, 11):
+            _medias.append(api_model.MediaFile(media_id=None,
+                                               torrent_id=None,
+                                               filename='movie-1.mp4',
+                                               file_ext='.mp4',
+                                               file_path='/tmp/media'))
+        medias = self.dbapi.bulk_create_medias(_medias)
+        self.assertEqual(len(medias), 10)
+        self.assertIsInstance(medias[0], api_model.MediaFile)
 
-    def test_purge_media(self):
+    def test_delete_media(self):
 
-        mediafiles = [{'filename': 'vid11',
-                       'file_ext': '.rar',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 1,
-                       'synced': 0,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid2',
-                       'file_ext': '.mxx',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 0,
-                       'missing': 0,
-                       'skipped': 1,
-                       },
-                      {'filename': 'vid3',
-                       'file_ext': '.mp4',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 1,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid4',
-                       'file_ext': '.mp4',
-                       'file_path': None,
-                       'compressed': 0,
-                       'synced': 0,
-                       'missing': 1,
-                       'skipped': 0,
-                       },
-                      {'filename': 'vid5',
-                       'file_ext': '.mp4',
-                       'file_path': '/etc/torrents/',
-                       'compressed': 0,
-                       'synced': 1,
-                       'missing': 0,
-                       'skipped': 0,
-                       },
-                      ]
+        media = api_model.MediaFile(media_id=None,
+                                    torrent_id=None,
+                                    filename='movie-1.mp4',
+                                    file_ext='.mp4',
+                                    file_path='/tmp/media')
+        media = self.dbapi.save_media(media)
 
-        tornames = ['xxxx.torrent', 'xxxxx5.torrent', 'xxxx10.torrent',
-                    'x1.torrent', 'XXXX10.torrent', 'test2.torrent',
-                    'test-a.torrent', 'myt.torrent', 'ant.torrent',
-                    'the-perfect-t.torrent']
+        self.dbapi.delete_media(media)
+        self.assertIsNone(self.dbapi.get_media(media.media_id))
 
-        states = [schema.DONE,
-                  schema.CANCELLED,
-                  ]
+    def test_delete_medias(self):
 
-        torrents = []
-        # loop through and create the torrents
-        for i, name in enumerate(tornames):
-            torrent = dbapi.add_torrent(name=name)
-            torrents.append(torrent)
-            torrent.state = states[i % 2]
+        _medias = []
+        for i in range(1, 11):
+            _medias.append(api_model.MediaFile(media_id=None,
+                                               torrent_id=None,
+                                               filename='movie-1.mp4',
+                                               file_ext='.mp4',
+                                               file_path='/tmp/media',
+                                               synced=i % 2))
+        self.dbapi.bulk_create_medias(_medias)
 
-            dbapi.add_files_to_torrent(torrent, mediafiles)
+        qfilter = {'=': {'synced': True}}
+        self.dbapi.delete_medias(qfilter)
 
-        for torrent in torrents:
-            self.assertEqual(len(list(torrent.media_files)), 5)
-            dbapi.purge_media(torrent)
-            self.assertEqual(len(list(torrent.media_files)), 0)
+        qfilter = {'=': {'synced': False}}
+        self.assertEqual(len(list(self.dbapi.get_medias(qfilter))), 5)
 
-    def test_appstate(self):
-        """
-        AppState is just a key:value pair caching. So test out setting each
-        'type' in one test case.
-        """
-        str_key = 'key_str'
-        dbapi.set(str_key, None)
-        str_state = dbapi.get(str_key)
-        # verify we have an instance
-        self.assertIsNone(str_state)
-        self.assertIsInstance(str_state, type(None))
+    def test_get_medias_by_torrent(self):
 
-        dbapi.set(str_key, 'Just a simple string')
-        str_state = dbapi.get(str_key)
-        self.assertIsNotNone(str_state)
-        self.assertIsInstance(str_state, six.string_types)
+        tor1 = self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='active'))
 
-        int_key = 'key_int'
-        dbapi.set_int(int_key, None)
-        int_state = dbapi.get_int(int_key)
-        # verify we have an instance
-        self.assertIsNotNone(int_state)
-        self.assertIsInstance(int_state, six.integer_types)
+        tor2 = self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='active'))
 
-        dbapi.set_int(int_key, 7)
-        int_state = dbapi.get_int(int_key)
-        self.assertIsNotNone(int_state)
-        self.assertIsInstance(int_state, six.integer_types)
+        _medias = []
+        for i in range(1, 11):
+            _medias.append(api_model.MediaFile(
+                media_id=None,
+                torrent_id=tor1.torrent_id if i % 2 else tor2.torrent_id,
+                filename='movie-1.mp4',
+                file_ext='.mp4',
+                file_path='/tmp/media'))
+        self.dbapi.bulk_create_medias(_medias)
 
-        list_key = 'key_list'
-        dbapi.set_list(list_key, None)
-        list_state = dbapi.get_list(list_key)
-        self.assertIsNotNone(list_state)
-        # verify we have an instance
-        self.assertIsInstance(list_state, list)
+        self.assertEqual(
+            len(list(self.dbapi.get_medias_by_torrent(tor1.torrent_id))), 5)
 
-        dbapi.set_list(list_key, 'item1,item2,item3,item4,item5')
-        list_state = dbapi.get_list(list_key)
-        self.assertIsNotNone(list_state)
-        self.assertIsInstance(list_state, list)
+    def test_get_medias_by(self):
 
-        list_state = dbapi.get_list('dummy')
-        self.assertIsNone(list_state)
-        self.assertIsInstance(list_state, type(None))
+        tor1 = self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='active'))
 
-        list_state = dbapi.get_list('dummy', ['dummy'])
-        self.assertIsNotNone(list_state)
-        self.assertIsInstance(list_state, list)
-        self.assertEqual(list_state, ['dummy'])
+        tor2 = self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='active'))
 
-        flag_key = 'key_flag'
-        dbapi.set_flag(flag_key, None)
-        flag_state = dbapi.get_flag(flag_key)
-        print 'flag_state=', flag_state
-        # verify we have an instance
-        self.assertIsNotNone(flag_state)
-        self.assertIsInstance(flag_state, bool)
+        _medias = []
+        for i in range(1, 11):
+            _medias.append(api_model.MediaFile(
+                media_id=None,
+                torrent_id=tor1.torrent_id if i % 2 else tor2.torrent_id,
+                filename='movie-{0}.mp4'.format(i),
+                file_ext='.mp4',
+                file_path='/tmp/media/{0}'.format('a' if i % 2 else 'b'),
+                compressed=0 if i % 2 else 1,
+                synced=1 if i % 2 else 0,
+                missing=0 if i % 2 else 1,
+                skipped=1 if i == 5 else 0,
+                ))
+        self.dbapi.bulk_create_medias(_medias)
 
-        dbapi.set_flag(flag_key, True)
-        flag_state = dbapi.get_flag(flag_key)
-        self.assertIsNotNone(flag_state)
-        self.assertIsInstance(flag_state, bool)
+        self.assertEqual(
+            len(list(self.dbapi.get_medias_by(tor1.torrent_id))), 5)
 
-        flag_state = dbapi.get_flag('dummy')
-        self.assertIsNone(flag_state)
-        self.assertIsInstance(flag_state, type(None))
+        self.assertEqual(
+            len(list(self.dbapi.get_medias_by(tor1.torrent_id,
+                                              file_path='/tmp/media/a'))), 5)
 
-        flag_state = dbapi.get_flag('dummy', False)
-        self.assertIsNotNone(flag_state)
-        self.assertIsInstance(flag_state, bool)
-        self.assertFalse(flag_state)
+        self.assertEqual(
+            len(list(self.dbapi.get_medias_by(tor1.torrent_id,
+                                              compressed=False))), 5)
 
-        date_key = 'key_date'
-        dbapi.set_date(date_key, None)
-        date_state = dbapi.get_date(date_key)
-        self.assertIsNotNone(date_state)
-        # verify we have an instance
-        self.assertIsInstance(date_state, datetime.datetime)
+        self.assertEqual(
+            len(list(self.dbapi.get_medias_by(tor1.torrent_id,
+                                              synced=True))), 5)
+
+        self.assertEqual(
+            len(list(self.dbapi.get_medias_by(tor1.torrent_id,
+                                              missing=False))), 5)
+
+        self.assertEqual(
+            len(list(self.dbapi.get_medias_by(tor1.torrent_id,
+                                              skipped=False))), 4)
+
+    def test_get_processed_medias(self):
+
+        tor1 = self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='active'))
+
+        tor2 = self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='active'))
+
+        _medias = []
+        for i in range(1, 11):
+            _medias.append(api_model.MediaFile(
+                media_id=None,
+                torrent_id=tor1.torrent_id if i % 2 else tor2.torrent_id,
+                filename='movie-{0}.mp4'.format(i),
+                file_ext='.mp4',
+                file_path='/tmp/media/{0}'.format('a' if i % 2 else 'b'),
+                compressed=0 if i % 2 else 1,
+                synced=1 if i % 2 else 0,
+                missing=0 if i % 2 else 1,
+                skipped=1 if i == 5 else 0,
+                ))
+        self.dbapi.bulk_create_medias(_medias)
+
+        self.assertEqual(
+            len(list(self.dbapi.get_processed_medias(tor1.torrent_id))), 5)
+
+    def test_save_appstate(self):
+
+        appstate = api_model.AppState(name='test', value='fake')
+        appstate = self.dbapi.save_appstate(appstate)
+        self.assertIsInstance(appstate, api_model.AppState)
+
+    def test_delete_appstate(self):
+
+        appstate = self.dbapi.save_appstate(
+            api_model.AppState(name='test', value='fake'))
+
+        self.dbapi.delete_appstate(appstate)
+        self.assertIsNone(self.dbapi.get_appstate('test'))
+
+    def test_clean_up(self):
+        # initial call where there is no last_purge_date
+        # appstate entry.
+        self.dbapi.clean_up()
+
+        # second call where a value exists for
+        # last_purge_date
+        self.dbapi.clean_up()
+
+        # now with last_purge_date >= 1 week ago
+        self.dbapi.save_appstate(
+            api_model.AppState(
+                name='last_purge_date',
+                value=datetime.datetime.utcnow() - datetime.timedelta(weeks=1)
+                ))
+
+        self.dbapi.clean_up()
+
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake1.torrent',
+                              state='done'))
+
+        self.dbapi.save_torrent(
+            api_model.Torrent(torrent_id=None,
+                              name='fake2.torrent',
+                              state='done'))
+
+        self.assertEqual(
+            len(list(self.dbapi.get_torrents_eligible_for_purging())), 2)
+
+        open(os.path.join(self.CONF.torrent.torrent_path,
+                          'fake2.torrent'), 'a').close()
+        self.dbapi.clean_up()
