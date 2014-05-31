@@ -12,7 +12,6 @@ Created on 2012-03-07
 
 @author: mohanr
 """
-from __future__ import absolute_import
 from datetime import datetime
 import logging
 import os
