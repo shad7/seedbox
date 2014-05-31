@@ -23,21 +23,76 @@ This was derived from several different responses on stackoverflow and blogs
 on this topic. After pulling them all together and doing several rounds of
 testing, this was the result.
 """
+import logging
+import os
 import subprocess
+import time
 import threading
+
+from oslo.config import cfg
+
+from seedbox import logext
+
+LOG = logging.getLogger(__name__)
+
+OPTS = [
+    cfg.StrOpt('stdout_dir',
+               default='$config_dir/sync_out',
+               help='Output directory for stdout files'),
+    cfg.StrOpt('stderr_dir',
+               default='$config_dir/sync_err',
+               help='Output directory for stderr files'),
+    cfg.BoolOpt('stdout_verbose',
+                default=False,
+                help='Write output to stdout'),
+    cfg.BoolOpt('stderr_verbose',
+                default=True,
+                help='Output verbose details about exceptions'),
+]
+
+cfg.CONF.register_opts(OPTS, group='tasks_synclog')
+
+
+def make_file_logger(name, filepath, unique_id, enabled):
+
+    if enabled:
+        _handler = logging.FileHandler(
+            os.path.join(filepath, 'sync.home.{0}'.format(unique_id)))
+        _handler.setFormatter(logging.Formatter('%(message)s'))
+    else:
+        _handler = logext.NullHandler()
+
+    _logger = logging.getLogger(name)
+    _logger.propagate = 0
+    _logger.setLevel(logging.INFO)
+    _logger.addHandler(_handler)
+
+    return _logger
 
 
 class ProcessLogging(subprocess.Popen):
     """
     Run a command as a subprocess sending output to a logger.
     """
-    def __init__(self, cmd, logger):
+
+    def __init__(self, cmd):
         """
-        :param list cmd:    command and options sent to subprocess to execute
-        :param logging.Logger logger:   the logger to use to capture output
+        :param list cmd: command and options sent to subprocess to execute
         """
         self._cmd = cmd
-        self._logger = logger
+
+        _uid = time.time()
+        self.stdout_logger = make_file_logger(
+            'seedbox.tasks.subproc.stdout',
+            cfg.CONF.tasks_synclog.stdout_dir,
+            _uid,
+            cfg.CONF.tasks_synclog.stdout_verbose)
+
+        self.stderr_logger = make_file_logger(
+            'seedbox.tasks.subproc.stderr',
+            cfg.CONF.tasks_synclog.stderr_dir,
+            _uid,
+            cfg.CONF.tasks_synclog.stderr_verbose)
 
         # delegate to parent to spawn the rsync process
         super(ProcessLogging, self).__init__(self._cmd, shell=False,
@@ -47,11 +102,11 @@ class ProcessLogging(subprocess.Popen):
                                              universal_newlines=True)
 
         # start stdout and stderr logging threads
-        self.log_thread(self.stdout, self._logger.info)
-        self.log_thread(self.stderr, self._logger.warn)
+        self.log_thread(self.stdout, self.stdout_logger.info)
+        self.log_thread(self.stderr, self.stderr_logger.info)
 
-        self._logger.debug('Started subprocess, pid %s', self.pid)
-        self._logger.debug('Command:  %s', ' '.join(self._cmd))
+        LOG.debug('Started subprocess, pid %s', self.pid)
+        LOG.debug('Command:  %s', ' '.join(self._cmd))
 
     def log_thread(self, pipe, log_func):
         """
@@ -89,14 +144,13 @@ class ProcessLogging(subprocess.Popen):
                 raise subprocess.CalledProcessError(self.returncode, self._cmd)
 
     @staticmethod
-    def execute(cmd, logger):
+    def execute(cmd):
         """
         provide a convenience method for creating creating the object and
         waiting for the results; very similar to check_call() but not at
         module level.
 
-        :param list cmd:    command and options sent to subprocess to execute
-        :param logging.Logger logger:   the logger to use to capture output
+        :param list cmd: command and options sent to subprocess to execute
         """
-        proc = ProcessLogging(cmd, logger)
+        proc = ProcessLogging(cmd)
         proc.complete()
