@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+* test on travis-ci seemed to fail when writing to /tmp/<dir> so added in logic to create the <dir> under /tmp before trying to create files within <dir>
+
+2.2
+---
+
+* changes added to ChangeLog
 * added auto release of successfully built versions that include a tag
 * mades changes such that seedbox works as package name but pypi still sees it as SeedboxManager
 * updated sample configuration based on changes in the code and the removal of many unncessary options
