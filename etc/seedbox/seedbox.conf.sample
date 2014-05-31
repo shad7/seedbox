@@ -5,16 +5,66 @@
 #
 
 # **REQUIRED** Base path (string value)
-#base_path=<None>
+#base_path=
 
 # Location torrent client stores data files (string value)
 #base_client_path=<None>
 
 
-[filesync]
+[database]
 
 #
-# Options defined in seedbox.workflow.tasks.filesync
+# Options defined in seedbox.db
+#
+
+# The connection string used to connect to the database (string value)
+#connection=sqlite:///$config_dir/torrent.db
+
+# Timeout before idle sql connections are reaped (integer value)
+#idle_timeout=3600
+
+# Verbosity of SQL debugging information. 0=None, 100=All (integer value)
+#connection_debug=0
+
+
+[process]
+
+#
+# Options defined in seedbox.process.flow
+#
+
+# name of tasks associated with prepare phase (list value)
+#prepare=
+
+# name of tasks associated with activate phase (list value)
+#activate=
+
+# name of tasks associated with complete phase (list value)
+#complete=
+
+
+#
+# Options defined in seedbox.process.manager
+#
+
+# max processes to use for performing sync of torrents (integer value)
+#max_processes=4
+
+
+[tasks]
+
+#
+# Options defined in seedbox.tasks.base
+#
+
+# Location to temp media copies for syncing to library (string value)
+#sync_path=/tmp/sync
+
+
+[tasks_filesync]
+
+#
+# Options defined in seedbox.tasks.filesync
 #
 
 # rsync dryrun option (boolean value)
@@ -53,118 +103,21 @@
 # rsync destination path (string value)
 #remote_path=<None>
 
-# flag to enable parallel threads of rsync (boolean value)
-#enable_parallel=true
 
-
-[plugins]
+[tasks_synclog]
 
 #
-# Options defined in seedbox.workflow.tasks.base
+# Options defined in seedbox.tasks.subprocessext
 #
-
-# **REQUIRED** Location to temp media copies for syncing to library (string value)
-#sync_path=<None>
-
-
-#
-# Options defined in seedbox.workflow.tasks.filecopy
-#
-
-# disable this plugin (boolean value)
-#copy_file_v1_disabled=false
-
-
-#
-# Options defined in seedbox.workflow.tasks.filedelete
-#
-
-# disable this plugin (boolean value)
-#delete_file_v1_disabled=false
-
-
-#
-# Options defined in seedbox.workflow.tasks.filesync
-#
-
-# disable this plugin (boolean value)
-#sync_file_v1_disabled=false
-
-
-#
-# Options defined in seedbox.workflow.tasks.fileunrar
-#
-
-# disable this plugin (boolean value)
-#unrar_file_v1_disabled=false
-
-
-#
-# Options defined in seedbox.workflow.tasks.prepare
-#
-
-# disable this plugin (boolean value)
-#copy_file_v2_disabled=false
-
-# disable this plugin (boolean value)
-#unrar_file_v2_disabled=false
-
-
-#
-# Options defined in seedbox.workflow.tasks.validate_phase
-#
-
-# disable this plugin (boolean value)
-#phase_validator_v1_disabled=false
-
-
-[prepare]
-
-#
-# Options defined in seedbox.workflow.tasks.prepare
-#
-
-# storage (GB) allocated to seedbox slot (integer value)
-#slot_size=50
-
-# minimum storage (GB) threshold before processing stops (integer value)
-#min_storage_threshold=5
-
-# flag to override checking storage, if True then `min_storage_threshold` must
-# have positive value (boolean value)
-#storage_check_override=false
-
-# storage system offset (traditional = 1024 bytes), (si = 1000 bytes) (string
-# value)
-#storage_system=traditional
-
-
-[prsync]
-
-#
-# Options defined in seedbox.workflow.tasks.filesync
-#
-
-# Max number of parallel threads (integer value)
-#rsync_threads=5
-
-# Timeout (secs) (0 = no timeout) (integer value)
-#thread_timeout=0
 
 # Output directory for stdout files (string value)
-#stdout_dir=<None>
+#stdout_dir=$config_dir/sync_out
 
 # Output directory for stderr files (string value)
-#stderr_dir=<None>
+#stderr_dir=$config_dir/sync_err
 
 # Write output to stdout (boolean value)
-#print_out=false
-
-# Buffer stdout until thread ends (boolean value)
-#stdout_buffer=false
-
-# Buffer stderr until thread ends (boolean value)
-#stderr_buffer=false
+#stdout_verbose=false
 
 # Output verbose details about exceptions (boolean value)
 #stderr_verbose=true
@@ -193,22 +146,5 @@
 
 # Minimum file size of a media file (integer value)
 #minimum_file_size=75000000
-
-
-[workflow]
-
-#
-# Options defined in seedbox.workflow
-#
-
-# Location(s) of additional plugins (list value)
-#plugin_paths=
-
-# List of phases to disable for execution (prepare, activate, complete) (list
-# value)
-#disabled_phases=
-
-# Maximum number of times to retry a failed torrent (integer value)
-#max_retry=5
 
 
