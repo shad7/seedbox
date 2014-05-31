@@ -1,16 +1,15 @@
 from __future__ import absolute_import
 import os
-import logging
 import subprocess
 import testtools
 from distutils.sysconfig import get_python_lib
 
 from seedbox.tests import test
 # now include what we need to test
-from seedbox.workflow.tasks import subprocessext
+from seedbox.tasks import subprocessext
 
 
-class SubprocessExtTest(test.BaseTestCase):
+class SubprocessExtTest(test.ConfiguredBaseTestCase):
     """
     Test all aspects of subprocessext module and corresponding capabilities.
     """
@@ -20,7 +19,10 @@ class SubprocessExtTest(test.BaseTestCase):
         create a logger
         """
         super(SubprocessExtTest, self).setUp()
-        self.logger = logging.getLogger('subproc-ext')
+        if not os.path.exists(self.CONF.tasks_synclog.stdout_dir):
+            os.mkdir(self.CONF.tasks_synclog.stdout_dir)
+        if not os.path.exists(self.CONF.tasks_synclog.stderr_dir):
+            os.mkdir(self.CONF.tasks_synclog.stderr_dir)
         self.py_lib = os.path.abspath(os.path.join(get_python_lib(), '..'))
 
     def test_short_single_cmd(self):
@@ -29,7 +31,7 @@ class SubprocessExtTest(test.BaseTestCase):
         basic use case.
         """
         cmd = ['ls']
-        subprocessext.ProcessLogging.execute(cmd, self.logger)
+        subprocessext.ProcessLogging.execute(cmd)
         # it will complete with no return value or an exception
         self.assertTrue(True)
 
@@ -39,7 +41,7 @@ class SubprocessExtTest(test.BaseTestCase):
         make sure longer running commands work successfully.
         """
         cmd = ['ls', '-laR', self.py_lib]
-        subprocessext.ProcessLogging.execute(cmd, self.logger)
+        subprocessext.ProcessLogging.execute(cmd)
         # it will complete with no return value or an exception
         self.assertTrue(True)
 
@@ -51,7 +53,7 @@ class SubprocessExtTest(test.BaseTestCase):
         """
         for cmd in [['ls'], ['ls', '--help'], ['tail', '--help'],
                     ['ps', '--help'], ['mv', '--help']]:
-            subprocessext.ProcessLogging.execute(cmd, self.logger)
+            subprocessext.ProcessLogging.execute(cmd)
             # it will complete with no return value or an exception
             self.assertTrue(True)
 
@@ -63,7 +65,7 @@ class SubprocessExtTest(test.BaseTestCase):
         """
         for cmd in [['ls', '-laR', self.py_lib],
                     ['ls', '-laR', os.path.expanduser('~')]]:
-            subprocessext.ProcessLogging.execute(cmd, self.logger)
+            subprocessext.ProcessLogging.execute(cmd)
             # it will complete with no return value or an exception
             self.assertTrue(True)
 
@@ -74,7 +76,7 @@ class SubprocessExtTest(test.BaseTestCase):
         cmd = ['ls', 'some_unknown_or_missing_file']
         # should result in exception because it is a bad command!!!
         with testtools.ExpectedException(subprocess.CalledProcessError):
-            subprocessext.ProcessLogging.execute(cmd, self.logger)
+            subprocessext.ProcessLogging.execute(cmd)
 
     def test_multi_good_bad_cmd(self):
         """
@@ -86,11 +88,11 @@ class SubprocessExtTest(test.BaseTestCase):
                     ['ps', '--help'],
                     ['ls', 'and_another_unknown_or_missing_file']]:
             if '--help' in cmd:
-                subprocessext.ProcessLogging.execute(cmd, self.logger)
+                subprocessext.ProcessLogging.execute(cmd)
                 # it will complete with no return value or an exception
                 self.assertTrue(True)
             else:
                 # should result in exception because it is a bad command!!!
                 with testtools.ExpectedException(
                         subprocess.CalledProcessError):
-                    subprocessext.ProcessLogging.execute(cmd, self.logger)
+                    subprocessext.ProcessLogging.execute(cmd)
