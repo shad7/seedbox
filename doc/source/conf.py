@@ -145,8 +145,20 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
+    'sphinx.ext.intersphinx',
 ]
 #   'sphinx.ext.viewcode',
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {'python': ('http://docs.python.org/', None),
+                       'osloconfig': ('http://docs.openstack.org/developer/oslo.config/', None),
+                       'pbr': ('http://docs.openstack.org/developer/pbr/', None),
+                       'rarfile': ('https://rarfile.readthedocs.org/en/latest/', None),
+                       'six': ('http://pythonhosted.org/six/', None),
+                       'sqlalchemy': ('http://docs.sqlalchemy.org/en/rel_0_9/', None),
+                       'stevedore': ('http://stevedore.readthedocs.org/en/latest/', None),
+                       'xworkflows': ('http://xworkflows.readthedocs.org/en/latest/', None),
+                       }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

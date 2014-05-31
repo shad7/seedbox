@@ -59,17 +59,11 @@ General Information
       - Task
       - Description
     * - prepare
-      - filecopy (v1)
+      - filecopy
       - copy supported media files related to torrents from download directory to sync directory
     * - 
-      - filecopy (v2)
-      - copy supported media files related to torrents from download directory to sync directory (includes storage check to avoid running out of disk)
-    * - 
-      - fileunrar (v1)
+      - fileunrar
       - decompress rar media files related to torrents from download directory to sync directory
-    * - 
-      - fileunrar (v2)
-      - decompress rar media files related to torrents from download directory to sync directory (includes storage check to avoid running out of disk)
     * - activate
       - filesync
       - rsync files in sync directory to remote server location
@@ -104,8 +98,7 @@ Possible configuration file locations (General to specific)::
 
 Command line interface::
 
-        usage: seedmgr [-h] [--workflow-noretry] [--workflow-retry] [--db-nopurge]
-                       [--db-purge] [--config-dir DIR] [--config-file PATH]
+        usage: seedmgr [-h] [--config-dir DIR] [--config-file PATH]
                        [--logconfig LOG_CONFIG] [--logfile LOG_FILE]
                        [--loglevel LOG_LEVEL] [--version]
         
@@ -119,22 +112,13 @@ Command line interface::
                                 over-ridden options in the directory take precedence.
           --config-file PATH    Path to a config file to use. Multiple config files
                                 can be specified, with values in later files taking
-                                precedence. The default files used are: None.
+                                precedence. The default files used are: None
           --logconfig LOG_CONFIG
                                 specific path and filename of logging configuration
                                 (override defaults)
           --logfile LOG_FILE    specify name of log file (location is resource path)
           --loglevel LOG_LEVEL  specify logging level to log messages at
           --version             show program's version number and exit
-        
-        db options:
-          --db-nopurge          The inverse of --purge
-          --db-purge            DANGER: deletes the database cache and everything
-                                starts over
-        
-        workflow options:
-          --workflow-noretry    The inverse of --retry
-          --workflow-retry      only executes entries that failed previously
 
 
 :doc:`seedbox-config`

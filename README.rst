@@ -27,4 +27,4 @@ Links
 .. _GitHub: http://github.com/shad7/seedbox
 .. _`Travis CI`: https://travis-ci.org/shad7/seedbox
 .. _`Coveralls`: https://coveralls.io/r/shad7/seedbox
-.. _`Read the Docs`: seedboxmanager.readthedocs.org
+.. _`Read the Docs`: http://seedboxmanager.readthedocs.org/
