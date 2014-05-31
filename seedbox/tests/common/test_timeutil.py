@@ -60,6 +60,18 @@ class TimeutilTest(test.BaseTestCase):
         self.assertIsNotNone(CaptureOutput.OUTPUT)
         self.assertEqual(len(CaptureOutput.OUTPUT), 28)
 
+        def _getLogger(name):
+            return LOG
+
+        @timeutil.timed()
+        def simple_func_no_log():
+            print 'simple'
+
+        self.patch(timeutil, 'logging.getLogger', _getLogger)
+        simple_func_no_log()
+        self.assertIsNotNone(CaptureOutput.OUTPUT)
+        self.assertEqual(len(CaptureOutput.OUTPUT), 28)
+
     def test_timed_function_no_emit(self):
 
         class CaptureOutput(logging.Handler):
@@ -248,3 +260,53 @@ class TimeutilTest(test.BaseTestCase):
 
         self.assertEqual(counter, 11)
         self.assertEqual(execs, 2)
+
+    def test_after_delta_alt(self):
+
+        class ShortDelta(timeutil.AfterDelta):
+
+            DEFAULT_DELTA = .5
+
+        @ShortDelta
+        def do_something():
+            print 'do_something'
+            return True
+
+        execs = 0
+        counter = 0
+        while counter < 11:
+            print 'working....', counter
+            if do_something():
+                execs += 1
+            print execs
+            time.sleep(.1)
+            counter += 1
+
+        self.assertEqual(counter, 11)
+        self.assertEqual(execs, 2)
+
+    def test_advance_time_delta(self):
+        _cur = timeutil.utcnow()
+        _future = timeutil.advance_time_delta(_cur,
+                                              datetime.timedelta(seconds=60))
+        self.assertGreater(_future, _cur)
+
+    def test_advance_time_seconds(self):
+        _cur = timeutil.utcnow()
+        _future = timeutil.advance_time_seconds(_cur, 60)
+        self.assertGreater(_future, _cur)
+
+    def test_is_newer_than(self):
+        _future = timeutil.advance_time_seconds(timeutil.utcnow(), 10)
+        self.assertTrue(timeutil.is_newer_than(_future, 5))
+        self.assertFalse(timeutil.is_newer_than(_future, 15))
+
+    def test_total_seconds(self):
+        secs = timeutil.total_seconds(datetime.timedelta(seconds=60))
+        self.assertEqual(secs, 60)
+
+    def test_is_soon(self):
+        expires = timeutil.utcnow() + datetime.timedelta(minutes=5)
+        self.assertFalse(timeutil.is_soon(expires, 120))
+        self.assertTrue(timeutil.is_soon(expires, 300))
+        self.assertTrue(timeutil.is_soon(expires, 600))

@@ -17,6 +17,7 @@
 # under the License.
 
 import fixtures
+import sys
 
 from seedbox.configs import generator
 from seedbox.fixture import mockpatch
@@ -27,14 +28,6 @@ class GeneratorTestcase(test.BaseTestCase):
     conffiles = ['seedbox/tests/testmods/baar_baa_opt.py',
                  'seedbox/tests/testmods/bar_foo_opt.py',
                  ]
-
-    def setUp(self):
-        super(GeneratorTestcase, self).setUp()
-        self.groups = []
-
-    def tearDown(self):
-        self.groups = []
-        super(GeneratorTestcase, self).tearDown()
 
     def test_generate(self):
         stdout = self.useFixture(fixtures.StringStream('confstdout')).stream
@@ -59,3 +52,25 @@ class GeneratorTestcase(test.BaseTestCase):
         self.assertIn('#crazy=sample,people\n', lines)
         self.assertIn('#numbers=one.two.three.four.five.six\n', lines)
         self.assertIn('#strings=\n', lines)
+
+    def test_main(self):
+        self.patch(sys, 'argv', ['test',
+                                 'seedbox/tests/testmods/baar_baa_opt.py'])
+        generator.main()
+        self.assertTrue(True)
+
+    def test_import_module(self):
+        mod = generator._import_module('seedbox.tests.testmods.baar_baa_opt')
+        self.assertIsNotNone(mod)
+
+        mod = generator._import_module('seedbox.tests.bar_foo_opt')
+        self.assertIsNone(mod)
+
+    def test_list_opts(self):
+        mod = generator._import_module('seedbox.tests.testmods.baar_baa_opt')
+        opts = generator._list_opts(mod)
+        self.assertIsNotNone(opts)
+
+    def test_gen_opts_by_group(self):
+        self.assertRaises(RuntimeError, generator._gen_opts_by_group,
+                          ['seedbox.tests.bar_foo_opt'], {'DEFAULT': []})
