@@ -1,11 +1,16 @@
 language: python
 python:
-  - "2.7"
+- '2.7'
 install:
-  - "pip install -r requirements.txt"
-  - "pip install -r test-requirements.txt"
-# command to run tests
+- pip install -r requirements.txt
+- pip install -r test-requirements.txt
 script: tox
-after_success:
-  coveralls
-
+after_success: coveralls
+deploy:
+  provider: pypi
+  user: Kenny.shad7
+  password:
+    secure: iwDQn9vzp0sfjM58B7FonDuFaWCI5EDZN+GisSSQ0B0DCa/u1qyyei7L6Btvw1m5YQxLyraebjgpfdbqI8/db2Ezkd5yswQJNmckDsnVIeWQH86U0xW2blpQedXtZqssW4hlpDcP6+PIqawcDYWTa5BXpAOv/CbAcIxkLWzlac0=
+  on:
+    tags: true
+    repo: shad7/seedbox
