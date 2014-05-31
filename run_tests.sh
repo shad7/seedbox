@@ -1,5 +1,5 @@
 #!/bin/bash
 #set -e
 
-python setup.py testr --slowest --testr-args="$*"
+python setup.py test --slowest --testr-args="$*"
 
