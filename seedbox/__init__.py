@@ -1,3 +1,3 @@
 """
-seedbox package
+package
 """

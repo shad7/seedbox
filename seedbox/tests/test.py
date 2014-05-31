@@ -15,16 +15,15 @@
 
 """Common utilities used in testing"""
 
-import os
 import fixtures
+import os
 import shutil
 import testtools
 import tempfile
 
 from seedbox import options  # noqa
 from seedbox import logext as logmgr  # noqa
-from seedbox.torrent import loader  # noqa
-from seedbox.workflow.tasks import base as plugins  # noqa
+from seedbox import torrent  # noqa
 from seedbox.fixture import config
 
 _TRUE_VALUES = ('True', 'true', '1', 'yes')
@@ -95,6 +94,3 @@ class ConfiguredBaseTestCase(BaseTestCase):
         self.CONF.set_override('incomplete_path',
                                self._make_dir('inprogress'),
                                group='torrent')
-        self.CONF.set_override('sync_path',
-                               self._make_dir('toSync'),
-                               group='plugins')
