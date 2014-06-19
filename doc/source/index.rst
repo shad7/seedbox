@@ -131,7 +131,7 @@ Resources
 
 * Package on PyPI: https://pypi.python.org/pypi/SeedboxManager
 * Repository and issues on GitHub: http://github.com/shad7/seedbox
-* Doc on http://readthedocs.org/docs/seedbox/
+* Doc on http://seedboxmanager.readthedocs.org/
 
 
 Contents
