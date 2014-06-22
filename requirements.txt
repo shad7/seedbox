@@ -1,9 +1,11 @@
 bencode
+click
 futures
 oslo.config==1.2.1
 lockfile
 pbr
 rarfile>=2.6
+sandman
 six>=1.4.1
 sqlalchemy
 sqlalchemy-migrate
