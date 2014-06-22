@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+2.2.2
+-----
+
+* fixed the generated ChangeLog to represent the entire history Updated version to 2.2.2 as that is the next release strting
+* updated requirements file to include sandman and click
+* fixed bug where a downloaded file was within a subdirectory, and the subdirectory name is included in the filename cache attribute. Moved the subdirectory name to the filepath
+* minor update to documentation configuration
+
 2.2.1
 -----
 
@@ -104,7 +112,7 @@ CHANGES
 0.1.17
 ------
 
-* bug fix: format() got messed up some where along the way
+* bug fix: format(
 
 0.1.16
 ------
@@ -153,52 +161,47 @@ CHANGES
 * added lockfile support to make sure that when running as a cron that multiple instances do not run at the same time
 
 0.1.9
-------
+-----
 
 * undo change to filesync
 
 0.1.8
-------
+-----
 
 * general cleanup
 * removed commented code
 
 0.1.7
-------
+-----
 
 * bug fix: variable name changed but didn't change all locations
 
 0.1.6
-------
+-----
 
 * updated the backup db routine to work similar to RotatingLogFiles
 * renamed test folder to tests
 * added shutilwhich to setup.py as dependency
 
 0.1.5
-------
+-----
 
 * moved purge from plugin to internals of datamanager. Deleted actual filepurge.py as it is no longer needed. Also added in dependency on shutilwhich since running as a cron made it difficult to find unrar
 
 0.1.4
-------
+-----
 
 * bumped the rev
 * updated logext to default to user folder/directory if available; else cwd
 * updated README; added new required attribute to configfile
 
 0.1.3
-------
+-----
 
-* found bug where if torrent was still downloading it would be marked as missing and then purged without ever doing sync. Added check to make sure it waits and checks again later. (automation will really help you find issues)
-
-0.1.2
-------
-
-* FAILED
+* found bug where if torrent was still downloading it would be marked as missing and then purged without ever doing sync. Added check to make sure it waits and checks again later. (automation will really help you find issues
 
 0.1.1
-------
+-----
 
 * forgot to include ez_setup.py in distribution
 * no longer needed with setuptools model
@@ -218,7 +221,7 @@ CHANGES
 * Bug fixes related to database backup, some extra logging
 
 0.1
-------
+---
 
 * adding setup/distribution related files
 * Initial creation
