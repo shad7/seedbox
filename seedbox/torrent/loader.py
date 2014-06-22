@@ -177,7 +177,7 @@ def _filter_media(torrent_id, media_items):
         # full path and filename. If file is not found, then we will set
         # the file to missing
         if not media.skipped:
-            media.file_path = _get_file_path(filename)
+            (media.file_path, media.filename) = _get_file_path(filename)
             if not media.file_path:
                 media.missing = True
                 LOG.info('Media file [%s] not found', filename)
@@ -198,13 +198,15 @@ def _get_file_path(filename):
         None if not found
     """
 
-    found_location = None
+    found_file = None
+    found_path = None
     for location in cfg.CONF.torrent.media_paths:
 
+        full_path = os.path.join(location, filename)
         # if the file is found then break out of the loop and
         # return found; else we will return default not found
-        if os.path.exists(os.path.join(location, filename)):
-            found_location = location
+        if os.path.exists(full_path):
+            (found_path, found_file) = os.path.split(full_path)
             break
 
-    return found_location
+    return (found_path, found_file)
