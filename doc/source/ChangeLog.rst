@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+2.2.3
+-----
+
+* Updating version to 2.2.3
+* added link to ChangeLog to published documentation
 
 2.2.2
 -----
