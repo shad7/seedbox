@@ -45,6 +45,11 @@ Running SeedboxManager from crontab::
     As part of installing in virtualenv the sample configuration files will be installed into the
     **~/seedbox/etc/seedbox** folder.
 
+Starting Admin UI and REST API::
+
+    dbadmin sqlite:////home/USER/.seedbox/torrent.db >> /home/USER/seedbox/etc/seedbox/admin.log 2>&1
+
+
 General Information
 -------------------
 
@@ -136,6 +141,11 @@ Resources
 
 Contents
 ========
+
+.. toctree::
+    :hidden:
+
+    ChangeLog
 
 .. toctree::
     :maxdepth: 2
