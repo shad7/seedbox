@@ -18,9 +18,12 @@ def _get_work(dbapi):
     # now retrieve any torrents that are eligible for processing
     # and kick off the workflows.
     for tor in dbapi.get_torrents_active():
-        LOG.debug('creating workflow for torrent: %s', tor)
-        wf = workflow.Workflow(tor)
-        flows.append(wf)
+        # need to make sure there are actually media files that
+        # were parsed for the torrent.
+        if tor.media_files:
+            LOG.debug('creating workflow for torrent: %s', tor)
+            wf = workflow.Workflow(tor)
+            flows.append(wf)
 
     return flows
 
