@@ -143,13 +143,9 @@ Contents
 ========
 
 .. toctree::
-    :hidden:
-
-    ChangeLog
-
-.. toctree::
     :maxdepth: 2
 
+    ChangeLog
     ToDo
     sourcecode/autoindex
 
