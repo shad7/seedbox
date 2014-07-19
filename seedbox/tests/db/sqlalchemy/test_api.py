@@ -1,3 +1,4 @@
+from __future__ import print_function
 from seedbox.db import models as api_model
 from seedbox.db.sqlalchemy import models as db_model
 from seedbox.db.sqlalchemy import api
@@ -14,7 +15,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
     def _print_tables(self, msg_key):
 
         for t, tab in db_model.Base.metadata.tables.items():
-            print msg_key, 'table =>', t, tab.c
+            print(msg_key, 'table =>', t, tab.c)
 
     def test_upgrade(self):
         try:
