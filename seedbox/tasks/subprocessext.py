@@ -115,12 +115,12 @@ class ProcessLogging(subprocess.Popen):
         :param subprocess.PIPE pipe:    messaging channel
         :param ref log_func:            reference to the logging method
         """
-        def log_output(out, log_func):
+        def log_output(out, write_func):
             """
             thread function to log subprocess output
             """
             for line in iter(out.readline, b''):
-                log_func(line.rstrip('\n'))
+                write_func(line.rstrip('\n'))
 
         # start thread
         thread = threading.Thread(target=log_output, args=(pipe, log_func))
