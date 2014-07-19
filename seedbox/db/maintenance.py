@@ -5,14 +5,14 @@ import shutil
 import six.moves.urllib.parse as urlparse
 
 LOG = logging.getLogger(__name__)
+# total of 8 weeks/2 months of backups
+MAX_BACKUP_COUNT = 8
 
 
 def backup(conf):
     """
     create a backup copy of the database file.
     """
-    # total of 8 weeks/2 months of backups
-    MAX_BACKUP_COUNT = 8
 
     LOG.debug('starting database backup process')
     default_db_name = urlparse.urlparse(
