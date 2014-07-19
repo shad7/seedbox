@@ -124,4 +124,4 @@ def get_tasks(phase):
                                       names=cfg.CONF['process'][phase],
                                       invoke_on_load=False)
 
-    return sorted([ext.plugin for ext in mgr.extensions])
+    return [ext.plugin for ext in mgr.extensions]
