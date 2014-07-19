@@ -43,9 +43,6 @@ class Connection(base.Connection):
             conn.execute('VACUUM')
             LOG.debug('db space reclaimed')
 
-    def _row_to_model(self, row):
-        return model_util.from_db(row)
-
     def save(self, instance):
         """Save the instance to the database"""
         _model = getattr(db_model, instance.__class__.__name__)
@@ -59,7 +56,7 @@ class Connection(base.Connection):
                 _row = model_util.to_db(instance)
                 session.add(_row)
             _row.save(session)
-        return self._row_to_model(_row)
+        return model_util.from_db(_row)
 
     def bulk_create(self, instances):
         """Save the instances in bulk to the database."""
@@ -71,7 +68,7 @@ class Connection(base.Connection):
         with session.begin():
             session.add_all(_instances)
         for _row in _instances:
-            yield self._row_to_model(_row)
+            yield model_util.from_db(_row)
 
     def bulk_update(self, value_map, entity_type, qfilter):
         """
@@ -120,7 +117,7 @@ class Connection(base.Connection):
                                                     session.query(_model))
             _query = transformer.apply_filter(qfilter)
             for _row in _query.all():
-                yield self._row_to_model(_row)
+                yield model_util.from_db(_row)
 
     def fetch(self, entity_type, pk):
         """Fetch the instance using primary key from the database."""
@@ -128,4 +125,4 @@ class Connection(base.Connection):
         session = self._engine_facade.session
         with session.begin():
             _row = session.query(_model).get(pk)
-        return self._row_to_model(_row)
+        return model_util.from_db(_row)
