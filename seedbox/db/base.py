@@ -36,7 +36,7 @@ class Connection(object):
         """Save the instances in bulk to the database."""
 
     @abc.abstractmethod
-    def bulk_update(self, instances):
+    def bulk_update(self, value_map, entity_type, qfilter):
         """Save the updated instances in bulk to the database."""
 
     @abc.abstractmethod
@@ -52,5 +52,5 @@ class Connection(object):
         """Fetch the instance(s) based on filter from the database."""
 
     @abc.abstractmethod
-    def fetch(self, qfilter):
+    def fetch(self, qfilter, pk):
         """Fetch the instance(s) based on filter from the database."""
