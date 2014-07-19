@@ -27,11 +27,8 @@ import logging
 import os
 import subprocess
 import time
-import threading
 
 from oslo.config import cfg
-
-from seedbox import logext
 
 LOG = logging.getLogger(__name__)
 
@@ -53,14 +50,11 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group='tasks_synclog')
 
 
-def make_file_logger(name, filepath, unique_id, enabled):
+def _make_file_logger(name, filepath, unique_id):
 
-    if enabled:
-        _handler = logging.FileHandler(
-            os.path.join(filepath, 'sync.home.{0}'.format(unique_id)))
-        _handler.setFormatter(logging.Formatter('%(message)s'))
-    else:
-        _handler = logext.NullHandler()
+    _handler = logging.FileHandler(
+        os.path.join(filepath, 'sync.home.{0}'.format(unique_id)))
+    _handler.setFormatter(logging.Formatter('%(message)s'))
 
     _logger = logging.getLogger(name)
     _logger.propagate = 0
@@ -81,19 +75,6 @@ class ProcessLogging(subprocess.Popen):
         """
         self._cmd = cmd
 
-        _uid = time.time()
-        self.stdout_logger = make_file_logger(
-            'seedbox.tasks.subproc.stdout',
-            cfg.CONF.tasks_synclog.stdout_dir,
-            _uid,
-            cfg.CONF.tasks_synclog.stdout_verbose)
-
-        self.stderr_logger = make_file_logger(
-            'seedbox.tasks.subproc.stderr',
-            cfg.CONF.tasks_synclog.stderr_dir,
-            _uid,
-            cfg.CONF.tasks_synclog.stderr_verbose)
-
         # delegate to parent to spawn the rsync process
         super(ProcessLogging, self).__init__(self._cmd, shell=False,
                                              stdout=subprocess.PIPE,
@@ -101,47 +82,45 @@ class ProcessLogging(subprocess.Popen):
                                              bufsize=1,
                                              universal_newlines=True)
 
-        # start stdout and stderr logging threads
-        self.log_thread(self.stdout, self.stdout_logger.info)
-        self.log_thread(self.stderr, self.stderr_logger.info)
-
         LOG.debug('Started subprocess, pid %s', self.pid)
         LOG.debug('Command:  %s', ' '.join(self._cmd))
 
-    def log_thread(self, pipe, log_func):
+    def _log(self, name, filepath, unique_id, data):
         """
-        Start a thread logging output from pipe
-
-        :param subprocess.PIPE pipe:    messaging channel
-        :param ref log_func:            reference to the logging method
+        Handles logging data to a file via logger
         """
-        def log_output(out, write_func):
-            """
-            thread function to log subprocess output
-            """
-            for line in iter(out.readline, b''):
-                write_func(line.rstrip('\n'))
-
-        # start thread
-        thread = threading.Thread(target=log_output, args=(pipe, log_func))
-        thread.setDaemon(True)  # thread dies with the program
-        thread.start()
-        thread.join()
+        _logger = _make_file_logger(name, filepath, unique_id)
+        _logger.info(data)
 
     def complete(self):
         """
         Handle all the processing of the subprocess
         """
-        while self.poll() is None:
-            # we can look to add in signal interruption handling
-            # here in the future.
-            pass
+        outdata = None
+        outerr = None
+
+        while self.returncode is None:
+            outdata, outerr = self.communicate()
         else:
             # if we have a return code of anything other than 0;
             # we had some kind of failure so we should recognize the
             # error and handle accordingly.
             if self.returncode != 0:
                 raise subprocess.CalledProcessError(self.returncode, self._cmd)
+
+        _uid = time.time()
+
+        if cfg.CONF.tasks_synclog.stdout_verbose and outdata:
+            self._log('seedbox.tasks.subproc.stdout',
+                      cfg.CONF.tasks_synclog.stdout_dir,
+                      _uid,
+                      outdata)
+
+        if cfg.CONF.tasks_synclog.stderr_verbose and outerr:
+            self._log('seedbox.tasks.subproc.stderr',
+                      cfg.CONF.tasks_synclog.stderr_dir,
+                      _uid,
+                      outerr)
 
     @staticmethod
     def execute(cmd):
