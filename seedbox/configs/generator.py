@@ -144,7 +144,7 @@ def _gen_group_opts_output(group, opts_by_module):
         output.append('#')
         output.append('')
         for opt in opts:
-            map(output.append, _gen_opt_output(opt))
+            output.extend(_gen_opt_output(opt))
         output.append('')
 
     return output
@@ -222,12 +222,12 @@ def _import_module(mod_str):
 def _gen_output(opts_by_group, outputfile):
 
     output = []
-    map(output.append, _gen_group_opts_output(DEFAULT_GROUP,
-                                              opts_by_group.pop(DEFAULT_GROUP,
-                                                                [])))
+    output.extend(_gen_group_opts_output(DEFAULT_GROUP,
+                                         opts_by_group.pop(DEFAULT_GROUP,
+                                                           [])))
     for group in sorted(opts_by_group.keys()):
-        map(output.append, _gen_group_opts_output(group,
-                                                  opts_by_group[group]))
+        output.extend(_gen_group_opts_output(group,
+                                             opts_by_group[group]))
 
     _write_output(output, outputfile)
 
