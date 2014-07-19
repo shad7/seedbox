@@ -25,7 +25,6 @@ class UnrarFile(base.BaseTask):
         Perform the action associated with task for the provided media_file.
         """
         LOG.debug('decompressing file %s', self.media_file.filename)
-        archived_files = None
         with rarfile.RarFile(
                 os.path.join(
                     self.media_file.file_path,

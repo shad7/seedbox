@@ -79,7 +79,6 @@ def _gen_opt_output(opt):
     if not opt_help:
         sys.stderr.write('WARNING: [%s] is missing help string.\n' % opt_name)
         opt_help = ''
-    opt_type = None
     try:
         opt_type = OPTION_REGEX.search(str(type(opt))).group(0)
     except (ValueError, AttributeError) as err:
