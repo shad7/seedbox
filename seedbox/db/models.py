@@ -3,6 +3,8 @@ Model classes to represent the structures of data.
 """
 import inspect
 
+import six
+
 
 class Model(object):
 
@@ -10,7 +12,7 @@ class Model(object):
 
     def __init__(self, **kwds):
         self.fields = list(kwds)
-        for k, v in kwds.iteritems():
+        for k, v in six.iteritems(kwds):
             setattr(self, k, v)
 
     def as_dict(self):
