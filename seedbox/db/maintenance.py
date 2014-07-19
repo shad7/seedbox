@@ -31,5 +31,5 @@ def backup(conf):
         shutil.copy2(default_db_name, dfn)
         LOG.info('backup complete')
     else:
-        LOG.warn('Database [%s] does not exist, no backup taken.',
-                 default_db_name)
+        LOG.warning('Database [%s] does not exist, no backup taken.',
+                    default_db_name)
