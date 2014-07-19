@@ -13,6 +13,7 @@ def verify_path(path_entry):
     """
     verify a path, if it exists make sure it is
     an absolute path and return. else None
+    :param path_entry: path to file or directory on host
     """
     if path_entry and os.path.exists(path_entry):
         if os.path.isabs(path_entry):
@@ -27,6 +28,7 @@ def format_file_ext(filetypes):
     """
     verifies that each item in the list of filetypes is a string
     and starts with a '.'
+    :param filetypes: a list of extensions representing types of files
     """
 
     result_list = []
