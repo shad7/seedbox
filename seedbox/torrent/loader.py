@@ -209,4 +209,4 @@ def _get_file_path(filename):
             (found_path, found_file) = os.path.split(full_path)
             break
 
-    return (found_path, found_file)
+    return found_path, found_file
