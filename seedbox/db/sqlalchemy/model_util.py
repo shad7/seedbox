@@ -10,7 +10,7 @@ def from_db(db_item):
     """
     Handles the conversion from the database model object to the
     corresponding public facing api model object. If an item has
-    a reference to another model object then the call is recurvsive.
+    a reference to another model object then the call is recursive.
 
     :param db_item: an instance of a database model object
     :returns: an instance of an api model object
@@ -55,7 +55,7 @@ def to_db(api_item, db_item=None):
     """
     Handles the conversion from the api model object to the
     corresponding database model object. If an item has
-    a reference to another model object then the call is recurvsive.
+    a reference to another model object then the call is recursive.
 
     :param api_item: an instance of a api model object
     :param db_item: an instance of a database model object that

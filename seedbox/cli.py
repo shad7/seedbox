@@ -35,7 +35,7 @@ def main():
     cfg.CONF.log_opt_values(LOG, logging.DEBUG)
 
     # need to create a lock to make sure multiple instances do not start at
-    # the sametime because we are running as a cron.
+    # the same time because we are running as a cron.
     filelock = os.path.join(cfg.CONF.config_dir, 'seedmgr.lock')
     lock = pidlockfile.PIDLockFile(filelock, timeout=10)
     try:

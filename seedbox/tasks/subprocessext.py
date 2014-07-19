@@ -3,7 +3,7 @@ Extends the subprocess.Popen class to provide logging threads for stdout and
 stderr of the child process such that it will log stdout through logging
 module to provided logger.info() and log stderr to provided logger.warn().
 
-Because using subprocess.PIPE for stdout and stderr with any of the convience
+Because using subprocess.PIPE for stdout and stderr with any of the convenience
 methods or with the wait() command has potential for buffer issue,
 we leverage Popen directly with PIPE but then spawn a thread with access to
 the corresponding logger function on the specific pipe. And then leverage the

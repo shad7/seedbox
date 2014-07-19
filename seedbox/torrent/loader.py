@@ -86,7 +86,7 @@ def _is_parsing_required(torrent):
 
 def _is_torrent_downloading(media_items):
     """
-    Verify if atleast one item still located in the
+    Verify if at least one item still located in the
     inprogress/downloading location
 
     args:
