@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 from testtools import matchers
 
@@ -45,7 +46,7 @@ class BaseTasksTest(test.ConfiguredBaseTestCase):
     def test_task_str(self):
 
         task = SampleTask(None)
-        print str(task)
+        print(str(task))
         self.assertThat(str(task), matchers.StartsWith("""SampleTask:"""))
 
     def test_sorted_tasks(self):
