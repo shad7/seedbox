@@ -66,7 +66,7 @@ def configure():
                                   disable_existing_loggers=False)
     else:
         logger = logging.getLogger()
-        logger.setLevel(logging.getLevelName(cfg.CONF.loglevel.upper()))
+        logger.setLevel(cfg.CONF.loglevel.upper())
 
         logloc_filename = os.path.join(cfg.CONF.config_dir, cfg.CONF.logfile)
         handler = logging.handlers.RotatingFileHandler(
