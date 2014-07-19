@@ -29,11 +29,11 @@ class Taskflow(xworkflows.Workflow):
     Define the workflow conditions for managing torrents;
     """
     states = (
-        (constants.INIT, (u"Initial state")),
-        (constants.READY, (u"Ready")),
-        (constants.ACTIVE, (u"Active")),
-        (constants.DONE, (u"Done")),
-        (constants.CANCELLED, (u"Cancelled")),
+        (constants.INIT, u"Initial state"),
+        (constants.READY, u"Ready"),
+        (constants.ACTIVE, u"Active"),
+        (constants.DONE, u"Done"),
+        (constants.CANCELLED, u"Cancelled"),
     )
 
     transitions = (
