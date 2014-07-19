@@ -56,11 +56,11 @@ class Base(six.Iterator):
         return getattr(self, key, default)
 
     def __iter__(self):
-        self._i = iter(orm.object_mapper(self).columns)
+        self._i = iter(list(dict(orm.object_mapper(self).columns).keys()))
         return self
 
     def __next__(self):
-        n = self._i.next().name
+        n = six.advance_iterator(self._i)
         return n, getattr(self, n)
 
     def next(self):
@@ -262,13 +262,13 @@ class QueryTransformer(object):
 
     def _handle_simple_op(self, simple_op, nodes):
         op = self.operators[simple_op]
-        field_name = nodes.keys()[0]
-        value = nodes.values()[0]
+        field_name = list(nodes.keys())[0]
+        value = list(nodes.values())[0]
         return op(getattr(self.table, field_name), value)
 
     def _transform(self, sub_tree):
-        op = sub_tree.keys()[0]
-        nodes = sub_tree.values()[0]
+        op = list(sub_tree.keys())[0]
+        nodes = list(sub_tree.values())[0]
         if op in self.complex_operators:
             return self._handle_complex_op(op, nodes)
         else:
