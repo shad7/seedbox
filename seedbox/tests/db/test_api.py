@@ -1,3 +1,4 @@
+from __future__ import print_function
 import datetime
 import os
 
@@ -16,7 +17,7 @@ class ApiDBTestCase(test.ConfiguredBaseTestCase):
 
     def test_list_opts(self):
         opts = db.list_opts()
-        print opts
+        print(opts)
         self.assertEqual(len(opts[0][1]), 3)
 
     def test_clear(self):
