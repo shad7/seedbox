@@ -41,7 +41,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_save(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake1.torrent')
         self.assertIsInstance(torrent, api_model.Torrent)
 
         _saved_torrent = self.dbconn.save(torrent)
@@ -55,7 +55,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_bulk_create(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake2.torrent')
         torrent = self.dbconn.save(torrent)
 
         _medias = []
@@ -71,7 +71,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_bulk_update(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake3.torrent')
         torrent = self.dbconn.save(torrent)
 
         _medias = []
@@ -90,7 +90,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_delete_by(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake4.torrent')
         torrent = self.dbconn.save(torrent)
 
         _medias = []
@@ -108,7 +108,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_delete(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake5.torrent')
         torrent = self.dbconn.save(torrent)
 
         self.dbconn.delete(torrent)
@@ -120,9 +120,9 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_fetch_by(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake6.torrent')
         torrent = self.dbconn.save(torrent)
 
-        qfilter = {'=': {'name': 'fake.torrent'}}
+        qfilter = {'=': {'name': 'fake6.torrent'}}
         _torrent = self.dbconn.fetch_by(api_model.Torrent, qfilter)
         self.assertEqual(torrent, list(_torrent)[0])
