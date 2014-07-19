@@ -4,7 +4,7 @@ from seedbox import process
 from seedbox.tests import test
 
 
-class fake_manager(object):
+class FakeManager(object):
 
     DBAPI = None
 
@@ -25,7 +25,7 @@ class fake_manager(object):
                     filename='movie-{0}.mp4'.format(i),
                     file_ext='.mp4',
                     file_path='/tmp/media'))
-            medias = fake_manager.DBAPI.bulk_create_medias(_medias)
+            medias = FakeManager.DBAPI.bulk_create_medias(_medias)
 
             return medias
 
@@ -61,8 +61,8 @@ class ProcessTestCase(test.ConfiguredBaseTestCase):
                 file_path='/tmp/media'))
         self.dbapi.bulk_create_medias(_medias)
 
-        fake_manager.DBAPI = self.dbapi
-        self.patch(process, 'manager', fake_manager)
+        FakeManager.DBAPI = self.dbapi
+        self.patch(process, 'manager', FakeManager)
 
         process.start()
         self.assertTrue(True)
