@@ -80,8 +80,8 @@ class EngineFacade(object):
         """
         self._engine = create_engine(
             sql_connection=sql_connection,
-            idle_timeout=kwargs.get('idle_timeout'),
-            connection_debug=kwargs.get('connection_debug'))
+            idle_timeout=kwargs.get('idle_timeout', 3600),
+            connection_debug=kwargs.get('connection_debug', 0))
         self._session_maker = get_maker(engine=self._engine)
 
     @property
