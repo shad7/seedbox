@@ -59,12 +59,12 @@ DEFAULT_GROUP = 'DEFAULT'
 def _write_output(output, outputfile):
 
     if outputfile is None:
-        file = sys.stdout
+        outfile = sys.stdout
     else:
-        file = open(outputfile, 'w')
+        outfile = open(outputfile, 'w')
 
     for line in output:
-        print(line, file=file)
+        print(line, file=outfile)
 
 
 def _sanitize_default(name, value):
