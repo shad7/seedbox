@@ -50,7 +50,7 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group='tasks_synclog')
 
 
-def _make_file_logger(name, filepath, unique_id):
+def _log(name, filepath, unique_id, data):
 
     _handler = logging.FileHandler(
         os.path.join(filepath, 'sync.home.{0}'.format(unique_id)))
@@ -61,7 +61,7 @@ def _make_file_logger(name, filepath, unique_id):
     _logger.setLevel(logging.INFO)
     _logger.addHandler(_handler)
 
-    return _logger
+    _logger.info(data)
 
 
 class ProcessLogging(subprocess.Popen):
@@ -85,13 +85,6 @@ class ProcessLogging(subprocess.Popen):
         LOG.debug('Started subprocess, pid %s', self.pid)
         LOG.debug('Command:  %s', ' '.join(self._cmd))
 
-    def _log(self, name, filepath, unique_id, data):
-        """
-        Handles logging data to a file via logger
-        """
-        _logger = _make_file_logger(name, filepath, unique_id)
-        _logger.info(data)
-
     def complete(self):
         """
         Handle all the processing of the subprocess
@@ -111,16 +104,16 @@ class ProcessLogging(subprocess.Popen):
         _uid = time.time()
 
         if cfg.CONF.tasks_synclog.stdout_verbose and outdata:
-            self._log('seedbox.tasks.subproc.stdout',
-                      cfg.CONF.tasks_synclog.stdout_dir,
-                      _uid,
-                      outdata)
+            _log('seedbox.tasks.subproc.stdout',
+                 cfg.CONF.tasks_synclog.stdout_dir,
+                 _uid,
+                 outdata)
 
         if cfg.CONF.tasks_synclog.stderr_verbose and outerr:
-            self._log('seedbox.tasks.subproc.stderr',
-                      cfg.CONF.tasks_synclog.stderr_dir,
-                      _uid,
-                      outerr)
+            _log('seedbox.tasks.subproc.stderr',
+                 cfg.CONF.tasks_synclog.stderr_dir,
+                 _uid,
+                 outerr)
 
     @staticmethod
     def execute(cmd):
