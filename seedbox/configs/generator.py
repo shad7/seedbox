@@ -187,17 +187,17 @@ def _is_cli_opt(opt):
 
 
 def _list_opts(obj):
-    def is_opt(o):
+    def _is_opt(o):
         return (isinstance(o, cfg.Opt) and
                 not isinstance(o, cfg.SubCommandOpt))
 
     opts = list()
     for attr_str in dir(obj):
         attr_obj = getattr(obj, attr_str)
-        if is_opt(attr_obj):
+        if _is_opt(attr_obj):
             opts.append(attr_obj)
         elif (isinstance(attr_obj, list) and
-              all(map(lambda x: is_opt(x), attr_obj))):
+              all(map(lambda x: _is_opt(x), attr_obj))):
             opts.extend(attr_obj)
 
     ret = {}
@@ -284,9 +284,6 @@ def main():
     """
     Entry point into generator (from command line) to generate a
     sample configuration file
-
-    :param list sys.argv:   list of source files to process for
-                            capturing options
     """
     generate(sys.argv[1:])
 

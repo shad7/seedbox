@@ -29,5 +29,9 @@ cfg.CONF.register_opts(OPTS, group='torrent')
 
 
 def load():
+    """
+    Simple wrapper to provide parsing and loading torrents into a
+    database cache.
+    """
     from seedbox.torrent import loader
     loader.load_torrents()
