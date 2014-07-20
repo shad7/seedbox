@@ -36,9 +36,6 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
         self.dbconn.shrink_db()
         self.assertTrue(True)
 
-    def test_row_to_model(self):
-        self.assertIsNone(self.dbconn._row_to_model(None))
-
     def test_save(self):
 
         torrent = api_model.Torrent(torrent_id=None, name='fake1.torrent')
