@@ -1,3 +1,7 @@
+"""
+Provides the basic definition for a task that handles execution and basic
+error handling.
+"""
 import abc
 import logging
 import os
@@ -9,8 +13,6 @@ import six
 from seedbox.common import timeutil
 
 LOG = logging.getLogger(__name__)
-
-DEFAULT_PRIORITY = 128
 
 OPTS = [
     cfg.StrOpt('sync_path',
@@ -26,7 +28,6 @@ class BaseTask(object):
     """
     Provides the base definition of a task.
     """
-    PRIORITY = None
 
     def __init__(self, media_file):
         self.media_file = media_file
@@ -41,16 +42,19 @@ class BaseTask(object):
             self.execute()
             self.media_file.total_time = timeutil.delta_seconds(
                 _start, timeutil.utcnow())
-        except BaseException:
+        except Exception:
             self.media_file.error_msg = traceback.format_exc()
         self.gen_files.append(self.media_file)
         return self.gen_files
 
-    @property
-    def priority(self):
-        return self.PRIORITY if self.PRIORITY is not None else DEFAULT_PRIORITY
-
     def add_gen_files(self, files):
+        """
+        Adds media files included within an archived file to be processed
+        separately to increase parallel processing.
+
+        :param files: a list of media files produced by a plugin to be
+        included on the torrent.
+        """
         _cls = type(self.media_file)
         _base = self.media_file.as_dict()
         _base['media_id'] = None
@@ -87,27 +91,7 @@ class BaseTask(object):
     def execute(self):
         """
         Perform the action associated with task for the provided media_file.
-
-        :param media_file: a media file to act on
         """
-
-    def __eq__(self, other):
-        """
-        override eq to compare priority
-        """
-        return self.priority == other.priority
-
-    def __lt__(self, other):
-        """
-        override lt to compare priority
-        """
-        return self.priority < other.priority
-
-    def __gt__(self, other):
-        """
-        override gt to compare priority
-        """
-        return self.priority > other.priority
 
     def __str__(self):
         return '{0}: {1}'.format(self.__class__.__name__, self.__dict__)
