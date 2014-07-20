@@ -9,18 +9,33 @@ import logging.handlers
 import os
 
 from oslo.config import cfg
+import six
 
 try:
     NullHandler = logging.NullHandler
 except AttributeError:  # NullHandler added in Python 2.7
     class NullHandler(logging.Handler):
+        """
+        Copied from Python 2.7 logging module
+        """
         def handle(self, record):
+            """
+            @see logging module
+            :param record:
+            """
             pass
 
         def emit(self, record):
+            """
+            @see logging module
+            :param record:
+            """
             pass
 
         def createLock(self):
+            """
+            @see logging module
+            """
             self.lock = None
 
 DEFAULT_LOG_FILENAME = 'seedbox.log'
@@ -55,6 +70,12 @@ cfg.CONF.register_cli_opts(CLI_OPTS)
 # generate logging handler errors
 logging.getLogger().addHandler(NullHandler())
 
+DEFAULT_LIBRARY_LOG_LEVEL = {'xworkflows': logging.ERROR,
+                             'stevedore': logging.ERROR,
+                             'sqlalchemy': logging.ERROR,
+                             'migrate': logging.ERROR,
+                             }
+
 
 def configure():
     """
@@ -78,14 +99,6 @@ def configure():
         logger.addHandler(handler)
 
         # shut off logging from 3rd party frameworks
-        xlogger = logging.getLogger('xworkflows')
-        xlogger.setLevel(logging.ERROR)
-
-        stevedore = logging.getLogger('stevedore')
-        stevedore.setLevel(logging.ERROR)
-
-        sa = logging.getLogger('sqlalchemy')
-        sa.setLevel(logging.ERROR)
-
-        migrate = logging.getLogger('migrate')
-        migrate.setLevel(logging.ERROR)
+        for xlib, xlevel in six.iteritems(DEFAULT_LIBRARY_LOG_LEVEL):
+            xlogger = logging.getLogger(xlib)
+            xlogger.setLevel(xlevel)
