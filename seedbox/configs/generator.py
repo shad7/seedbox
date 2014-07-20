@@ -159,7 +159,7 @@ def _is_in_group(opt, group):
     return False
 
 
-def _guess_groups(opt, mod_obj):
+def _guess_groups(opt):
     # is it in the DEFAULT group?
     if _is_in_group(opt, cfg.CONF):
         return DEFAULT_GROUP
@@ -205,7 +205,7 @@ def _list_opts(obj):
         # do not include cli in the config file
         if _is_cli_opt(opt):
             continue
-        ret.setdefault(_guess_groups(opt, obj), []).append(opt)
+        ret.setdefault(_guess_groups(opt), []).append(opt)
     return ret.items()
 
 
