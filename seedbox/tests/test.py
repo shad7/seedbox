@@ -57,11 +57,6 @@ class BaseTestCase(testtools.TestCase):
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
 
-    def _make_dir(self, dirname):
-        dirpath = os.path.join(self.base_dir, dirname)
-        os.mkdir(dirpath)
-        return dirpath
-
 
 class ConfiguredBaseTestCase(BaseTestCase):
 
@@ -80,6 +75,11 @@ class ConfiguredBaseTestCase(BaseTestCase):
         shutil.rmtree(self.base_dir, ignore_errors=True)
         self.CONF.reset()
         super(ConfiguredBaseTestCase, self).tearDown()
+
+    def _make_dir(self, dirname):
+        dirpath = os.path.join(self.base_dir, dirname)
+        os.mkdir(dirpath)
+        return dirpath
 
     def set_required_options(self):
 
