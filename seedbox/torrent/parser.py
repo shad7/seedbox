@@ -13,13 +13,23 @@ Created on 2012-03-07
 @author: mohanr
 """
 from datetime import datetime
+import io
 import logging
 import os
-import string
 
-import bencode
-from bencode import BTL
 import six
+
+from seedbox.torrent import bencode
+
+
+def _is_int(val):
+    ret_val = True
+    try:
+        int(val)
+    except ValueError:
+        ret_val = False
+
+    return ret_val
 
 
 class ParsingError(Exception):
@@ -71,7 +81,7 @@ class TorrentParser(object):
         INT_END = 'e'
 
         def __init__(self, torr_str):
-            self.torr_str = six.StringIO(torr_str)
+            self.torr_str = six.BytesIO(torr_str)
             self.curr_char = None
 
         def next_char(self):
@@ -80,12 +90,15 @@ class TorrentParser(object):
                 1. as return value,
                 2. as self.curr_char (useful in some circumstances)
             """
-            self.curr_char = self.torr_str.read(1)
+            self.curr_char = self.torr_str.read(1).decode(encoding='utf-8',
+                                                          errors='replace')
             return self.curr_char
 
         def step_back(self, position=-1, mode=1):
             """ Step back, by default, 1 position relative to the
             current position.
+            :param position: offset from current position
+            :param mode: current position
             """
             self.torr_str.seek(position, mode)
 
@@ -146,7 +159,7 @@ class TorrentParser(object):
             parsed_int = ''
             while True:
                 parsed_int_char = self.next_char()
-                if parsed_int_char not in string.digits:
+                if not _is_int(parsed_int_char):
                     if parsed_int_char != delimiter:
                         raise ParsingError(
                             'Invalid character %s found after parsing an \
@@ -173,7 +186,7 @@ class TorrentParser(object):
         if not os.path.exists(torrent_file_path):
             raise IOError('No file found at %s'.format(torrent_file_path))
 
-        with open(torrent_file_path, 'rb') as handle:
+        with io.open(file=torrent_file_path, mode='rb') as handle:
             self.torrent_content = handle.read()
 
         # bencode is supremely more efficient parser of torrents but extremely
@@ -187,10 +200,10 @@ class TorrentParser(object):
         # correspondingly.
         try:
             self.parsed_content = bencode.bdecode(self.torrent_content)
-        except BTL.BTFailure as bterr:
-            logging.debug(
-                'bencode.bdecode failed: ({0}); \
-                trying alternate approach'.format(bterr))
+        except bencode.BTFailure as bterr:
+            logging.info(
+                'bencode.bdecode failed: ({0});'
+                'trying alternate approach'.format(bterr))
             self.torrent_str = self._TorrentStr(self.torrent_content)
             self.parsed_content = self._parse_torrent()
 
@@ -198,7 +211,7 @@ class TorrentParser(object):
         """
         Retrieves tracker URL from the parsed torrent file
 
-        :returns:   tracker URL from parased torrent file
+        :returns:   tracker URL from parsed torrent file
         :rtype:     str
         """
         return self.parsed_content.get('announce')
@@ -287,7 +300,7 @@ class TorrentParser(object):
         elif parsed_char == self.INT_START:
             return self.torrent_str.parse_int()
 
-        elif parsed_char in string.digits:  # string
+        elif _is_int(parsed_char):  # string
             self.torrent_str.step_back()
             return self.torrent_str.parse_str()
 
@@ -298,7 +311,11 @@ class TorrentParser(object):
                 if not dict_key:
                     break  # End of dict
                 dict_value = self._parse_torrent()  # parse value
-                parsed_dict.setdefault(dict_key, dict_value)
+                if isinstance(dict_value, six.binary_type):
+                    dict_value = dict_value.decode(encoding='utf-8',
+                                                   errors='replace')
+                parsed_dict.setdefault(dict_key.decode(encoding='utf-8'),
+                                       dict_value)
 
             return parsed_dict
 
@@ -308,6 +325,10 @@ class TorrentParser(object):
                 list_item = self._parse_torrent()
                 if not list_item:
                     break  # End of list
+
+                if isinstance(list_item, six.binary_type):
+                    list_item = list_item.decode(encoding='utf-8',
+                                                 errors='replace')
                 parsed_list.append(list_item)
 
             return parsed_list
