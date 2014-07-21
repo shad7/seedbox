@@ -1,3 +1,6 @@
+"""
+SyncFile task plugin for performing rsync of a file to a specified location.
+"""
 import logging
 import os
 
@@ -47,6 +50,9 @@ cfg.CONF.register_opts(SYNC_OPTS, group='tasks_filesync')
 
 
 class SyncFile(base.BaseTask):
+    """
+    Provides the capability of rsync file to a specified location.
+    """
 
     def __init__(self, *args, **kwargs):
         super(SyncFile, self).__init__(*args,  **kwargs)
@@ -55,6 +61,12 @@ class SyncFile(base.BaseTask):
 
     @property
     def cmd(self):
+        """
+        A property for accessing the rsync command used for specified media
+        file.
+
+        :return: rsync command :rtype: list
+        """
         if self._cmd is None:
             self._cmd = ['rsync']
 
@@ -93,6 +105,11 @@ class SyncFile(base.BaseTask):
 
     @property
     def destination(self):
+        """
+        A property for accessing the destination to sync file to.
+
+        :return: remote destination :rtype: string
+        """
         if self._destination is None:
             self._destination = []
             self._destination.append(cfg.CONF.tasks_filesync.remote_user)
@@ -108,6 +125,7 @@ class SyncFile(base.BaseTask):
     def is_actionable(media_file):
         """
         Perform check to determine if action should be taken.
+        :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
         :rtype: boolean
         """

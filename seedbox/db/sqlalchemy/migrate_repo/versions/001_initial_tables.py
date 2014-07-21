@@ -1,3 +1,7 @@
+"""
+Initial version of the database model; maintained to support anyone upgrading
+from a previous version.
+"""
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -6,6 +10,11 @@ STATES = ['init', 'ready', 'active', 'done', 'cancelled']
 
 
 def upgrade(migrate_engine):
+    """
+    Creates the initial version of the database tables.
+
+    :param migrate_engine: an instance of database connection engine
+    """
     meta = sa.MetaData(bind=migrate_engine)
 
     appstate = sa.Table(
@@ -48,4 +57,10 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
+    """
+    Not implemented because this is associated with initial version.
+
+    :param migrate_engine: an instance of database connection engine
+    :raise NotImplementedError: if method executed
+    """
     raise NotImplementedError('Downgrade from initial version is unsupported.')

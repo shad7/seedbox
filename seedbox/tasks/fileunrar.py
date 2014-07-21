@@ -1,3 +1,6 @@
+"""
+UnrarFile task plugin for decompressing archived files to specified location.
+"""
 import logging
 import os
 
@@ -10,11 +13,16 @@ LOG = logging.getLogger(__name__)
 
 
 class UnrarFile(base.BaseTask):
+    """
+    Provides the capability of decompressing archived files to specified
+    location.
+    """
 
     @staticmethod
     def is_actionable(media_file):
         """
         Perform check to determine if action should be taken.
+        :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
         :rtype: boolean
         """

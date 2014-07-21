@@ -1,3 +1,6 @@
+"""
+Provides utilities for managing models
+"""
 import logging
 
 from seedbox.db import models as api_model

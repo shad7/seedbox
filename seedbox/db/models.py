@@ -8,6 +8,11 @@ import six
 
 class Model(object):
 
+    """
+    Provides base methods for interacting with database model
+    :param kwds: keyword parameters and values of the model
+    :type kwds: dict
+    """
     PK_NAME = 'id'
 
     def __init__(self, **kwds):
@@ -16,6 +21,11 @@ class Model(object):
             setattr(self, k, v)
 
     def as_dict(self):
+        """
+        Generates a dictionary representation of the model.
+
+        :return: model as dict :rtype: dict
+        """
         _d = dict()
         for f in self.fields:
             v = getattr(self, f)
@@ -27,6 +37,9 @@ class Model(object):
         return _d
 
     def items(self):
+        """
+        Provides a generator of key-value pair attributes for a model.
+        """
         for n in self.fields:
             yield n, getattr(self, n)
 
@@ -58,10 +71,21 @@ class Model(object):
 
     @classmethod
     def pk_filter(cls, value=None):
+        """
+        Creates a primary key filter for the given model.
+        :param value: primary key value
+        :return: primary key filter :rtype: dict
+        """
         return {cls.PK_NAME: value}
 
     @classmethod
     def make_empty(cls):
+        """
+        Create an instance of the model using the defined attributes from the
+        parameters of the model.
+
+        :return: model class :rtype: seedbox.db.models
+        """
         args = inspect.getargspec(cls.__init__).args
         # remove self; always first arg of __init__
         args = args[1:]

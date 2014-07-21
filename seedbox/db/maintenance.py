@@ -1,3 +1,6 @@
+"""
+Provides the ability to perform maintenance on a database.
+"""
 import logging
 import os
 import shutil
@@ -12,6 +15,8 @@ MAX_BACKUP_COUNT = 8
 def backup(conf):
     """
     create a backup copy of the database file.
+
+    :param conf: an instance of configuration
     """
 
     LOG.debug('starting database backup process')

@@ -1,3 +1,6 @@
+"""
+CopyFile task plugin for copying a file to specified location.
+"""
 import logging
 import os
 import shutil
@@ -10,12 +13,17 @@ LOG = logging.getLogger(__name__)
 
 
 class CopyFile(base.BaseTask):
+    """
+    Provides the capability of copying files from seeding location to another
+    location.
+    """
 
     @staticmethod
     def is_actionable(media_file):
         """
         Perform check to determine if action should be taken.
 
+        :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
         :rtype: boolean
         """

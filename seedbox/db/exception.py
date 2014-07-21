@@ -12,10 +12,12 @@ class DBError(Exception):
 
 
 class MultipleResultsFound(DBError):
+    """Represents when Multiple results found when searching by unique id"""
     pass
 
 
 class NoResultFound(DBError):
+    """Represents when No results found when fetching by unique id"""
     pass
 
 

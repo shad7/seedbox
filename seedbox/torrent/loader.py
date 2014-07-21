@@ -1,3 +1,7 @@
+"""
+Torrent loader handles searches the directory where torrent files are stored
+and adds them to the database cache if not already found.
+"""
 import logging
 import glob
 import os

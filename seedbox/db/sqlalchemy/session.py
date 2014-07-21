@@ -1,3 +1,6 @@
+"""
+Manages connection to the database via sqlalchemy
+"""
 import logging
 
 import sqlalchemy as sa
@@ -15,12 +18,18 @@ def receive_connect(dbapi_con, con_record):
     The foreign key constraints are disabled by default in SQLite,
     so the foreign key constraints will be enabled here for every
     database connection
+    :param dbapi_con: database connection
+    :param con_record: connection record
     """
     dbapi_con.execute('pragma foreign_keys=ON')
 
 
 def create_engine(sql_connection, idle_timeout=3600, connection_debug=0):
-    """Return a new SQLAlchemy engine."""
+    """Return a new SQLAlchemy engine.
+    :param sql_connection: sql connection string
+    :param idle_timeout: timeout period the connection can be idle
+    :param connection_debug: enable debugging for the connection
+    """
 
     logger = logging.getLogger('sqlalchemy.engine')
 
@@ -47,7 +56,9 @@ def create_engine(sql_connection, idle_timeout=3600, connection_debug=0):
 
 
 def get_maker(engine):
-    """Return a SQLAlchemy sessionmaker using the given engine."""
+    """Return a SQLAlchemy sessionmaker using the given engine.
+    :param engine: a database connection engine
+    """
     return orm.sessionmaker(bind=engine, autocommit=True)
 
 

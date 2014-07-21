@@ -1,3 +1,6 @@
+"""
+The core process flow for managing the syncing of torrents to remote location.
+"""
 import logging
 
 from seedbox import torrent
