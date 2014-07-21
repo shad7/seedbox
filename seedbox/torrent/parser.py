@@ -175,6 +175,10 @@ class TorrentParser(object):
     def __init__(self, torrent_file_path):
         """
         Reads the torrent file and sets the content as an object attribute.
+        .. todo::
+
+            Investigate merging logic from custom parser into bencode code
+            base such that a single unit of code supports parsing.
 
         :param str torrent_file_path: Path to the torrent file to be parsed
         :raises IOError:    when a torrent_file_path does not exists
