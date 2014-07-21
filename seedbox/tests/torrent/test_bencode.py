@@ -20,26 +20,27 @@
 from seedbox.tests import test
 from seedbox.torrent import bencode
 
+
 class KnownValues(test.BaseTestCase):
     """ * example values partially taken from http://en.wikipedia.org/wiki/Bencode
         * test case inspired by Mark Pilgrim's examples:
             http://diveintopython.org/unit_testing/romantest.html
     """
-    knownValues = ( (0, 'i0e'),
-                    (1, 'i1e'),
-                    (10, 'i10e'),
-                    (42, 'i42e'),
-                    (-42, 'i-42e'),
-                    (True, 'i1e'),
-                    (False, 'i0e'),
-                    ('spam', '4:spam'),
-                    ('parrot sketch', '13:parrot sketch'),
-                    (['parrot sketch', 42], 'l13:parrot sketchi42ee'),
-                    ({
-                        'foo' : 42,
-                        'bar' : 'spam'
-                    }, 'd3:bar4:spam3:fooi42ee'),
-                  )
+    knownValues = (
+        (0, b'i0e'),
+        (1, b'i1e'),
+        (10, b'i10e'),
+        (42, b'i42e'),
+        (-42, b'i-42e'),
+        (True, b'i1e'),
+        (False, b'i0e'),
+        (b'spam', b'4:spam'),
+        (b'parrot sketch', b'13:parrot sketch'),
+        ([b'parrot sketch', 42], b'l13:parrot sketchi42ee'),
+        ({b'foo': 42,
+          b'bar': b'spam'},
+         b'd3:bar4:spam3:fooi42ee'),
+    )
 
     def test_bencode_known_values(self):
         """bencode should give known result with known input"""
@@ -69,6 +70,7 @@ class KnownValues(test.BaseTestCase):
             result = bencode.bencode(plain)
             self.assertEqual(plain, bencode.bdecode(result))
 
+
 class IllegaleValues(test.BaseTestCase):
     """ handling of illegal values"""
 
@@ -77,13 +79,14 @@ class IllegaleValues(test.BaseTestCase):
         self.assertRaises(bencode.BTFailure, bencode.bdecode, [0])
         self.assertRaises(bencode.BTFailure, bencode.bdecode, None)
         self.assertRaises(bencode.BTFailure, bencode.bdecode, [1, 2])
-        self.assertRaises(bencode.BTFailure, bencode.bdecode, {'foo' : 'bar'})
+        self.assertRaises(bencode.BTFailure, bencode.bdecode, {b'foo': b'bar'})
 
     def test_raise_illegal_input_for_decode(self):
-        """illegally formatted strings should raise an exception when decoded."""
-        self.assertRaises(bencode.BTFailure, bencode.bdecode, "foo")
-        self.assertRaises(bencode.BTFailure, bencode.bdecode, "x:foo")
-        self.assertRaises(bencode.BTFailure, bencode.bdecode, "x42e")
+        """Illegally formatted strings should raise an exception when
+        decoded."""
+        self.assertRaises(bencode.BTFailure, bencode.bdecode, b"foo")
+        self.assertRaises(bencode.BTFailure, bencode.bdecode, b"x:foo")
+        self.assertRaises(bencode.BTFailure, bencode.bdecode, b"x42e")
 
 
 class Dictionaries(test.BaseTestCase):
@@ -91,12 +94,13 @@ class Dictionaries(test.BaseTestCase):
 
     def test_sorted_keys_for_dicts(self):
         """ the keys of a dictionary must be sorted before encoded. """
-        adict = {'zoo' : 42, 'bar' : 'spam'}
+        adict = {b'zoo': 42, b'bar': b'spam'}
         encoded_dict = bencode.bencode(adict)
-        self.failUnless(encoded_dict.index('zoo') > encoded_dict.index('bar'))
+        self.assertTrue(encoded_dict.index(b'zoo') > encoded_dict.index(b'bar'))
 
     def test_nested_dictionary(self):
         """ tests for handling of nested dicts"""
-        adict = {'foo' : 42, 'bar' : {'sketch' : 'parrot', 'foobar' : 23}}
+        adict = {b'foo': 42, b'bar': {b'sketch': b'parrot', b'foobar': 23}}
         encoded_dict = bencode.bencode(adict)
-        self.assertEqual(encoded_dict, "d3:bard6:foobari23e6:sketch6:parrote3:fooi42ee")
+        self.assertEqual(encoded_dict,
+                         b"d3:bard6:foobari23e6:sketch6:parrote3:fooi42ee")

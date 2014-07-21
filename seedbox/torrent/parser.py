@@ -211,6 +211,8 @@ class TorrentParser(object):
             self.torrent_str = self._TorrentStr(self.torrent_content)
             self.parsed_content = self._parse_torrent()
 
+        # print('parsed content: {}'.format(self.parsed_content))
+
     def get_tracker_url(self):
         """
         Retrieves tracker URL from the parsed torrent file
@@ -218,7 +220,7 @@ class TorrentParser(object):
         :returns:   tracker URL from parsed torrent file
         :rtype:     str
         """
-        return self.parsed_content.get('announce')
+        return self.parsed_content.get(b'announce')
 
     def get_creation_date(self, time_format='iso'):
         """
@@ -230,7 +232,7 @@ class TorrentParser(object):
         :returns:               creation date
         :rtype:                 datetime
         """
-        time_stamp = self.parsed_content.get('creation date')
+        time_stamp = self.parsed_content.get(b'creation date')
         if time_stamp:
             time_stamp = datetime.utcfromtimestamp(time_stamp)
 
@@ -247,7 +249,7 @@ class TorrentParser(object):
         :returns:   name of the client that created the torrent
         :rtype:     str
         """
-        return self.parsed_content.get('created by')
+        return self.parsed_content.get(b'created by')
 
     def get_files_details(self):
         """
@@ -263,24 +265,30 @@ class TorrentParser(object):
         :rtype:     list of tuples (name, length, checksum)
         """
         parsed_files_info = []
-        files_info = self.parsed_content.get('info')
+        files_info = self.parsed_content.get(b'info')
         # 'info' should be present in all torrent files. Nevertheless..
         if files_info:
-            multiple_files_info = files_info.get('files')
+            multiple_files_info = files_info.get(b'files')
+            logging.debug('files: |{}|'.format(multiple_files_info))
             if multiple_files_info:  # multiple-file torrent
                 # the name attribute was holding the directory name that each
                 # of the multiple files were contained within.
-                dir_name = files_info.get('name')
+                dir_name = files_info.get(b'name').decode(encoding='utf-8')
+                logging.debug('dirname: |{}|'.format(dir_name))
                 for file_info in multiple_files_info:
+                    logging.debug('file_info: |{}|'.format(file_info))
                     # simply append the directory to the concatenated list
                     # of items under path, mostly it is a single item.
                     parsed_files_info.append(
                         (os.path.join(dir_name,
-                                      os.path.sep.join(file_info.get('path'))),
-                         file_info.get('length'),))
+                                      os.path.sep.join(
+                                          [x.decode(encoding='utf-8') for x in
+                                           file_info.get(b'path')])),
+                         file_info.get(b'length'),))
             else:  # single file torrent
-                parsed_files_info.append((files_info.get('name'),
-                                          files_info.get('length'), ))
+                parsed_files_info.append(
+                    (files_info.get(b'name').decode(encoding='utf-8'),
+                     files_info.get(b'length'), ))
 
         return parsed_files_info
 
