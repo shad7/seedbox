@@ -96,7 +96,8 @@ class Dictionaries(test.BaseTestCase):
         """ the keys of a dictionary must be sorted before encoded. """
         adict = {b'zoo': 42, b'bar': b'spam'}
         encoded_dict = bencode.bencode(adict)
-        self.assertTrue(encoded_dict.index(b'zoo') > encoded_dict.index(b'bar'))
+        self.assertTrue(
+            encoded_dict.index(b'zoo') > encoded_dict.index(b'bar'))
 
     def test_nested_dictionary(self):
         """ tests for handling of nested dicts"""
