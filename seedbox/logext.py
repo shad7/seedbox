@@ -1,7 +1,6 @@
 """
-logging module that provides an extension to the python logging module
-by adding a more fine grained log level (TRACE), and then configures
-logging for the entire application.
+Configures logging module for the entire application, setting default log
+levels for library code.
 """
 import logging
 import logging.config

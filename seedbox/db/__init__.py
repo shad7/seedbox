@@ -42,8 +42,11 @@ def _get_connection(conf):
 def dbapi(conf=cfg.CONF):
     """
     Retrieves an instance of the configured database API.
-    :param conf: an instance of the configuration file
-    :return: database API instance :rtype: seedbox.db
+
+    :param oslo.config.cfg.ConfigOpts conf: an instance of the configuration
+                                            file
+    :return: database API instance
+    :rtype: :class:`~seedbox.db.api.DBApi`
     """
     global _DBAPI
 

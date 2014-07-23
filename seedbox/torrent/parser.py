@@ -97,6 +97,7 @@ class TorrentParser(object):
         def step_back(self, position=-1, mode=1):
             """ Step back, by default, 1 position relative to the
             current position.
+
             :param position: offset from current position
             :param mode: current position
             """

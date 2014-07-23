@@ -59,7 +59,7 @@ class BaseFlow(xworkflows.WorkflowEnabled):
     files of the specified torrent.
 
     :param torrent: an instance of a parsed torrent metadata
-    :type torrent: seedbox.db.models.Torrent
+    :type torrent: :class:`~seedbox.db.models.Torrent`
     """
     state = Taskflow()
 
@@ -80,7 +80,8 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         Property for accessing the tasks associated with current workflow step
         by looking up the configured plugins.
 
-        :return: list of tasks :rtype: seedbox.tasks.base.BaseTask
+        :return: list of tasks (:class:`~seedbox.tasks.base.BaseTask`)
+        :rtype: list
         """
         return get_tasks(self.phase)
 
@@ -89,7 +90,8 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         """
         The name of current step/phase of the workflow
 
-        :return: name of current phase :rtype: string
+        :return: name of current phase
+        :rtype: string
         """
         return list(Taskflow.transitions.available_from(self.state))[0].name
 
@@ -97,7 +99,8 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         """
         Checks if the current state of workflow is either done or cancelled.
 
-        :return: flag indicating workflow is done :rtype: boolean
+        :return: flag indicating workflow is done
+        :rtype: boolean
         """
         return self.state.is_done or self.state.is_cancelled
 
@@ -105,7 +108,8 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         """
         Find the list of tasks and associated media eligible for processing.
 
-        :return: list of tasks :rtype: generator
+        :return: list of tasks
+        :rtype: generator
         """
         LOG.debug('finding next tasks...')
         for task in self.tasks:
@@ -122,6 +126,7 @@ class BaseFlow(xworkflows.WorkflowEnabled):
     def update_state(self, *args, **kwargs):
         """
         Handles the capturing the current state of processing
+
         :param args: required parameter based on decorator (unused)
         :param kwargs: required parameter based on decorator (unused)
         """
@@ -155,6 +160,7 @@ class BaseFlow(xworkflows.WorkflowEnabled):
 def get_tasks(phase):
     """
     Gets a list of tasks based the current phase of processing
+
     :param phase: the name of the current phase/step of workflow
     """
     mgr = named.NamedExtensionManager('seedbox.tasks',

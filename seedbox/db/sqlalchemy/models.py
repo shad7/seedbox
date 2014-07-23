@@ -24,8 +24,10 @@ def to_table_name(klass_name):
     """
     Convention is to take camel-case class name and rewrite it to an
     underscore form, e.g. 'ClassName' to 'class_name'
+
     :param klass_name: name of class
-    :return: properly formatted table name :rtype: string
+    :return: properly formatted table name
+    :rtype: string
     """
     return re.sub('[A-Z]+',
                   lambda i: '_' + i.group(0).lower(),
@@ -86,12 +88,14 @@ class Base(six.Iterator):
         """
         Using an iterator to get next attribute value from generator
 
-        :return: attribute, attribute value :rtype: tuple
+        :return: attribute, attribute value
+        :rtype: tuple
         """
         return self.__next__()
 
     def update(self, values):
         """Make the model object behave like a dict.
+
         :param values: key-value pairs of attributes and values
         """
         for k, v in six.iteritems(values):
@@ -101,7 +105,8 @@ class Base(six.Iterator):
         """
         an iterator over dictionary items
 
-        :return: dictionary items :rtype: iterator
+        :return: dictionary items
+        :rtype: iterator
         """
         local = dict(self)
         joined = dict([(k, v) for k, v in six.iteritems(self.__dict__)
@@ -203,7 +208,8 @@ class AppState(Base):
 
         :param key: id/name of app state
         :param default: default value if not found
-        :return: an appstate value attribute :rtype: varies
+        :return: an appstate value attribute
+        :rtype: varies
         """
         if key in ['id', 'name']:
             return self.name
@@ -213,6 +219,7 @@ class AppState(Base):
 
     def update(self, values):
         """Make the model object behave like a dict.
+
         :param values: key-value pairs to update in database
         """
         for k, v in six.iteritems(values):
@@ -223,7 +230,8 @@ class AppState(Base):
         """
         Retrieve the value of an instance of AppState
 
-        :return: value of app state :rtype: varies
+        :return: value of app state
+        :rtype: varies
         """
         if self.dtype == INT_TYPE:
             return self.t_int
@@ -243,7 +251,7 @@ class AppState(Base):
 
         :param value: the value of an app state instance
         :raise TypeError: if value type does not map to supported type
-        (string, int, boolean, datetime)
+                          (string, int, boolean, datetime)
         """
         if value is None:
             dtype = NONE_TYPE
@@ -321,9 +329,9 @@ class QueryTransformer(object):
     the sqlalchemy compliant manner.
 
     :param table: an instance of database table
-    :type table: seedbox.db.sqlalchemy.models.Base
+    :type table: :class:`~seedbox.db.sqlalchemy.models.Base`
     :param query: an instance of database query
-    :type query: sqlalchemy.Query
+    :type query: :class:`~sqlalchemy.orm.query.Query`
     """
     operators = {'=': operator.eq,
                  '<': operator.lt,
@@ -373,7 +381,8 @@ class QueryTransformer(object):
         Uses the filter to update the query
 
         :param expression_tree: query filter to apply
-        :return: database query :rtype: sqlalchemy.Query
+        :return: database query
+        :rtype: :class:`~sqlalchemy.orm.query.Query`
         """
         condition = self._transform(expression_tree)
         self.query = self.query.filter(condition)

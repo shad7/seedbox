@@ -16,7 +16,7 @@ def backup(conf):
     """
     create a backup copy of the database file.
 
-    :param conf: an instance of configuration
+    :param oslo.config.cfg.ConfigOpts conf: an instance of configuration
     """
 
     LOG.debug('starting database backup process')

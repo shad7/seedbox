@@ -22,6 +22,7 @@ class UnrarFile(base.BaseTask):
     def is_actionable(media_file):
         """
         Perform check to determine if action should be taken.
+
         :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
         :rtype: boolean

@@ -11,7 +11,8 @@ def version_string():
     """
     Provide a string representing the version of the project.
 
-    :return: project version :rtype: string
+    :return: project version
+    :rtype: string
     """
     return version_info.version_string()
 
@@ -20,6 +21,7 @@ def release_string():
     """
     Provide a string representing the release of the project.
 
-    :return: project release :rtype: string
+    :return: project release
+    :rtype: string
     """
     return version_info.release_string()

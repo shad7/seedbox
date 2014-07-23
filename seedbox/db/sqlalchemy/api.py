@@ -17,6 +17,10 @@ class Connection(base.Connection):
     """SQLAlchemy connection."""
 
     def __init__(self, conf):
+        """
+        :param oslo.config.cfg.ConfigOpts conf: an instance of configuration
+                                                file
+        """
         super(Connection, self).__init__(conf)
         self._engine_facade = db_session.EngineFacade.from_config(
             conf.database.connection, conf)
@@ -48,6 +52,7 @@ class Connection(base.Connection):
 
     def save(self, instance):
         """Save the instance to the database
+
         :param instance: an instance of modeled data object
         """
         _model = getattr(db_model, instance.__class__.__name__)
@@ -65,7 +70,8 @@ class Connection(base.Connection):
 
     def bulk_create(self, instances):
         """Save the instances in bulk to the database.
-        :param instances: a list of instance of modeled data object
+
+        :param list instances: a list of instance of modeled data object
         """
         if not instances:
             return
@@ -81,10 +87,11 @@ class Connection(base.Connection):
         """
         Perform bulk save based on filter criteria with values
         from value map to the database.
-        :param value_map: a dict of key-value pairs representing the data of
-        an instance.
-        :param entity_type: the model type
-        :param qfilter: query filter to determine which rows to update
+
+        :param dict value_map: a dict of key-value pairs representing the
+                               data of an instance.
+        :param class entity_type: the model type
+        :param dict qfilter: query filter to determine which rows to update
         """
         _model = getattr(db_model, entity_type.__name__)
         session = self._engine_facade.session
@@ -97,6 +104,7 @@ class Connection(base.Connection):
 
     def delete_by(self, entity_type, qfilter):
         """Delete instances of a specific type based on filter criteria
+
         :param entity_type: the model type
         :param qfilter: query filter to determine which rows to update
         """
@@ -111,6 +119,7 @@ class Connection(base.Connection):
 
     def delete(self, instance):
         """Delete the instance(s) based on filter from the database.
+
         :param instance: an instance of modeled data object
         """
         _model = getattr(db_model, instance.__class__.__name__)
@@ -126,6 +135,7 @@ class Connection(base.Connection):
 
     def fetch_by(self, entity_type, qfilter):
         """Fetch the instance(s) based on filter from the database.
+
         :param entity_type: the model type
         :param qfilter: query filter to determine which rows to update
         """
@@ -140,6 +150,7 @@ class Connection(base.Connection):
 
     def fetch(self, entity_type, pk):
         """Fetch the instance using primary key from the database.
+
         :param entity_type: the model type
         :param pk: primary key value
         """

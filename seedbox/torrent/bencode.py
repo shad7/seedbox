@@ -50,6 +50,7 @@ class BTFailure(Exception):
 def bytes_index(s, pattern, start):
     """
     Returns the index of pattern within string starting at position start.
+
     :param s: byte string to search for pattern
     :type s: str
     :param pattern: pattern to search for within byte string
@@ -73,6 +74,7 @@ def ord_(s):
     """
     Given a string representing one Unicode character, return an integer
     representing the Unicode code point of that character.
+
     :param s: string representing single unicode character
     :type s: str
     :return: integer representation of unicode character
@@ -87,6 +89,7 @@ def chr_(s):
     """
     Return the string representing a character whose Unicode code point is
     the integer i.
+
     :param s: integer representation of unicode character
     :type s: int
     :return: string representation of unicode character
@@ -154,8 +157,10 @@ decode_func = {
 def bdecode(x):
     """
     Public method for decoding a message
+
     :param x: message to decode
-    :return: decoded message :rtype: dict
+    :return: decoded message
+    :rtype: dict
     :raise BTFailure: decoding failure
     """
     try:
@@ -234,8 +239,10 @@ encode_func = {
 def bencode(x):
     """
     Public method for encoding message
+
     :param x: message
-    :return: encoded string :rtype: string
+    :return: encoded string
+    :rtype: string
     """
     r = []
     encode_func[type(x)](x, r)

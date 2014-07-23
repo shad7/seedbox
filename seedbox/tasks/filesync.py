@@ -65,7 +65,8 @@ class SyncFile(base.BaseTask):
         A property for accessing the rsync command used for specified media
         file.
 
-        :return: rsync command :rtype: list
+        :return: rsync command
+        :rtype: list
         """
         if self._cmd is None:
             self._cmd = ['rsync']
@@ -108,7 +109,8 @@ class SyncFile(base.BaseTask):
         """
         A property for accessing the destination to sync file to.
 
-        :return: remote destination :rtype: string
+        :return: remote destination
+        :rtype: string
         """
         if self._destination is None:
             self._destination = []
@@ -125,6 +127,7 @@ class SyncFile(base.BaseTask):
     def is_actionable(media_file):
         """
         Perform check to determine if action should be taken.
+
         :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
         :rtype: boolean

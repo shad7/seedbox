@@ -35,7 +35,7 @@ class TaskManager(object):
         Adds tasks to list of tasks to be executed.
 
         :param tasks: a task or list of tasks to add to the list of tasks to
-        execute
+                      execute
         """
         if isinstance(tasks, list):
             self.tasks.extend(tasks)
@@ -47,7 +47,8 @@ class TaskManager(object):
         """
         Executes the list of tasks.
 
-        :return: the result/output from each tasks :rtype: list of task results
+        :return: the result/output from each tasks
+        :rtype: list
         """
         futures_task = [self.executor.submit(task) for task in self.tasks]
         del self.tasks[:]

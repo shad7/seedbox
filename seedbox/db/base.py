@@ -11,7 +11,10 @@ class Connection(object):
     """Base class for database connections."""
 
     def __init__(self, conf):
-        """Constructor."""
+        """
+        :param oslo.config.cfg.ConfigOpts conf: an instance of configuration
+                                                file
+        """
         self.conf = conf
 
     @abc.abstractmethod

@@ -53,7 +53,7 @@ class BaseTask(object):
         separately to increase parallel processing.
 
         :param files: a list of media files produced by a plugin to be
-        included on the torrent.
+                      included on the torrent.
         """
         _cls = type(self.media_file)
         _base = self.media_file.as_dict()
