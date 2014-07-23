@@ -44,7 +44,8 @@ class DBApi(object):
         Performs save (insert/update) operation on an instance of torrent.
 
         :param torrent: an instance of a torrent
-        :return: saved torrent instance :rtype: seedbox.db.models.Torrent
+        :return: saved torrent instance
+        :rtype: seedbox.db.models.Torrent
         """
         return self.impl.save(torrent)
 
@@ -79,7 +80,8 @@ class DBApi(object):
         Perform select operation on selection of torrent instances.
 
         :param qfilter: query filter to determine instances to fetch.
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         return self.impl.fetch_by(models.Torrent, qfilter)
 
@@ -88,7 +90,8 @@ class DBApi(object):
         Perform select operation using a pre-defined criteria for what
         constitutes an active torrent.
 
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         qfilter = {'and': [{'=': {'invalid': 0}},
                            {'=': {'purged': 0}},
@@ -104,7 +107,8 @@ class DBApi(object):
 
         :param state: name of the state of the torrent
         :param failed: flag indicating to include failed entries or not
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         qfilter = {'and': [{'=': {'state': state}},
                            {'=': {'failed': 1 if failed else 0}}
@@ -116,7 +120,8 @@ class DBApi(object):
         Perform select operation using a pre-defined criteria for what
         constitutes eligible for purging.
 
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         qfilter = {'and': [{'=': {'invalid': 0}},
                            {'=': {'purged': 0}},
@@ -129,7 +134,8 @@ class DBApi(object):
         Perform select operation using a pre-defined criteria for what
         constitutes eligible for removal.
 
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         qfilter = {'and': [{'=': {'purged': 1}},
                            {'in': {'state': constants.INACTIVE_STATES}}
@@ -141,7 +147,8 @@ class DBApi(object):
         Perform select operation using the name of torrent to fetch torrent.
 
         :param name: the name of torrent
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         qfilter = {'=': {'name': name}}
         return list(self.get_torrents(qfilter))
@@ -152,7 +159,8 @@ class DBApi(object):
         torrent.
 
         :param torrent_id: primary key of torrent
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         return self.impl.fetch(models.Torrent, torrent_id)
 
@@ -163,7 +171,8 @@ class DBApi(object):
         performed using the name of the torrent.
 
         :param name: the name of a torrent
-        :return: torrent instance(s) :rtype: seedbox.db.models.Torrent
+        :return: torrent instance(s)
+        :rtype: seedbox.db.models.Torrent
         """
         _torrent = self.get_torrent_by_name(name)
         if not _torrent:
@@ -177,7 +186,8 @@ class DBApi(object):
         Perform save (insert/update) operation on an instance of media.
 
         :param media: an instance of media file
-        :return: media file instance :rtype: seedbox.db.models.MediaFile
+        :return: media file instance
+        :rtype: seedbox.db.models.MediaFile
         """
         return self.impl.save(media)
 
@@ -186,7 +196,8 @@ class DBApi(object):
         Perform save (insert) operation on a list of instances of media.
 
         :param medias: a list of instances of media file
-        :return: media file instance(s) :rtype: seedbox.db.models.MediaFile
+        :return: media file instance(s)
+        :rtype: seedbox.db.models.MediaFile
         """
         return list(self.impl.bulk_create(medias))
 
@@ -211,7 +222,8 @@ class DBApi(object):
         Perform select operation on selection of media instances.
 
         :param qfilter: query filter to determine instances to fetch.
-        :return: media file instance(s) :rtype: seedbox.db.models.MediaFile
+        :return: media file instance(s)
+        :rtype: seedbox.db.models.MediaFile
         """
         return self.impl.fetch_by(models.MediaFile, qfilter)
 
@@ -221,7 +233,8 @@ class DBApi(object):
         associated media.
 
         :param torrent_id: primary key of torrent
-        :return: media file instance(s) :rtype: seedbox.db.models.MediaFile
+        :return: media file instance(s)
+        :rtype: seedbox.db.models.MediaFile
         """
         qfilter = {'=': {'torrent_id': torrent_id}}
         return self.get_medias(qfilter)
@@ -243,7 +256,8 @@ class DBApi(object):
         (default: None; ignored attribute)
         :param skipped: flag to indicate to include or exclude skipped media
         (default: None; ignored attribute)
-        :return: media file instance(s) :rtype: seedbox.db.models.MediaFile
+        :return: media file instance(s)
+        :rtype: seedbox.db.models.MediaFile
         """
         conditions = [{'=': {'torrent_id': torrent_id}}]
         if file_path is not None:
@@ -265,7 +279,8 @@ class DBApi(object):
         criteria for what constitutes processed media.
 
         :param torrent_id: torrent primary key
-        :return: media file instance(s) :rtype: seedbox.db.models.MediaFile
+        :return: media file instance(s)
+        :rtype: seedbox.db.models.MediaFile
         """
         qfilter = {'and': [{'=': {'torrent_id': torrent_id}},
                            {'or': [{'=': {'synced': 1}},
@@ -280,7 +295,8 @@ class DBApi(object):
         Perform select operation using media primary key to fetch media.
 
         :param media_id: media primary key
-        :return: media file instance :rtype: seedbox.db.models.MediaFile
+        :return: media file instance
+        :rtype: seedbox.db.models.MediaFile
         """
         return self.impl.fetch(models.MediaFile, media_id)
 
@@ -289,7 +305,8 @@ class DBApi(object):
         Perform save (insert/update) operation on an instance of appstate.
 
         :param appstate: an instance of appstate
-        :return: appstate instance :rtype: seedbox.db.models.AppState
+        :return: appstate instance
+        :rtype: seedbox.db.models.AppState
         """
         return self.impl.save(appstate)
 
@@ -307,7 +324,8 @@ class DBApi(object):
         of appstate.
 
         :param name: name of an appstate instance
-        :return: appstate instance :rtype: seedbox.db.models.AppState
+        :return: appstate instance
+        :rtype: seedbox.db.models.AppState
         """
         return self.impl.fetch(models.AppState, name)
 
