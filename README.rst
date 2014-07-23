@@ -13,6 +13,10 @@ SeedboxManager
     :alt: Coverage
 
 
+.. image:: https://badge.fury.io/py/SeedboxManager.svg
+    :target: http://badge.fury.io/py/SeedboxManager
+    :alt: Version
+
 
 Links
 =====
