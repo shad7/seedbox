@@ -1,9 +1,66 @@
 CHANGES
 =======
 
-2.2.4
+2.3.0
 -----
 
+* Update to version v2.3.0
+* removed deploy section; update_version.sh does this now as part of the tagging process
+* updated documentation such that sphinx would format it correctly
+* updated docstrings
+* added classifiers for python 3.3 and 3.4
+* added version badge to README
+* added items related to vagrant and pycharm
+* added debug to make sure check for mediafiles is working as expected
+* added python34 and python33 to extend supported versions
+* pep8 fix
+* updated to be compliant with pyhton 3
+* added TODO
+* copied test code for bencode to make sure there is code coverage
+* copied bencode into project to support python 3, and then updated custom parser to also support python 3
+* removed pypi bencode from requirements
+* copied and updated version to support python 3
+* updated missing or incomplete docstrings
+* moved private method to subclass where instance variable is defined
+* removed unncessary priority and comparison methods
+* added missing docstrings
+* refactored setting log level for library code, and added missing docstrings
+* removed unused parameter
+* removed test case related to deleted code
+* updated missing docstrings
+* permissions got changed as part of move to vagrant
+* corrected spelling of words in documentation
+* refactored the writing of the stdout and stderr to further simplify
+* replaced static method containing a single function call by calling function directly
+* updated abstract to synchronize the signatures
+* removed unncessary definition of variable to None
+* updated process for logging stdout and stderr from external rsync process that works for both python2/python3
+* leverage different name of torrents to avoid conflict between test threads
+* fixed import order for pep8
+* removed sorted() call as list is not sortable because the list holds classes and not instances
+* removed unncessary call to getLevelName as setLevel already handles accepting named level
+* include default values when accessing values from dict to support python2/python3
+* updated access to dict to work for both python2 and python3
+* leverage six iteritems for dict to support python2 and python3
+* replaced warn with warning for python3 support
+* replaced the use of map method with simple list extend method to suppot python3
+* removed extra parentheses
+* method expected a string, replaced None with empty string
+* fixed class name
+* converted print builtin calls to print function calls to be python3 compatiable
+* fixed class name
+* fixed naming of class
+* fixed naming of class
+* removed extra parentheses
+* simplified variable comparison against 2 values
+* updated method parameter name to be different than local variable used within the outter method
+* converted print builtin calls to print function calls to be python3 compatiable
+* converted print builtin calls to print function calls to be python3 compatiable
+* converted print builtin calls to print function calls to be python3 compatiable
+* changed name of parameter to avoid collision with outter method parameter
+* removed extra parentheses
+* moved global variable from inside function to module level
+* changed local variable that shadows builtin to more descriptive variable name
 * Update to version v2.2.4
 * get_torrents_active did not take into account that the torrent contained media_files but to keep from processing the torrent and marking done and to keep query simple, added simple check if torrent contains media_files before adding to workflow list
 * added script to handle packaging a new release, pushing to pypi, and releasing updates to remote git
