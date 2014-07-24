@@ -3,17 +3,31 @@ Model classes to represent the structures of data.
 """
 import inspect
 
+import six
+
 
 class Model(object):
 
+    """
+    Provides base methods for interacting with database model
+
+    :param kwds: keyword parameters and values of the model
+    :type kwds: dict
+    """
     PK_NAME = 'id'
 
     def __init__(self, **kwds):
         self.fields = list(kwds)
-        for k, v in kwds.iteritems():
+        for k, v in six.iteritems(kwds):
             setattr(self, k, v)
 
     def as_dict(self):
+        """
+        Generates a dictionary representation of the model.
+
+        :return: model as dict
+        :rtype: dict
+        """
         _d = dict()
         for f in self.fields:
             v = getattr(self, f)
@@ -25,6 +39,9 @@ class Model(object):
         return _d
 
     def items(self):
+        """
+        Provides a generator of key-value pair attributes for a model.
+        """
         for n in self.fields:
             yield n, getattr(self, n)
 
@@ -56,10 +73,24 @@ class Model(object):
 
     @classmethod
     def pk_filter(cls, value=None):
+        """
+        Creates a primary key filter for the given model.
+
+        :param value: primary key value
+        :return: primary key filter
+        :rtype: dict
+        """
         return {cls.PK_NAME: value}
 
     @classmethod
     def make_empty(cls):
+        """
+        Create an instance of the model using the defined attributes from the
+        parameters of the model.
+
+        :return: model class
+        :rtype: :class:`~seedbox.db.models.Model`
+        """
         args = inspect.getargspec(cls.__init__).args
         # remove self; always first arg of __init__
         args = args[1:]
@@ -77,6 +108,23 @@ class Torrent(Model):
     def __init__(self, torrent_id, name, created_at=None, updated_at=None,
                  state=None, retry_count=None, failed=None, error_msg=None,
                  invalid=None, purged=None, media_files=None):
+        """
+        :param int torrent_id: primary key identifier of torrent
+        :param str name: name of the torrent file
+        :param datetime.datetime created_at: date when db entry created
+        :param datetime.datetime updated_at: date when db entry updated
+        :param str state: current state of processing of torrent
+                          (**init**, **ready**, **active**, **done**,
+                          **cancelled**)
+        :param int retry_count: number of times entry was reprocessed
+        :param bool failed: flag indicating processing failed
+        :param str error_msg: error message generated during processing
+        :param bool invalid: flag indicating entry was invalid
+        :param bool purged: flag indicating entry details were purged
+        :param list media_files: list of associated media file(s)
+        :return: an instance of the Torrent object
+        :rtype: :class:`~seedbox.db.models.Torrent`
+        """
         Model.__init__(
             self,
             torrent_id=torrent_id,
@@ -104,6 +152,22 @@ class MediaFile(Model):
     def __init__(self, media_id, torrent_id, filename, file_ext,
                  file_path=None, size=None, compressed=None, synced=None,
                  missing=None, skipped=None, error_msg=None, total_time=None):
+        """
+        :param int media_id: primary key identifier of media file
+        :param int torrent_id: foreign key identifier of torrent
+        :param str filename: name of media file
+        :param str file_ext: extension of media file
+        :param str file_path: location of media file
+        :param int size: file size of media file
+        :param bool compressed: flag indicating compressed file
+        :param bool synced: flag indicating sync to remote location
+        :param bool missing: flag indicating file not found on file system
+        :param bool skipped: flag indicating if skipped during processing
+        :param str error_msg: error message that happened during processing
+        :param int total_time: total amount of time to process file
+        :return: an instance of the MediaFile object
+        :rtype: :class:`~seedbox.db.models.MediaFile`
+        """
         Model.__init__(
             self,
             media_id=media_id,
@@ -129,6 +193,14 @@ class AppState(Model):
     PK_NAME = 'name'
 
     def __init__(self, name, value):
+        """
+        :param name: an identifier for the capturing a state attribute
+        :type name: str
+        :param value: the data associated with the identifier
+        :type value: str | int | bool | datetime.datetime
+        :return: an instance of the AppState object
+        :rtype: :class:`~seedbox.db.models.AppState`
+        """
         Model.__init__(
             self,
             name=name,

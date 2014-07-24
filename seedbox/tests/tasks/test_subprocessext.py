@@ -37,7 +37,7 @@ class SubprocessExtTest(test.ConfiguredBaseTestCase):
 
     def test_long_single_cmd(self):
         """
-        using a single command that takes atleast a few seconds to execute to
+        using a single command that takes at least a few seconds to execute to
         make sure longer running commands work successfully.
         """
         cmd = ['ls', '-laR', self.py_lib]
@@ -59,7 +59,7 @@ class SubprocessExtTest(test.ConfiguredBaseTestCase):
 
     def test_long_multi_cmd(self):
         """
-        using a list of commands that take atleast a few seconds to execute
+        using a list of commands that take at least a few seconds to execute
         to demonstrate how it works subprocess is executed multiple
         in succession
         """

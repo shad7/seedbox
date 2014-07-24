@@ -31,7 +31,7 @@ def _find_config_files():
     legacy_cfg_type = '.cfg'
 
     possible = []
-    # in reverse order as the last one loaded always takes precendence
+    # in reverse order as the last one loaded always takes precedence
     # system-level /etc and /etc/<project>
     possible.append(os.sep + 'etc')
     possible.append(os.path.join(os.sep, 'etc', PROJECT_NAME))

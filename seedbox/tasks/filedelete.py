@@ -1,3 +1,6 @@
+"""
+DeleteFile task plugin for deleting a file from specified location.
+"""
 import logging
 import os
 
@@ -9,11 +12,16 @@ LOG = logging.getLogger(__name__)
 
 
 class DeleteFile(base.BaseTask):
+    """
+    Provides capability of deleting file from a specified location.
+    """
 
     @staticmethod
     def is_actionable(media_file):
         """
         Perform check to determine if action should be taken.
+
+        :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
         :rtype: boolean
         """

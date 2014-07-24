@@ -24,7 +24,7 @@ class DbMaintenanceTest(test.ConfiguredBaseTestCase):
         for cnt in range(0, 15):
             if cnt == 0:
                 self.assertEqual(len(glob.glob(db_name+'*')), 1)
-            elif cnt >= 1 and cnt <= 8:
+            elif 1 <= cnt <= 8:
                 self.assertEqual(len(glob.glob(db_name+'*')), 1+cnt)
             else:
                 self.assertEqual(len(glob.glob(db_name+'*')), 9)

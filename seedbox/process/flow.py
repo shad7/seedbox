@@ -1,3 +1,8 @@
+"""
+Provides the definition of workflow (steps and transition),
+and implementation what happens during each step by binding in the provided
+plugins for each and updating the db cache after each step.
+"""
 import logging
 
 from oslo.config import cfg
@@ -29,11 +34,11 @@ class Taskflow(xworkflows.Workflow):
     Define the workflow conditions for managing torrents;
     """
     states = (
-        (constants.INIT, (u"Initial state")),
-        (constants.READY, (u"Ready")),
-        (constants.ACTIVE, (u"Active")),
-        (constants.DONE, (u"Done")),
-        (constants.CANCELLED, (u"Cancelled")),
+        (constants.INIT, u"Initial state"),
+        (constants.READY, u"Ready"),
+        (constants.ACTIVE, u"Active"),
+        (constants.DONE, u"Done"),
+        (constants.CANCELLED, u"Cancelled"),
     )
 
     transitions = (
@@ -48,6 +53,14 @@ class Taskflow(xworkflows.Workflow):
 
 class BaseFlow(xworkflows.WorkflowEnabled):
 
+    """
+    Provides the base workflow implementation on binding plugin tasks to each
+    step and determining which plugin is capable of operating on the media
+    files of the specified torrent.
+
+    :param torrent: an instance of a parsed torrent metadata
+    :type torrent: :class:`~seedbox.db.models.Torrent`
+    """
     state = Taskflow()
 
     def __init__(self, torrent):
@@ -63,16 +76,41 @@ class BaseFlow(xworkflows.WorkflowEnabled):
 
     @property
     def tasks(self):
+        """
+        Property for accessing the tasks associated with current workflow step
+        by looking up the configured plugins.
+
+        :return: list of tasks (:class:`~seedbox.tasks.base.BaseTask`)
+        :rtype: list
+        """
         return get_tasks(self.phase)
 
     @property
     def phase(self):
+        """
+        The name of current step/phase of the workflow
+
+        :return: name of current phase
+        :rtype: string
+        """
         return list(Taskflow.transitions.available_from(self.state))[0].name
 
     def is_done(self):
+        """
+        Checks if the current state of workflow is either done or cancelled.
+
+        :return: flag indicating workflow is done
+        :rtype: boolean
+        """
         return self.state.is_done or self.state.is_cancelled
 
     def next_tasks(self):
+        """
+        Find the list of tasks and associated media eligible for processing.
+
+        :return: list of tasks
+        :rtype: generator
+        """
         LOG.debug('finding next tasks...')
         for task in self.tasks:
             LOG.debug('checking task: %s', task)
@@ -88,6 +126,9 @@ class BaseFlow(xworkflows.WorkflowEnabled):
     def update_state(self, *args, **kwargs):
         """
         Handles the capturing the current state of processing
+
+        :param args: required parameter based on decorator (unused)
+        :param kwargs: required parameter based on decorator (unused)
         """
         self.torrent = self.dbapi.get_torrent(self.torrent.torrent_id)
         self.torrent.state = self.state.name
@@ -119,9 +160,11 @@ class BaseFlow(xworkflows.WorkflowEnabled):
 def get_tasks(phase):
     """
     Gets a list of tasks based the current phase of processing
+
+    :param phase: the name of the current phase/step of workflow
     """
     mgr = named.NamedExtensionManager('seedbox.tasks',
                                       names=cfg.CONF['process'][phase],
                                       invoke_on_load=False)
 
-    return sorted([ext.plugin for ext in mgr.extensions])
+    return [ext.plugin for ext in mgr.extensions]

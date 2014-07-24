@@ -1,3 +1,17 @@
+"""
+Workflow implementation that handles automatic execution of each workflow
+step until the workflow reaches completion.
+
+::
+
+    wf = Workflow(torrent)
+    tasks = wf.next_tasks()
+    # execute tasks in separate threads
+    <<logic>>
+    # now move the workflow to the next step
+    wf.run()
+
+"""
 import logging
 
 from seedbox.process import flow

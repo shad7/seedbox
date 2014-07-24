@@ -1,4 +1,3 @@
-bencode
 click
 futures
 oslo.config==1.2.1

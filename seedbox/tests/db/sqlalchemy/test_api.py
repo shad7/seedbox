@@ -1,3 +1,4 @@
+from __future__ import print_function
 from seedbox.db import models as api_model
 from seedbox.db.sqlalchemy import models as db_model
 from seedbox.db.sqlalchemy import api
@@ -14,7 +15,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
     def _print_tables(self, msg_key):
 
         for t, tab in db_model.Base.metadata.tables.items():
-            print msg_key, 'table =>', t, tab.c
+            print(msg_key, 'table =>', t, tab.c)
 
     def test_upgrade(self):
         try:
@@ -35,12 +36,9 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
         self.dbconn.shrink_db()
         self.assertTrue(True)
 
-    def test_row_to_model(self):
-        self.assertIsNone(self.dbconn._row_to_model(None))
-
     def test_save(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake1.torrent')
         self.assertIsInstance(torrent, api_model.Torrent)
 
         _saved_torrent = self.dbconn.save(torrent)
@@ -54,7 +52,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_bulk_create(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake2.torrent')
         torrent = self.dbconn.save(torrent)
 
         _medias = []
@@ -70,7 +68,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_bulk_update(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake3.torrent')
         torrent = self.dbconn.save(torrent)
 
         _medias = []
@@ -89,7 +87,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_delete_by(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake4.torrent')
         torrent = self.dbconn.save(torrent)
 
         _medias = []
@@ -107,7 +105,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_delete(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake5.torrent')
         torrent = self.dbconn.save(torrent)
 
         self.dbconn.delete(torrent)
@@ -119,9 +117,9 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
 
     def test_fetch_by(self):
 
-        torrent = api_model.Torrent(torrent_id=None, name='fake.torrent')
+        torrent = api_model.Torrent(torrent_id=None, name='fake6.torrent')
         torrent = self.dbconn.save(torrent)
 
-        qfilter = {'=': {'name': 'fake.torrent'}}
+        qfilter = {'=': {'name': 'fake6.torrent'}}
         _torrent = self.dbconn.fetch_by(api_model.Torrent, qfilter)
         self.assertEqual(torrent, list(_torrent)[0])

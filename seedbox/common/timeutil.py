@@ -75,6 +75,8 @@ def timed(method=None, logger=None, loglvl=None):
         A decorator that times the execution of a method/function and logs
         using the supplied logger at the specified loglevel.
 
+
+    :param method: the method being timed
     :param logging.Logger logger:   reference to logger
                                     (defaults to logger of module holding the
                                     decorated method or function)
@@ -101,6 +103,12 @@ def timed(method=None, logger=None, loglvl=None):
     # like method name or doc.
     @functools.wraps(method)
     def timer(*args, **kwargs):
+        """
+        Logs the execution time of the specified method.
+        :param args: the positional inputs to the method being timed
+        :param kwargs: the key-value inputs to the method being timed
+        :return: output of method being timed
+        """
         start = utcnow()
         result = method(*args, **kwargs)
         end = utcnow()
@@ -113,6 +121,15 @@ def timed(method=None, logger=None, loglvl=None):
 
 
 def nvl_date(dt, default=None):
+    """
+    Determines if the provided date, time, or datetime has a value, and returns
+    the provided value back or the value of default (current time)
+
+    :param dt: an instance of a date, time, or datetime
+    :param default: value to return if provided dt has no value
+    :return: date, time, or datetime provided or default
+    :rtype: datetime
+    """
     _default = default if default else utcnow()
     return dt if dt and isinstance(dt, datetime.datetime) else _default
 

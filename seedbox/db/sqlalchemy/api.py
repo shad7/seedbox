@@ -1,3 +1,6 @@
+"""
+Private database API implemented for sqlalchemy for database operations.
+"""
 import logging
 
 from seedbox.db import base
@@ -14,6 +17,10 @@ class Connection(base.Connection):
     """SQLAlchemy connection."""
 
     def __init__(self, conf):
+        """
+        :param oslo.config.cfg.ConfigOpts conf: an instance of configuration
+                                                file
+        """
         super(Connection, self).__init__(conf)
         self._engine_facade = db_session.EngineFacade.from_config(
             conf.database.connection, conf)
@@ -43,11 +50,11 @@ class Connection(base.Connection):
             conn.execute('VACUUM')
             LOG.debug('db space reclaimed')
 
-    def _row_to_model(self, row):
-        return model_util.from_db(row)
-
     def save(self, instance):
-        """Save the instance to the database"""
+        """Save the instance to the database
+
+        :param instance: an instance of modeled data object
+        """
         _model = getattr(db_model, instance.__class__.__name__)
         session = self._engine_facade.session
         with session.begin():
@@ -59,10 +66,13 @@ class Connection(base.Connection):
                 _row = model_util.to_db(instance)
                 session.add(_row)
             _row.save(session)
-        return self._row_to_model(_row)
+        return model_util.from_db(_row)
 
     def bulk_create(self, instances):
-        """Save the instances in bulk to the database."""
+        """Save the instances in bulk to the database.
+
+        :param list instances: a list of instance of modeled data object
+        """
         if not instances:
             return
         _instances = [model_util.to_db(item) for item in instances]
@@ -71,12 +81,17 @@ class Connection(base.Connection):
         with session.begin():
             session.add_all(_instances)
         for _row in _instances:
-            yield self._row_to_model(_row)
+            yield model_util.from_db(_row)
 
     def bulk_update(self, value_map, entity_type, qfilter):
         """
         Perform bulk save based on filter criteria with values
         from value map to the database.
+
+        :param dict value_map: a dict of key-value pairs representing the
+                               data of an instance.
+        :param class entity_type: the model type
+        :param dict qfilter: query filter to determine which rows to update
         """
         _model = getattr(db_model, entity_type.__name__)
         session = self._engine_facade.session
@@ -88,7 +103,11 @@ class Connection(base.Connection):
             LOG.debug('total rows updated: %d', total)
 
     def delete_by(self, entity_type, qfilter):
-        """Delete instances of a specific type based on filter criteria"""
+        """Delete instances of a specific type based on filter criteria
+
+        :param entity_type: the model type
+        :param qfilter: query filter to determine which rows to update
+        """
         _model = getattr(db_model, entity_type.__name__)
         session = self._engine_facade.session
         with session.begin():
@@ -99,7 +118,10 @@ class Connection(base.Connection):
             LOG.debug('total rows deleted: %d', total)
 
     def delete(self, instance):
-        """Delete the instance(s) based on filter from the database."""
+        """Delete the instance(s) based on filter from the database.
+
+        :param instance: an instance of modeled data object
+        """
         _model = getattr(db_model, instance.__class__.__name__)
         session = self._engine_facade.session
         with session.begin():
@@ -112,7 +134,11 @@ class Connection(base.Connection):
                 LOG.debug('no rows deleted')
 
     def fetch_by(self, entity_type, qfilter):
-        """Fetch the instance(s) based on filter from the database."""
+        """Fetch the instance(s) based on filter from the database.
+
+        :param entity_type: the model type
+        :param qfilter: query filter to determine which rows to update
+        """
         _model = getattr(db_model, entity_type.__name__)
         session = self._engine_facade.session
         with session.begin():
@@ -120,12 +146,16 @@ class Connection(base.Connection):
                                                     session.query(_model))
             _query = transformer.apply_filter(qfilter)
             for _row in _query.all():
-                yield self._row_to_model(_row)
+                yield model_util.from_db(_row)
 
     def fetch(self, entity_type, pk):
-        """Fetch the instance using primary key from the database."""
+        """Fetch the instance using primary key from the database.
+
+        :param entity_type: the model type
+        :param pk: primary key value
+        """
         _model = getattr(db_model, entity_type.__name__)
         session = self._engine_facade.session
         with session.begin():
             _row = session.query(_model).get(pk)
-        return self._row_to_model(_row)
+        return model_util.from_db(_row)

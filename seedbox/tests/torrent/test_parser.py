@@ -22,7 +22,7 @@ class TorrentParserTest(test.BaseTestCase):
             self.assertIsNotNone(torrent)
             self.assertIsNotNone(torrent.get_tracker_url())
             self.assertIsNotNone(torrent.get_creation_date())
-            self.assertIsNotNone(torrent.get_creation_date(None))
+            self.assertIsNotNone(torrent.get_creation_date(str()))
             self.assertTrue(len(torrent.get_files_details()) > 0)
 
     def test_custom_parser1(self):
@@ -67,7 +67,7 @@ class TorrentParserTest(test.BaseTestCase):
     def test_missing_file(self):
 
         with testtools.ExpectedException(ValueError):
-            parser.TorrentParser(None)
+            parser.TorrentParser(str())
 
         with testtools.ExpectedException(IOError):
             parser.TorrentParser('dummy/file/does/not/exist')

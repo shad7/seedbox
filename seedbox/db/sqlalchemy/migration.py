@@ -36,7 +36,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
+"""
+Provides ability to manage versions of database models
+"""
 import os
 
 from migrate import exceptions as versioning_exceptions
@@ -82,7 +84,7 @@ def db_version(engine, init_version=INIT_VERSION):
     Show the current version of the repository.
 
     :param engine:  SQLAlchemy engine instance for a given database
-    :param version:  Initial database version
+    :param init_version:  Initial database version
     """
     repository = _find_migrate_repo()
     try:

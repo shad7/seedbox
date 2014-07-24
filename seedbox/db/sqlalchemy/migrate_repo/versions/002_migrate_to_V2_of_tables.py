@@ -1,3 +1,7 @@
+"""
+Migrates to version 2 of the database tables and supports downgrading to
+previous version.
+"""
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -7,6 +11,12 @@ VAL_TYPES = ['none', 'bool', 'datetime', 'int', 'str']
 
 
 def upgrade(migrate_engine):
+    """
+    Updates table model to new version and moves existing data from old
+    structures to the new structure.
+
+    :param migrate_engine: an instance of database connection engine
+    """
     meta = sa.MetaData(bind=migrate_engine)
 
     appstates = sa.Table(
@@ -72,6 +82,11 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
+    """
+    Converts back to previous version and removes the newly created tables.
+
+    :param migrate_engine: an instance of database connection engine
+    """
     meta = sa.MetaData(bind=migrate_engine)
 
     appstates = sa.Table('app_states', meta)

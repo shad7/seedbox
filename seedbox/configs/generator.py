@@ -59,12 +59,12 @@ DEFAULT_GROUP = 'DEFAULT'
 def _write_output(output, outputfile):
 
     if outputfile is None:
-        file = sys.stdout
+        outfile = sys.stdout
     else:
-        file = open(outputfile, 'w')
+        outfile = open(outputfile, 'w')
 
     for line in output:
-        print(line, file=file)
+        print(line, file=outfile)
 
 
 def _sanitize_default(name, value):
@@ -79,7 +79,6 @@ def _gen_opt_output(opt):
     if not opt_help:
         sys.stderr.write('WARNING: [%s] is missing help string.\n' % opt_name)
         opt_help = ''
-    opt_type = None
     try:
         opt_type = OPTION_REGEX.search(str(type(opt))).group(0)
     except (ValueError, AttributeError) as err:
@@ -144,7 +143,7 @@ def _gen_group_opts_output(group, opts_by_module):
         output.append('#')
         output.append('')
         for opt in opts:
-            map(output.append, _gen_opt_output(opt))
+            output.extend(_gen_opt_output(opt))
         output.append('')
 
     return output
@@ -160,7 +159,7 @@ def _is_in_group(opt, group):
     return False
 
 
-def _guess_groups(opt, mod_obj):
+def _guess_groups(opt):
     # is it in the DEFAULT group?
     if _is_in_group(opt, cfg.CONF):
         return DEFAULT_GROUP
@@ -188,17 +187,17 @@ def _is_cli_opt(opt):
 
 
 def _list_opts(obj):
-    def is_opt(o):
+    def _is_opt(o):
         return (isinstance(o, cfg.Opt) and
                 not isinstance(o, cfg.SubCommandOpt))
 
     opts = list()
     for attr_str in dir(obj):
         attr_obj = getattr(obj, attr_str)
-        if is_opt(attr_obj):
+        if _is_opt(attr_obj):
             opts.append(attr_obj)
         elif (isinstance(attr_obj, list) and
-              all(map(lambda x: is_opt(x), attr_obj))):
+              all(map(lambda x: _is_opt(x), attr_obj))):
             opts.extend(attr_obj)
 
     ret = {}
@@ -206,7 +205,7 @@ def _list_opts(obj):
         # do not include cli in the config file
         if _is_cli_opt(opt):
             continue
-        ret.setdefault(_guess_groups(opt, obj), []).append(opt)
+        ret.setdefault(_guess_groups(opt), []).append(opt)
     return ret.items()
 
 
@@ -222,12 +221,12 @@ def _import_module(mod_str):
 def _gen_output(opts_by_group, outputfile):
 
     output = []
-    map(output.append, _gen_group_opts_output(DEFAULT_GROUP,
-                                              opts_by_group.pop(DEFAULT_GROUP,
-                                                                [])))
+    output.extend(_gen_group_opts_output(DEFAULT_GROUP,
+                                         opts_by_group.pop(DEFAULT_GROUP,
+                                                           [])))
     for group in sorted(opts_by_group.keys()):
-        map(output.append, _gen_group_opts_output(group,
-                                                  opts_by_group[group]))
+        output.extend(_gen_group_opts_output(group,
+                                             opts_by_group[group]))
 
     _write_output(output, outputfile)
 
@@ -285,9 +284,6 @@ def main():
     """
     Entry point into generator (from command line) to generate a
     sample configuration file
-
-    :param list sys.argv:   list of source files to process for
-                            capturing options
     """
     generate(sys.argv[1:])
 

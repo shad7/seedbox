@@ -1,3 +1,7 @@
+"""
+Torrent loader handles searches the directory where torrent files are stored
+and adds them to the database cache if not already found.
+"""
 import logging
 import glob
 import os
@@ -86,7 +90,7 @@ def _is_parsing_required(torrent):
 
 def _is_torrent_downloading(media_items):
     """
-    Verify if atleast one item still located in the
+    Verify if at least one item still located in the
     inprogress/downloading location
 
     args:
@@ -209,4 +213,4 @@ def _get_file_path(filename):
             (found_path, found_file) = os.path.split(full_path)
             break
 
-    return (found_path, found_file)
+    return found_path, found_file

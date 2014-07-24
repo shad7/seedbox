@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 import datetime
 import logging
 import time
@@ -54,20 +54,20 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG)
         def simple_func():
-            print 'simple'
+            print('simple')
 
         simple_func()
         self.assertIsNotNone(CaptureOutput.OUTPUT)
         self.assertEqual(len(CaptureOutput.OUTPUT), 28)
 
-        def _getLogger(name):
+        def _get_logger(name):
             return LOG
 
         @timeutil.timed()
         def simple_func_no_log():
-            print 'simple'
+            print('simple')
 
-        self.patch(timeutil, 'logging.getLogger', _getLogger)
+        self.patch(timeutil, 'logging.getLogger', _get_logger)
         simple_func_no_log()
         self.assertIsNotNone(CaptureOutput.OUTPUT)
         self.assertEqual(len(CaptureOutput.OUTPUT), 28)
@@ -89,7 +89,7 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG)
         def simple_func():
-            print 'simple'
+            print('simple')
 
         simple_func()
         self.assertIsNone(CaptureOutput.OUTPUT)
@@ -112,7 +112,7 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG, loglvl=logging.INFO)
         def simple_func():
-            print 'simple'
+            print('simple')
 
         simple_func()
         self.assertIsNotNone(CaptureOutput.OUTPUT)
@@ -135,7 +135,7 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG, loglvl=logging.INFO)
         def simple_func():
-            print 'simple'
+            print('simple')
 
         simple_func()
         self.assertIsNone(CaptureOutput.OUTPUT)
@@ -158,7 +158,7 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG)
         def simple_func(arg1, arg2):
-            print 'simple', arg1, arg2
+            print('simple', arg1, arg2)
 
         simple_func(2, 3)
         self.assertIsNotNone(CaptureOutput.OUTPUT)
@@ -181,7 +181,7 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG)
         def simple_func(arg1, arg2):
-            print 'simple', arg1, arg2
+            print('simple', arg1, arg2)
 
         simple_func(2, 3)
         self.assertIsNone(CaptureOutput.OUTPUT)
@@ -204,7 +204,7 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG)
         def simple_func(arg1, arg2):
-            print 'simple', arg1, arg2
+            print('simple', arg1, arg2)
             return arg1 * arg2
 
         retval = simple_func(2, 3)
@@ -229,7 +229,7 @@ class TimeutilTest(test.BaseTestCase):
 
         @timeutil.timed(logger=LOG)
         def simple_func(arg1, arg2):
-            print 'simple', arg1, arg2
+            print('simple', arg1, arg2)
             return arg1 * arg2
 
         retval = simple_func(2, 3)
@@ -245,16 +245,16 @@ class TimeutilTest(test.BaseTestCase):
 
         @ShortDelta
         def do_something():
-            print 'do_something'
+            print('do_something')
             return True
 
         execs = 0
         counter = 0
         while counter < 11:
-            print 'working....', counter
+            print('working....', counter)
             if do_something():
                 execs += 1
-            print execs
+            print(execs)
             time.sleep(.1)
             counter += 1
 
@@ -269,16 +269,16 @@ class TimeutilTest(test.BaseTestCase):
 
         @ShortDelta
         def do_something():
-            print 'do_something'
+            print('do_something')
             return True
 
         execs = 0
         counter = 0
         while counter < 11:
-            print 'working....', counter
+            print('working....', counter)
             if do_something():
                 execs += 1
-            print execs
+            print(execs)
             time.sleep(.1)
             counter += 1
 

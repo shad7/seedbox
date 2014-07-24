@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 
 from seedbox.db import models
@@ -5,12 +6,12 @@ from seedbox.tasks import fileunrar
 from seedbox.tests import test
 
 
-class fake_rarfile(object):
+class FakeRarfile(object):
 
     class RarFile(object):
 
         def __init__(self, rarfile):
-            print 'RarFile', rarfile
+            print('RarFile', rarfile)
             self.rarfile = rarfile
 
         def namelist(self):
@@ -50,7 +51,7 @@ class FileUnrarTest(test.ConfiguredBaseTestCase):
     def test_execute(self):
         task = fileunrar.UnrarFile(self.media_file)
 
-        self.patch(fileunrar, 'rarfile', fake_rarfile)
+        self.patch(fileunrar, 'rarfile', FakeRarfile)
         files = task()
 
         self.assertEqual(len(files), 2)

@@ -1,3 +1,6 @@
+"""
+Provides database model compliant with sqlalchemy.
+"""
 import datetime
 import operator
 import re
@@ -18,8 +21,14 @@ VAL_TYPES = [NONE_TYPE, BOOL_TYPE, DATE_TYPE, INT_TYPE, STR_TYPE]
 
 
 def to_table_name(klass_name):
-    # Convention is to take camel-case class name and rewrite it to an
-    # underscore form, e.g. 'ClassName' to 'class_name'
+    """
+    Convention is to take camel-case class name and rewrite it to an
+    underscore form, e.g. 'ClassName' to 'class_name'
+
+    :param klass_name: name of class
+    :return: properly formatted table name
+    :rtype: string
+    """
     return re.sub('[A-Z]+',
                   lambda i: '_' + i.group(0).lower(),
                   klass_name).lstrip('_') + 's'
@@ -27,13 +36,18 @@ def to_table_name(klass_name):
 
 @declarative.as_declarative()
 class Base(six.Iterator):
+    """
+    Represents a Base class mapped to table in the database.
+    """
 
     @declarative.declared_attr
     def __tablename__(cls):
         return to_table_name(cls.__name__)
 
     def save(self, session):
-        """Save this object."""
+        """Save this object.
+        :param session: a database connection session
+        """
         with session.begin(subtransactions=True):
             session.add(self)
             session.flush()
@@ -53,25 +67,47 @@ class Base(six.Iterator):
         return getattr(self, key)
 
     def get(self, key, default=None):
+        """
+        Retrieve value for an attribute in the table.
+
+        :param key: name of field/attribute
+        :param default: default value if not found
+        :return: attribute value :rtype: varied
+        """
         return getattr(self, key, default)
 
     def __iter__(self):
-        self._i = iter(orm.object_mapper(self).columns)
+        self._i = iter(list(dict(orm.object_mapper(self).columns).keys()))
         return self
 
     def __next__(self):
-        n = self._i.next().name
+        n = six.advance_iterator(self._i)
         return n, getattr(self, n)
 
     def next(self):
+        """
+        Using an iterator to get next attribute value from generator
+
+        :return: attribute, attribute value
+        :rtype: tuple
+        """
         return self.__next__()
 
     def update(self, values):
-        """Make the model object behave like a dict."""
+        """Make the model object behave like a dict.
+
+        :param values: key-value pairs of attributes and values
+        """
         for k, v in six.iteritems(values):
             setattr(self, k, v)
 
     def iteritems(self):
+        """
+        an iterator over dictionary items
+
+        :return: dictionary items
+        :rtype: iterator
+        """
         local = dict(self)
         joined = dict([(k, v) for k, v in six.iteritems(self.__dict__)
                       if not k[0] == '_'])
@@ -80,15 +116,24 @@ class Base(six.Iterator):
 
 
 class HasId(object):
+    """
+    Table mixin providing a class/table id attribute
+    """
     id = sa.Column(sa.Integer, primary_key=True)
 
 
 class HasTimestamp(object):
+    """
+    Table mixin providing a class/table date attributes
+    """
     created_at = sa.Column(sa.DateTime, default=datetime.datetime.utcnow)
     updated_at = sa.Column(sa.DateTime, onupdate=datetime.datetime.utcnow)
 
 
 class Torrent(Base, HasId, HasTimestamp):
+    """
+    Class representing a torrent in the database
+    """
 
     __table_args__ = {
         'sqlite_autoincrement':  True,
@@ -106,6 +151,9 @@ class Torrent(Base, HasId, HasTimestamp):
 
 
 class MediaFile(Base, HasId):
+    """
+    Class representing a media file in the database
+    """
 
     __table_args__ = {
         'sqlite_autoincrement':  True,
@@ -126,6 +174,14 @@ class MediaFile(Base, HasId):
 
 class AppState(Base):
 
+    """
+    Class representing an app state in the database
+
+    :param id: primary key of app state (alias for name)
+    :type id: string
+    :param value: value of the app state
+    :type value: string, int, bool, or datetime
+    """
     name = sa.Column(sa.String(255), primary_key=True)
     dtype = sa.Column(sa.Enum(*VAL_TYPES), default=NONE_TYPE)
     t_string = sa.Column(sa.String(255), nullable=True, default=None)
@@ -147,6 +203,14 @@ class AppState(Base):
         return self.get(key)
 
     def get(self, key, default=None):
+        """
+        Overrides base class get method to handle primary key of app state
+
+        :param key: id/name of app state
+        :param default: default value if not found
+        :return: an appstate value attribute
+        :rtype: varies
+        """
         if key in ['id', 'name']:
             return self.name
         if key == 'value':
@@ -154,12 +218,21 @@ class AppState(Base):
         return getattr(self, key, default)
 
     def update(self, values):
-        """Make the model object behave like a dict."""
+        """Make the model object behave like a dict.
+
+        :param values: key-value pairs to update in database
+        """
         for k, v in six.iteritems(values):
             # this should result in __setitem__ being called
             self[k] = v
 
     def get_value(self):
+        """
+        Retrieve the value of an instance of AppState
+
+        :return: value of app state
+        :rtype: varies
+        """
         if self.dtype == INT_TYPE:
             return self.t_int
         if self.dtype == BOOL_TYPE:
@@ -173,6 +246,13 @@ class AppState(Base):
 
     def set_value(self, value):
 
+        """
+        Sets the value of an instance of AppState
+
+        :param value: the value of an app state instance
+        :raise TypeError: if value type does not map to supported type
+                          (string, int, boolean, datetime)
+        """
         if value is None:
             dtype = NONE_TYPE
         else:
@@ -211,6 +291,9 @@ class AppState(Base):
                     dtype, VAL_TYPES))
 
     def reset_value(self):
+        """
+        Resets the value associated with AppState to empty
+        """
         self.t_int = None
         self.t_bool = None
         self.t_datetime = None
@@ -222,15 +305,34 @@ class AppState(Base):
 
 
 def verify_tables(engine):
+    """
+    Creates all the defined tables within the database
+
+    :param engine: database engine instance
+    """
     Base.metadata.create_all(engine)
 
 
 def purge_all_tables(engine):
+    """
+    Drops all the defined tables within the database
+
+    :param engine: database engine instance
+    """
     Base.metadata.drop_all(engine)
 
 
 class QueryTransformer(object):
 
+    """
+    Provides the ability to transform a query filter into database query in
+    the sqlalchemy compliant manner.
+
+    :param table: an instance of database table
+    :type table: :class:`~seedbox.db.sqlalchemy.models.Base`
+    :param query: an instance of database query
+    :type query: :class:`~sqlalchemy.orm.query.Query`
+    """
     operators = {'=': operator.eq,
                  '<': operator.lt,
                  '>': operator.gt,
@@ -262,19 +364,26 @@ class QueryTransformer(object):
 
     def _handle_simple_op(self, simple_op, nodes):
         op = self.operators[simple_op]
-        field_name = nodes.keys()[0]
-        value = nodes.values()[0]
+        field_name = list(nodes.keys())[0]
+        value = list(nodes.values())[0]
         return op(getattr(self.table, field_name), value)
 
     def _transform(self, sub_tree):
-        op = sub_tree.keys()[0]
-        nodes = sub_tree.values()[0]
+        op = list(sub_tree.keys())[0]
+        nodes = list(sub_tree.values())[0]
         if op in self.complex_operators:
             return self._handle_complex_op(op, nodes)
         else:
             return self._handle_simple_op(op, nodes)
 
     def apply_filter(self, expression_tree):
+        """
+        Uses the filter to update the query
+
+        :param expression_tree: query filter to apply
+        :return: database query
+        :rtype: :class:`~sqlalchemy.orm.query.Query`
+        """
         condition = self._transform(expression_tree)
         self.query = self.query.filter(condition)
         return self.query

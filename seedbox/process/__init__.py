@@ -1,3 +1,6 @@
+"""
+The core process flow for managing the syncing of torrents to remote location.
+"""
 import logging
 
 from seedbox import torrent
@@ -20,6 +23,7 @@ def _get_work(dbapi):
     for tor in dbapi.get_torrents_active():
         # need to make sure there are actually media files that
         # were parsed for the torrent.
+        LOG.debug('torrent media files: %s', tor.media_files)
         if tor.media_files:
             LOG.debug('creating workflow for torrent: %s', tor)
             wf = workflow.Workflow(tor)
