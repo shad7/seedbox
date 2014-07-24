@@ -6,11 +6,3 @@ install:
 - pip install -r test-requirements.txt
 script: tox
 after_success: coveralls
-deploy:
-  provider: pypi
-  user: Kenny.shad7
-  password:
-    secure: iwDQn9vzp0sfjM58B7FonDuFaWCI5EDZN+GisSSQ0B0DCa/u1qyyei7L6Btvw1m5YQxLyraebjgpfdbqI8/db2Ezkd5yswQJNmckDsnVIeWQH86U0xW2blpQedXtZqssW4hlpDcP6+PIqawcDYWTa5BXpAOv/CbAcIxkLWzlac0=
-  distributions: "sdist bdist_egg"
-  on:
-    tags: true
