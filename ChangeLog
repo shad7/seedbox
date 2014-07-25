@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+2.3.2
+-----
+
 * Update to version v2.3.2
 * fixing release process script
 
