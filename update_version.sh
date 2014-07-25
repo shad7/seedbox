@@ -13,6 +13,8 @@ fi
 # make sure all requirements are installed; else setup.py develop fails
 pip install -r requirements.txt
 
+export OSLO_PACKAGE_VERSION=$1
+
 # intialize release with a version
 git flow release start $1
 
@@ -20,15 +22,11 @@ git flow release start $1
 sed -i -e "s/version = .*/version = $1/g" setup.cfg
 python setup.py develop
 git commit setup.cfg -m "Update to version v$1"
-COMMIT_HASH=$(git log -1 --pretty=format:"%h")
-git tag -a $1 -m "version $1" ${COMMIT_HASH}
 
 # generate ChangeLog and updated docs; commit and move tag
 python setup.py sdist
 cp ChangeLog doc/source/ChangeLog.rst
 git commit --amend --no-edit ChangeLog doc/source/ChangeLog.rst
-COMMIT_HASH=$(git log -1 --pretty=format:"%h")
-git tag -f -a $1 -m "version $1" ${COMMIT_HASH}
 
 # upload the latest version to pypi
 python setup.py sdist bdist_egg upload
@@ -37,4 +35,5 @@ git commit --amend --no-edit ChangeLog
 # finish release and push to remote git
 git flow release finish -p $1
 
+unset OSLO_PACKAGE_VERSION
 
