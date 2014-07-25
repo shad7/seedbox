@@ -9,7 +9,6 @@ CHANGES
 2.3.0
 -----
 
-* perm change; ignore
 * Update to version v2.3.0
 * removed deploy section; update_version.sh does this now as part of the tagging process
 * updated documentation such that sphinx would format it correctly
