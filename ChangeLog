@@ -1,9 +1,13 @@
 CHANGES
 =======
 
+* Update to version v2.3.2
+* fixing release process script
+
 2.3.1
 -----
 
+* fixing up ChangeLog within docs
 * fixing up ChangeLog within docs
 
 2.3.0
