@@ -1,6 +1,16 @@
 CHANGES
 =======
 
+2.3.3
+-----
+
+* Update to version v2.3.3
+* updated to tox 1.7.2 to fix posarg issue so updated tox.ini to use setup.py directly and allowed for removal of run_test.sh
+* added delete tag after building with pbr; then let git flow handle tagging, merging, and pushing to git
+* added support for wheel; and fix related to lazy loading of pbr
+* fixed docstring causing warning from sphinx
+* Update Changelog
+
 2.3.2
 -----
 
