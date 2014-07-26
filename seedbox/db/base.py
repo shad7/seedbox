@@ -12,8 +12,8 @@ class Connection(object):
 
     def __init__(self, conf):
         """
-        :param oslo.config.cfg.ConfigOpts conf: an instance of configuration
-                                                file
+        :param conf: an instance of configuration file
+        :type conf: oslo.config.cfg.ConfigOpts
         """
         self.conf = conf
 
