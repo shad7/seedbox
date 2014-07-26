@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright © 2013 Intel Corp.
+# Copyright ï¿½ 2013 Intel Corp.
 #
 # Author: Lianhao Lu <lianhao.lu@intel.com>
 #
@@ -18,9 +18,9 @@
 import sys
 
 import fixtures
+from oslotest import mockpatch
 
 from seedbox.configs import generator
-from seedbox.fixture import mockpatch
 from seedbox.tests import test
 
 
