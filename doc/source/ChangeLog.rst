@@ -1,6 +1,16 @@
 CHANGES
 =======
 
+2.3.4
+-----
+
+* Update to version v2.3.4
+* removed unnecessary assignment of instance to variable; corrected docstring
+* updated parameters to match actual abstract
+* fixed TODO docstring
+* updated year to 2014
+* adding fetch origin as part of finish release
+
 2.3.3
 -----
 
