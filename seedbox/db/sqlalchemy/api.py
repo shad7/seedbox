@@ -18,8 +18,8 @@ class Connection(base.Connection):
 
     def __init__(self, conf):
         """
-        :param oslo.config.cfg.ConfigOpts conf: an instance of configuration
-                                                file
+        :param conf: an instance of configuration file
+        :type conf: oslo.config.cfg.ConfigOpts
         """
         super(Connection, self).__init__(conf)
         self._engine_facade = db_session.EngineFacade.from_config(
