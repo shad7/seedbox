@@ -54,8 +54,8 @@ class SyncFile(base.BaseTask):
     Provides the capability of rsync file to a specified location.
     """
 
-    def __init__(self, *args, **kwargs):
-        super(SyncFile, self).__init__(*args,  **kwargs)
+    def __init__(self, media_file):
+        super(SyncFile, self).__init__(media_file)
         self._cmd = None
         self._destination = None
 

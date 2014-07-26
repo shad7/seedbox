@@ -176,6 +176,7 @@ class TorrentParser(object):
     def __init__(self, torrent_file_path):
         """
         Reads the torrent file and sets the content as an object attribute.
+
         .. todo::
 
             Investigate merging logic from custom parser into bencode code
