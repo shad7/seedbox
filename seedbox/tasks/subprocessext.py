@@ -118,11 +118,10 @@ class ProcessLogging(subprocess.Popen):
     @staticmethod
     def execute(cmd):
         """
-        provide a convenience method for creating creating the object and
+        provide a convenience method for creating the object and
         waiting for the results; very similar to check_call() but not at
         module level.
 
         :param list cmd: command and options sent to subprocess to execute
         """
-        proc = ProcessLogging(cmd)
-        proc.complete()
+        ProcessLogging(cmd).complete()
