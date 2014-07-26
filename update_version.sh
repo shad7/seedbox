@@ -38,5 +38,5 @@ git commit --amend --no-edit ChangeLog
 git tag -d $1
 
 # finish release and push to remote git
-git flow release finish -p $1 -m "version $1"
+git flow release finish -F -p $1 -m "version $1"
 
