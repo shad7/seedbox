@@ -21,9 +21,6 @@ import tempfile
 
 from oslotest import base
 
-from seedbox import options  # noqa
-from seedbox import logext as logmgr  # noqa
-from seedbox import torrent  # noqa
 from seedbox.fixture import config
 
 
@@ -38,6 +35,7 @@ class ConfiguredBaseTestCase(BaseTestCase):
         super(ConfiguredBaseTestCase, self).setUp()
 
         self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.import_group('torrent', 'seedbox.torrent')
         self.base_dir = tempfile.gettempdir()
         self.set_required_options()
         self.CONF([], project='seedbox')
