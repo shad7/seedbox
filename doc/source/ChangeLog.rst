@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+
 2.3.6
 -----
 
@@ -116,6 +117,10 @@ CHANGES
 * removed extra parentheses
 * moved global variable from inside function to module level
 * changed local variable that shadows builtin to more descriptive variable name
+
+2.2.4
+-----
+
 * Update to version v2.2.4
 * get_torrents_active did not take into account that the torrent contained media_files but to keep from processing the torrent and marking done and to keep query simple, added simple check if torrent contains media_files before adding to workflow list
 * added script to handle packaging a new release, pushing to pypi, and releasing updates to remote git
