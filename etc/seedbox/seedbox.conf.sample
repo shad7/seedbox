@@ -1,150 +1,145 @@
 [DEFAULT]
 
 #
-# Options defined in seedbox.options
+# From seedbox
 #
 
-# **REQUIRED** Base path (string value)
-#base_path=
-
 # Location torrent client stores data files (string value)
-#base_client_path=<None>
+#base_client_path = <None>
+
+# Base path (string value)
+#base_path = /vagrant
 
 
 [database]
 
 #
-# Options defined in seedbox.db
+# From seedbox.db
 #
 
 # The connection string used to connect to the database (string value)
-#connection=sqlite:///$config_dir/torrent.db
+#connection = sqlite:///$config_dir/torrent.db
+
+# Verbosity of SQL debugging information. 0=None, 100=All (integer
+# value)
+#connection_debug = 0
 
 # Timeout before idle sql connections are reaped (integer value)
-#idle_timeout=3600
-
-# Verbosity of SQL debugging information. 0=None, 100=All (integer value)
-#connection_debug=0
+#idle_timeout = 3600
 
 
 [process]
 
 #
-# Options defined in seedbox.process.flow
+# From seedbox.process
 #
-
-# name of tasks associated with prepare phase (list value)
-#prepare=
 
 # name of tasks associated with activate phase (list value)
-#activate=
+#activate =
 
 # name of tasks associated with complete phase (list value)
-#complete=
-
-
-#
-# Options defined in seedbox.process.manager
-#
+#complete =
 
 # max processes to use for performing sync of torrents (integer value)
-#max_processes=4
+#max_processes = 4
+
+# name of tasks associated with prepare phase (list value)
+#prepare =
 
 
 [tasks]
 
 #
-# Options defined in seedbox.tasks.base
+# From seedbox.task
 #
 
 # Location to temp media copies for syncing to library (string value)
-#sync_path=/tmp/sync
+#sync_path = /tmp/sync
 
 
 [tasks_filesync]
 
 #
-# Options defined in seedbox.tasks.filesync
+# From seedbox.task
 #
 
-# rsync dryrun option (boolean value)
-#dryrun=false
-
-# rsync verbose option (boolean value)
-#verbose=false
-
-# rsync progress option (boolean value)
-#progress=false
-
-# rsync perms option (boolean value)
-#perms=true
+# rsync chmod option (string value)
+#chmod = ugo+rwx
 
 # rsync delayupdates option (boolean value)
-#delayupdates=true
+#delayupdates = true
 
-# rsync recursive option (boolean value)
-#recursive=true
-
-# rsync chmod option (string value)
-#chmod=ugo+rwx
+# rsync dryrun option (boolean value)
+#dryrun = false
 
 # rsync-ssh identity option (ssh key) (string value)
-#identity=<None>
+#identity = <None>
+
+# rsync perms option (boolean value)
+#perms = true
 
 # rsync-ssh port (string value)
-#port=22
+#port = 22
 
-# User name on remote system (ssh) (string value)
-#remote_user=<None>
+# rsync progress option (boolean value)
+#progress = false
+
+# rsync recursive option (boolean value)
+#recursive = true
 
 # Host name/IP Address of remote system (string value)
-#remote_host=<None>
+#remote_host = <None>
 
 # rsync destination path (string value)
-#remote_path=<None>
+#remote_path = <None>
+
+# User name on remote system (ssh) (string value)
+#remote_user = <None>
+
+# rsync verbose option (boolean value)
+#verbose = false
 
 
 [tasks_synclog]
 
 #
-# Options defined in seedbox.tasks.subprocessext
+# From seedbox.task
 #
 
-# Output directory for stdout files (string value)
-#stdout_dir=$config_dir/sync_out
-
 # Output directory for stderr files (string value)
-#stderr_dir=$config_dir/sync_err
-
-# Write output to stdout (boolean value)
-#stdout_verbose=false
+#stderr_dir = $config_dir/sync_err
 
 # Output verbose details about exceptions (boolean value)
-#stderr_verbose=true
+#stderr_verbose = true
+
+# Output directory for stdout files (string value)
+#stdout_dir = $config_dir/sync_out
+
+# Write output to stdout (boolean value)
+#stdout_verbose = false
 
 
 [torrent]
 
 #
-# Options defined in seedbox.torrent
+# From seedbox.torrent
 #
 
-# **REQUIRED** Location of the .torrent files (string value)
-#torrent_path=<None>
+# List of compressed filetypes to support. (ignore others) (list
+# value)
+#compressed_filetypes = .rar
 
-# **REQUIRED** Location(s) of the media files (list value)
-#media_paths=<None>
+# Location of the downloading torrents (string value)
+#incomplete_path = <None>
 
-# **REQUIRED** Location of the downloading torrents (string value)
-#incomplete_path=<None>
-
-# List of video filetypes to support. (ignore others) (list value)
-#video_filetypes=.avi,.mp4,.mkv,.mpg
-
-# List of compressed filetypes to support. (ignore others) (list value)
-#compressed_filetypes=.rar
+# Location(s) of the media files (list value)
+#media_paths = <None>
 
 # Minimum file size of a media file (integer value)
-#minimum_file_size=75000000
+#minimum_file_size = 75000000
 
+# Location of the .torrent files (string value)
+#torrent_path = <None>
 
+# List of video filetypes to support. (ignore others) (list value)
+#video_filetypes = .avi,.mp4,.mkv,.mpg

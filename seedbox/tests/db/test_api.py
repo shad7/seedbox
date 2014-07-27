@@ -15,11 +15,6 @@ class ApiDBTestCase(test.ConfiguredBaseTestCase):
         self.patch(db, '_DBAPI', None)
         self.dbapi = db.dbapi(self.CONF)
 
-    def test_list_opts(self):
-        opts = db.list_opts()
-        print(opts)
-        self.assertEqual(len(opts[0][1]), 3)
-
     def test_clear(self):
         self.dbapi.clear()
         self.assertTrue(True)

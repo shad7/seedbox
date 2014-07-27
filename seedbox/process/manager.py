@@ -8,14 +8,14 @@ from oslo.config import cfg
 
 LOG = logging.getLogger(__name__)
 
-mgr_opts = [
+OPTS = [
     cfg.IntOpt('max_processes',
                default=4,
                help='max processes to use for performing sync of torrents'),
 ]
 
 CONF = cfg.CONF
-CONF.register_opts(mgr_opts, 'process')
+CONF.register_opts(OPTS, 'process')
 
 
 class TaskManager(object):
