@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+2.3.6
+-----
+
+* Update to version v2.3.6
+* test_save still causing an issue; commenting a line for now until periodic issue can be resolved
+
 2.3.5
 -----
 
