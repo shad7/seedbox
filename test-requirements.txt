@@ -1,19 +1,22 @@
+# testing automation
 tox>=1.7.2
+
+# coding standards
 pep8>=1.4.5
 pyflakes>=0.7.2
 flake8>=2.0
+
+# test coverage
 coverage>=3.6
 coveralls
-discover
-mock>=1.0
-mox>=0.5.3
-fixtures>=0.3.14
+
 # Docs Requirements
 docutils>=0.9.1
 sphinx>=1.2.2
 sphinxcontrib-httpdomain
-testtools>=0.9.32
-python-subunit
-testrepository>=0.0.17
-testscenarios>=0.4
+
+# packaging
 wheel
+
+# testing
+oslotest

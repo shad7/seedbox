@@ -1,7 +1,6 @@
 """
 Provides access to the database API for interacting with the torrent data.
 """
-import copy
 import logging
 
 from oslo.config import cfg
@@ -13,7 +12,7 @@ from seedbox.db import api
 LOG = logging.getLogger(__name__)
 DB_ENGINE_NAMESPACE = 'seedbox.db'
 
-database_opts = [
+OPTS = [
     cfg.StrOpt('connection',
                default='sqlite:///$config_dir/torrent.db',
                secret=True,
@@ -26,7 +25,7 @@ database_opts = [
                help='Verbosity of SQL debugging information. 0=None, 100=All'),
 ]
 
-cfg.CONF.register_opts(database_opts, 'database')
+cfg.CONF.register_opts(OPTS, 'database')
 
 _DBAPI = None
 
@@ -73,4 +72,5 @@ def list_opts():
 
     :returns: a list of (group_name, opts) tuples
     """
-    return [('database', copy.deepcopy(database_opts))]
+    from seedbox.common import tools
+    return tools.make_opt_list([OPTS], 'database')

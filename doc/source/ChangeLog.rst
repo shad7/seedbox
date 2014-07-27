@@ -1,6 +1,22 @@
 CHANGES
 =======
 
+2.3.5
+-----
+
+* Update to version v2.3.5
+* removed custom configuration generation code base and script
+* fixed db save that fails randomly when two instances with different values not successful when asserting not equal
+* fix pep8 issues
+* add generation of sample config via oslo.config instead of custom version copied from oslo.incubator project
+* undo travis configuration
+* updating travis configuration
+* updating travis configuration
+* removing copy of config fixture; leverage instance within oslo.config
+* replaced extra imports for the purpose of making config options available; leverage library approach for importing options from other modules
+* moved to using mockpatch from oslotest instead of local one
+* simplified testing dependencies by leveraging oslotest which handles the setting up the base test class
+
 2.3.4
 -----
 

@@ -11,7 +11,7 @@ from seedbox.tasks import subprocessext
 
 LOG = logging.getLogger(__name__)
 
-SYNC_OPTS = [
+OPTS = [
     cfg.BoolOpt('dryrun',
                 default=False,
                 help='rsync dryrun option'),
@@ -46,7 +46,7 @@ SYNC_OPTS = [
                help='rsync destination path'),
 ]
 
-cfg.CONF.register_opts(SYNC_OPTS, group='tasks_filesync')
+cfg.CONF.register_opts(OPTS, group='tasks_filesync')
 
 
 class SyncFile(base.BaseTask):

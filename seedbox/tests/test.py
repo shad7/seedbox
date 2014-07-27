@@ -15,47 +15,17 @@
 
 """Common utilities used in testing"""
 
-import fixtures
 import os
 import shutil
-import testtools
 import tempfile
 
-from seedbox import options  # noqa
-from seedbox import logext as logmgr  # noqa
-from seedbox import torrent  # noqa
-from seedbox.fixture import config
-
-_TRUE_VALUES = ('True', 'true', '1', 'yes')
+from oslo.config import fixture as config
+from oslotest import base
 
 
-class BaseTestCase(testtools.TestCase):
-
-    def setUp(self):
-        super(BaseTestCase, self).setUp()
-        self._set_timeout()
-        self._fake_output()
-        self.useFixture(fixtures.FakeLogger('seedbox'))
-        self.useFixture(fixtures.NestedTempfile())
-        self.useFixture(fixtures.TempHomeDir())
-
-    def _set_timeout(self):
-        test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
-        try:
-            test_timeout = int(test_timeout)
-        except ValueError:
-            # If timeout value is invalid do not set a timeout.
-            test_timeout = 0
-        if test_timeout > 0:
-            self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
-
-    def _fake_output(self):
-        if os.environ.get('OS_STDOUT_CAPTURE') in _TRUE_VALUES:
-            stdout = self.useFixture(fixtures.StringStream('stdout')).stream
-            self.useFixture(fixtures.MonkeyPatch('sys.stdout', stdout))
-        if os.environ.get('OS_STDERR_CAPTURE') in _TRUE_VALUES:
-            stderr = self.useFixture(fixtures.StringStream('stderr')).stream
-            self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
+# to avoid having to change all test code that references the base directly
+# just reference the oslotest version here.
+BaseTestCase = base.BaseTestCase
 
 
 class ConfiguredBaseTestCase(BaseTestCase):
@@ -64,6 +34,7 @@ class ConfiguredBaseTestCase(BaseTestCase):
         super(ConfiguredBaseTestCase, self).setUp()
 
         self.CONF = self.useFixture(config.Config()).conf
+        self.CONF.import_group('torrent', 'seedbox.torrent')
         self.base_dir = tempfile.gettempdir()
         self.set_required_options()
         self.CONF([], project='seedbox')
