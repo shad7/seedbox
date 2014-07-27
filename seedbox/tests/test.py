@@ -19,9 +19,8 @@ import os
 import shutil
 import tempfile
 
+from oslo.config import fixture as config
 from oslotest import base
-
-from seedbox.fixture import config
 
 
 # to avoid having to change all test code that references the base directly
