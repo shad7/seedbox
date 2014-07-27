@@ -54,6 +54,7 @@ def dbapi(conf=cfg.CONF):
         _DBAPI.shrink_db()
     return _DBAPI
 
+
 def list_opts():
     """
     Returns a list of oslo.config options available in the library.
@@ -73,4 +74,3 @@ def list_opts():
     """
     from seedbox.common import tools
     return tools.make_opt_list([OPTS], 'database')
-

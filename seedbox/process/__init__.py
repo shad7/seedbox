@@ -98,4 +98,3 @@ def list_opts():
     from seedbox.common import tools
     from seedbox.process import flow
     return tools.make_opt_list([flow.OPTS, manager.OPTS], 'process')
-

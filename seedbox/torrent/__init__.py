@@ -56,4 +56,3 @@ def list_opts():
     """
     from seedbox.common import tools
     return tools.make_opt_list([OPTS], 'torrent')
-
