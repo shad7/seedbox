@@ -10,9 +10,10 @@ import os
 from oslo.config import cfg
 import six
 
-try:
+if hasattr(logging, 'NullHandler'):
     NullHandler = logging.NullHandler
-except AttributeError:  # NullHandler added in Python 2.7
+else:
+    # NullHandler added in Python 2.7
     class NullHandler(logging.Handler):
         """
         Copied from Python 2.7 logging module

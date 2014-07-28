@@ -30,6 +30,9 @@ class SubprocessExtTest(test.ConfiguredBaseTestCase):
         using a single command that can be executed very quickly validate
         basic use case.
         """
+        self.CONF.set_override('stdout_verbose', True, group='tasks_synclog')
+        self.CONF.set_override('stderr_verbose', True, group='tasks_synclog')
+
         cmd = ['ls']
         subprocessext.ProcessLogging.execute(cmd)
         # it will complete with no return value or an exception
