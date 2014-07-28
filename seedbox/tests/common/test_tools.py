@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 import os
-import sys
 
 from seedbox.tests import test
 # now include what we need to test
