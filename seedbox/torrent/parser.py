@@ -271,7 +271,7 @@ class TorrentParser(object):
         # 'info' should be present in all torrent files. Nevertheless..
         if files_info:
             multiple_files_info = files_info.get(b'files')
-            logging.debug('files: |{}|'.format(multiple_files_info))
+            logging.debug('files: |{0}|'.format(multiple_files_info))
             if multiple_files_info:  # multiple-file torrent
                 # the name attribute was holding the directory name that each
                 # of the multiple files were contained within.

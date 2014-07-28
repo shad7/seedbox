@@ -26,6 +26,3 @@ class ConfigTest(test.BaseTestCase):
 
     def test_list_torrent_opts(self):
         self.assertIsNotNone(torrent.list_opts())
-
-
-

@@ -22,8 +22,6 @@ import logging
 
 import datetime
 
-ONE_WEEK = datetime.timedelta(weeks=1).total_seconds()
-
 
 class AfterDelta(object):
     """
@@ -246,3 +244,7 @@ def is_soon(dt, window):
     """
     soon = advance_time_seconds(utcnow(), window)
     return dt <= soon
+
+
+# Defined here such that total_seconds is properly defined prior to usage
+ONE_WEEK = total_seconds(datetime.timedelta(weeks=1))

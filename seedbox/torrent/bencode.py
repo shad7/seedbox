@@ -166,7 +166,7 @@ def bdecode(x):
     try:
         r, l = decode_func[chr_(x[0])](x, 0)
     except (IndexError, KeyError, TypeError, ValueError) as err:
-        raise BTFailure('not a valid bencoded string; error details ({'
+        raise BTFailure('not a valid bencoded string; error details ({0'
                         '})'.format(err))
     if l != len(x):
         raise BTFailure('invalid bencoded value (data after valid prefix)')

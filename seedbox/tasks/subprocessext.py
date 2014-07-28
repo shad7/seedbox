@@ -110,7 +110,6 @@ class ProcessLogging(subprocess.Popen):
             if self.returncode != 0:
                 raise subprocess.CalledProcessError(self.returncode, self._cmd)
 
-
         if cfg.CONF.tasks_synclog.stdout_verbose and outdata:
             _log('seedbox.tasks.subproc.stdout',
                  cfg.CONF.tasks_synclog.stdout_dir,
