@@ -1,6 +1,18 @@
 CHANGES
 =======
 
+2.3.7
+-----
+
+* Update to version v2.3.7
+* fixed format of message; py26
+* updated to support py26
+* applied updates to support py26
+* updated test cases to cover usage scenarios; added new test class to support generating sample config
+* removed files from coverage that are entry point executables or copied from another library to provide coverage based on actual code from this code base
+* fixed pep8 issue
+* removed unnecessary docstrings in empty files
+* fix ChangeLog by fixing which commit was associated with tag 2.2.4
 
 2.3.6
 -----
