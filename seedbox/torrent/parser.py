@@ -212,8 +212,6 @@ class TorrentParser(object):
             self.torrent_str = self._TorrentStr(self.torrent_content)
             self.parsed_content = self._parse_torrent()
 
-        # print('parsed content: {}'.format(self.parsed_content))
-
     def get_tracker_url(self):
         """
         Retrieves tracker URL from the parsed torrent file
@@ -275,9 +273,9 @@ class TorrentParser(object):
                 # the name attribute was holding the directory name that each
                 # of the multiple files were contained within.
                 dir_name = files_info.get(b'name').decode('utf-8')
-                logging.debug('dirname: |{}|'.format(dir_name))
+                logging.debug('dirname: |{0}|'.format(dir_name))
                 for file_info in multiple_files_info:
-                    logging.debug('file_info: |{}|'.format(file_info))
+                    logging.debug('file_info: |{0}|'.format(file_info))
                     # simply append the directory to the concatenated list
                     # of items under path, mostly it is a single item.
                     parsed_files_info.append(
