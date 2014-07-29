@@ -1,5 +1,5 @@
 """
-package tasks
+Defines tasks to execute as part of the process
 """
 
 

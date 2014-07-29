@@ -92,28 +92,29 @@ class ProcessLogging(subprocess.Popen):
         outdata = None
         outerr = None
 
+        _uid = time.time()
+
         while self.returncode is None:
             outdata, outerr = self.communicate()
         else:
+
+            if cfg.CONF.tasks_synclog.stderr_verbose and outerr:
+                _log('seedbox.tasks.subproc.stderr',
+                     cfg.CONF.tasks_synclog.stderr_dir,
+                     _uid,
+                     outerr)
+
             # if we have a return code of anything other than 0;
             # we had some kind of failure so we should recognize the
             # error and handle accordingly.
             if self.returncode != 0:
                 raise subprocess.CalledProcessError(self.returncode, self._cmd)
 
-        _uid = time.time()
-
         if cfg.CONF.tasks_synclog.stdout_verbose and outdata:
             _log('seedbox.tasks.subproc.stdout',
                  cfg.CONF.tasks_synclog.stdout_dir,
                  _uid,
                  outdata)
-
-        if cfg.CONF.tasks_synclog.stderr_verbose and outerr:
-            _log('seedbox.tasks.subproc.stderr',
-                 cfg.CONF.tasks_synclog.stderr_dir,
-                 _uid,
-                 outerr)
 
     @staticmethod
     def execute(cmd):

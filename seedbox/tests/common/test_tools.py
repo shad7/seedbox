@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 import os
-import sys
 
 from seedbox.tests import test
 # now include what we need to test
@@ -18,7 +17,6 @@ class ToolsTest(test.BaseTestCase):
         make sure it is able to verify all different path types properly
         """
         self.assertIsNotNone(tools.verify_path(os.getcwd()))
-        self.assertIsNotNone(tools.verify_path(sys.path[0]))
         self.assertIsNotNone(tools.verify_path(os.path.expanduser('~')))
         self.assertIsNotNone(tools.verify_path('.'))
         self.assertIsNotNone(tools.verify_path('/lib'))

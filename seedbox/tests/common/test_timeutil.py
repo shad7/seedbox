@@ -3,6 +3,8 @@ import datetime
 import logging
 import time
 
+from testtools import matchers
+
 from seedbox.tests import test
 # now include what we need to test
 from seedbox.common import timeutil
@@ -289,12 +291,12 @@ class TimeutilTest(test.BaseTestCase):
         _cur = timeutil.utcnow()
         _future = timeutil.advance_time_delta(_cur,
                                               datetime.timedelta(seconds=60))
-        self.assertGreater(_future, _cur)
+        self.assertThat(_future, matchers.GreaterThan(_cur))
 
     def test_advance_time_seconds(self):
         _cur = timeutil.utcnow()
         _future = timeutil.advance_time_seconds(_cur, 60)
-        self.assertGreater(_future, _cur)
+        self.assertThat(_future, matchers.GreaterThan(_cur))
 
     def test_is_newer_than(self):
         _future = timeutil.advance_time_seconds(timeutil.utcnow(), 10)

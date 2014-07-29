@@ -90,8 +90,7 @@ class TorrentParser(object):
                 1. as return value,
                 2. as self.curr_char (useful in some circumstances)
             """
-            self.curr_char = self.torr_str.read(1).decode(encoding='utf-8',
-                                                          errors='replace')
+            self.curr_char = self.torr_str.read(1).decode('utf-8', 'replace')
             return self.curr_char
 
         def step_back(self, position=-1, mode=1):
@@ -213,8 +212,6 @@ class TorrentParser(object):
             self.torrent_str = self._TorrentStr(self.torrent_content)
             self.parsed_content = self._parse_torrent()
 
-        # print('parsed content: {}'.format(self.parsed_content))
-
     def get_tracker_url(self):
         """
         Retrieves tracker URL from the parsed torrent file
@@ -271,25 +268,25 @@ class TorrentParser(object):
         # 'info' should be present in all torrent files. Nevertheless..
         if files_info:
             multiple_files_info = files_info.get(b'files')
-            logging.debug('files: |{}|'.format(multiple_files_info))
+            logging.debug('files: |{0}|'.format(multiple_files_info))
             if multiple_files_info:  # multiple-file torrent
                 # the name attribute was holding the directory name that each
                 # of the multiple files were contained within.
-                dir_name = files_info.get(b'name').decode(encoding='utf-8')
-                logging.debug('dirname: |{}|'.format(dir_name))
+                dir_name = files_info.get(b'name').decode('utf-8')
+                logging.debug('dirname: |{0}|'.format(dir_name))
                 for file_info in multiple_files_info:
-                    logging.debug('file_info: |{}|'.format(file_info))
+                    logging.debug('file_info: |{0}|'.format(file_info))
                     # simply append the directory to the concatenated list
                     # of items under path, mostly it is a single item.
                     parsed_files_info.append(
                         (os.path.join(dir_name,
                                       os.path.sep.join(
-                                          [x.decode(encoding='utf-8') for x in
+                                          [x.decode('utf-8') for x in
                                            file_info.get(b'path')])),
                          file_info.get(b'length'),))
             else:  # single file torrent
                 parsed_files_info.append(
-                    (files_info.get(b'name').decode(encoding='utf-8'),
+                    (files_info.get(b'name').decode('utf-8'),
                      files_info.get(b'length'), ))
 
         return parsed_files_info
@@ -326,9 +323,8 @@ class TorrentParser(object):
                     break  # End of dict
                 dict_value = self._parse_torrent()  # parse value
                 if isinstance(dict_value, six.binary_type):
-                    dict_value = dict_value.decode(encoding='utf-8',
-                                                   errors='replace')
-                parsed_dict.setdefault(dict_key.decode(encoding='utf-8'),
+                    dict_value = dict_value.decode('utf-8', 'replace')
+                parsed_dict.setdefault(dict_key.decode('utf-8'),
                                        dict_value)
 
             return parsed_dict
@@ -341,8 +337,7 @@ class TorrentParser(object):
                     break  # End of list
 
                 if isinstance(list_item, six.binary_type):
-                    list_item = list_item.decode(encoding='utf-8',
-                                                 errors='replace')
+                    list_item = list_item.decode('utf-8', 'replace')
                 parsed_list.append(list_item)
 
             return parsed_list
