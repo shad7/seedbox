@@ -24,6 +24,8 @@ OPTS = [
                help='Verbosity of SQL debugging information. 0=None, 100=All'),
 ]
 
+cfg.CONF.register_opts(OPTS, 'database')
+
 _DBAPI = None
 
 
@@ -64,7 +66,6 @@ def set_defaults(conf):
     :param conf: an instance of the configuration file
     :type: oslo.config.cfg.ConfigOpts
     """
-    conf.register_opts(OPTS, 'database')
     dbconn = conf.database.connection
     if '$config_dir' in dbconn:
         conf.set_default('connection',
