@@ -21,6 +21,8 @@ import six
 
 from seedbox.torrent import bencode
 
+LOG = logging.getLogger(__name__)
+
 
 def _is_int(val):
     ret_val = True
@@ -206,9 +208,8 @@ class TorrentParser(object):
         try:
             self.parsed_content = bencode.bdecode(self.torrent_content)
         except bencode.BTFailure as bterr:
-            logging.info(
-                'bencode.bdecode failed: ({0});'
-                'trying alternate approach'.format(bterr))
+            LOG.info('bencode.bdecode failed: ({0});'
+                     'trying alternate approach'.format(bterr))
             self.torrent_str = self._TorrentStr(self.torrent_content)
             self.parsed_content = self._parse_torrent()
 
@@ -268,14 +269,14 @@ class TorrentParser(object):
         # 'info' should be present in all torrent files. Nevertheless..
         if files_info:
             multiple_files_info = files_info.get(b'files')
-            logging.debug('files: |{0}|'.format(multiple_files_info))
+            LOG.debug('files: |{0}|'.format(multiple_files_info))
             if multiple_files_info:  # multiple-file torrent
                 # the name attribute was holding the directory name that each
                 # of the multiple files were contained within.
                 dir_name = files_info.get(b'name').decode('utf-8')
-                logging.debug('dirname: |{0}|'.format(dir_name))
+                LOG.debug('dirname: |{0}|'.format(dir_name))
                 for file_info in multiple_files_info:
-                    logging.debug('file_info: |{0}|'.format(file_info))
+                    LOG.debug('file_info: |{0}|'.format(file_info))
                     # simply append the directory to the concatenated list
                     # of items under path, mostly it is a single item.
                     parsed_files_info.append(
