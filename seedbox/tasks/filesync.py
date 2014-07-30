@@ -140,5 +140,5 @@ class SyncFile(base.BaseTask):
         Perform the action associated with task for the provided media_file.
         """
         LOG.debug('syncing file %s', self.media_file.filename)
-        subprocessext.ProcessLogging(self.cmd)
+        subprocessext.ProcessLogging.execute(self.cmd)
         self.media_file.synced = True
