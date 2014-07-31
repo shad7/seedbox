@@ -42,6 +42,14 @@ class ConfiguredBaseTestCase(BaseTestCase):
         if self.base_dir != self.CONF.config_dir:
             self.CONF.config_dir = self.base_dir
 
+        # handle fixing the db connection for $config_dir placeholder
+        dbconn = self.CONF.database.connection
+        if '$config_dir' in dbconn:
+            self.CONF.set_override(
+                'connection',
+                dbconn.replace('$config_dir', self.CONF.config_dir),
+                group='database')
+
     def tearDown(self):
         shutil.rmtree(self.base_dir, ignore_errors=True)
         self.CONF.reset()

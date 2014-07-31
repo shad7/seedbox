@@ -19,6 +19,16 @@ class SubprocessExtTest(test.ConfiguredBaseTestCase):
         create a logger
         """
         super(SubprocessExtTest, self).setUp()
+        # fix up the $config_dir placeholder issue
+        self.CONF.set_override('stdout_dir',
+                               subprocessext._get_filepath(
+                                   self.CONF.tasks_synclog.stdout_dir),
+                               group='tasks_synclog')
+        self.CONF.set_override('stderr_dir',
+                               subprocessext._get_filepath(
+                                   self.CONF.tasks_synclog.stderr_dir),
+                               group='tasks_synclog')
+
         if not os.path.exists(self.CONF.tasks_synclog.stdout_dir):
             os.mkdir(self.CONF.tasks_synclog.stdout_dir)
         if not os.path.exists(self.CONF.tasks_synclog.stderr_dir):

@@ -1,6 +1,17 @@
 CHANGES
 =======
 
+2.3.8
+-----
+
+* Update to version v2.3.8
+* updated to make sure subprocessext is patched for testing filesync
+* removed log entry that resulted in breaking test code because it mocks part that checks for called once
+* fixed testing class impacted by bug in oslo.config placeholder substitution
+* fixed bug where execute method was not called such that rsync never happened; fixed bug where config dir was not found when defaulting to path including configuration directory
+* fixed logging entries by defining logger for parser to avoid going to root logger
+* fix issue where database file is not able to be opened when defaulting to configuration directory
+
 2.3.7
 -----
 
@@ -129,10 +140,6 @@ CHANGES
 * removed extra parentheses
 * moved global variable from inside function to module level
 * changed local variable that shadows builtin to more descriptive variable name
-
-2.2.4
------
-
 * Update to version v2.2.4
 * get_torrents_active did not take into account that the torrent contained media_files but to keep from processing the torrent and marking done and to keep query simple, added simple check if torrent contains media_files before adding to workflow list
 * added script to handle packaging a new release, pushing to pypi, and releasing updates to remote git

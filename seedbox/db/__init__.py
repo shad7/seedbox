@@ -14,8 +14,7 @@ DB_ENGINE_NAMESPACE = 'seedbox.db'
 
 OPTS = [
     cfg.StrOpt('connection',
-               default='sqlite:///$config_dir/torrent.db',
-               secret=True,
+               default='sqlite:///$$config_dir/torrent.db',
                help='The connection string used to connect to the database'),
     cfg.IntOpt('idle_timeout',
                default=3600,
@@ -50,9 +49,28 @@ def dbapi(conf=cfg.CONF):
     global _DBAPI
 
     if _DBAPI is None:
+        set_defaults(conf)
         _DBAPI = api.DBApi(_get_connection(conf))
         _DBAPI.shrink_db()
     return _DBAPI
+
+
+def set_defaults(conf):
+    """
+    Register the database options and then handle replacement of placeholder
+    with actual configuration directory. As of the 1.3 and 1.4 release of
+    oslo.config, it will not auto replace the value. Therefore using the
+    escape sequence '$$' to avoid getting 'None' in place of actual config
+    directory, and then doing the replacement ourself.
+
+    :param conf: an instance of the configuration file
+    :type: oslo.config.cfg.ConfigOpts
+    """
+    dbconn = conf.database.connection
+    if '$config_dir' in dbconn:
+        conf.set_default('connection',
+                         dbconn.replace('$config_dir', conf.config_dir),
+                         group='database')
 
 
 def list_opts():

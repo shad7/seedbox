@@ -102,9 +102,11 @@ class FileSyncTest(test.ConfiguredBaseTestCase):
         class Dummy(object):
             class ProcessLogging(object):
 
-                def __init__(self, cmd):
+                @staticmethod
+                def execute(cmd):
                     pass
 
         self.patch(filesync, 'subprocessext', Dummy)
         files = task()
+        print(files[0])
         self.assertTrue(files[0].synced)

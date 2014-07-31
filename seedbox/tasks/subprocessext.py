@@ -34,10 +34,10 @@ LOG = logging.getLogger(__name__)
 
 OPTS = [
     cfg.StrOpt('stdout_dir',
-               default='$config_dir/sync_out',
+               default='$$config_dir/sync_out',
                help='Output directory for stdout files'),
     cfg.StrOpt('stderr_dir',
-               default='$config_dir/sync_err',
+               default='$$config_dir/sync_err',
                help='Output directory for stderr files'),
     cfg.BoolOpt('stdout_verbose',
                 default=False,
@@ -50,10 +50,19 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group='tasks_synclog')
 
 
+def _get_filepath(filepath):
+    # due to bug in oslo.config not properly handling substitution
+    # of $config_dir
+    if '$config_dir' in filepath:
+        return filepath.replace('$config_dir', cfg.CONF.config_dir)
+    return filepath
+
+
 def _log(name, filepath, unique_id, data):
 
     _handler = logging.FileHandler(
-        os.path.join(filepath, 'sync.home.{0}'.format(unique_id)))
+        os.path.join(_get_filepath(filepath),
+                     'sync.home.{0}'.format(unique_id)))
     _handler.setFormatter(logging.Formatter('%(message)s'))
 
     _logger = logging.getLogger(name)
@@ -97,7 +106,6 @@ class ProcessLogging(subprocess.Popen):
         while self.returncode is None:
             outdata, outerr = self.communicate()
         else:
-
             if cfg.CONF.tasks_synclog.stderr_verbose and outerr:
                 _log('seedbox.tasks.subproc.stderr',
                      cfg.CONF.tasks_synclog.stderr_dir,
