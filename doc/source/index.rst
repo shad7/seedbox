@@ -30,11 +30,6 @@ Running SeedboxManager::
 
     seedmgr
 
-.. note::
-
-    As long as virtualenv is running **(source ~/seedbox/bin/activate)**; you will be able
-    to execute seedmgr from anywhere.
-
 Running SeedboxManager from crontab::
 
     crontab -e
@@ -147,6 +142,7 @@ Contents
 
     ChangeLog
     ToDo
+    design
     sourcecode/autoindex
 
 .. toctree::
