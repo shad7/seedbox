@@ -23,11 +23,11 @@ def _get_work(dbapi):
     for tor in dbapi.get_torrents_active():
         # need to make sure there are actually media files that
         # were parsed for the torrent.
-        LOG.debug('torrent media files: %s', tor.media_files)
+        LOG.debug('torrent %s media files: %s',
+                  tor.torrent_id, tor.media_files)
         if tor.media_files:
             LOG.debug('creating workflow for torrent: %s', tor)
-            wf = workflow.Workflow(tor)
-            flows.append(wf)
+            flows.append(workflow.Workflow(tor))
 
     return flows
 
@@ -52,7 +52,6 @@ def start():
                 flows = _get_work(dbapi)
                 # if still no torrents break out
                 if not flows:
-                    mgr.shutdown()
                     break
 
             # for each flow get the next list of tasks to process
@@ -73,9 +72,7 @@ def start():
                     flows.remove(wf)
     finally:
         mgr.shutdown()
-
-    # clean up the db
-    dbapi.clean_up()
+        dbapi.clean_up()
 
 
 def list_opts():
