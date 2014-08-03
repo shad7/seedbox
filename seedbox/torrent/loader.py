@@ -16,6 +16,9 @@ from seedbox.torrent import parser
 
 LOG = logging.getLogger(__name__)
 
+COMPRESSED_TYPES = tools.format_file_ext(cfg.CONF.torrent.compressed_filetypes)
+VIDEO_TYPES = tools.format_file_ext(cfg.CONF.torrent.video_filetypes)
+
 
 def load_torrents():
     """
@@ -37,26 +40,27 @@ def load_torrents():
 
             try:
                 torparser = parser.TorrentParser(torrent_file)
-                media_items = torparser.get_files_details()
-                LOG.debug('Total files in torrent %d', len(media_items))
-
-                # determine if any of the files are still inprogress of
-                # being downloaded; if so then go to next torrent.
-                # Because no files were added to the cache for the torrent
-                # we will once again parse and attempt to process it.
-                if _is_torrent_downloading(media_items):
-                    LOG.debug('torrent still downloading, next...')
-                    continue
-
-                dbapi.bulk_create_medias(
-                    _filter_media(torrent.torrent_id, media_items))
-
             except parser.ParsingError as ape:
                 torrent.invalid = True
                 torrent.state = constants.CANCELLED
                 dbapi.save_torrent(torrent)
                 LOG.error('Torrent Parsing Error: [%s] [%s]',
                           torrent_file, ape)
+                continue
+
+            media_items = torparser.get_files_details()
+            LOG.debug('Total files in torrent %d', len(media_items))
+
+            # determine if any of the files are still inprogress of
+            # being downloaded; if so then go to next torrent.
+            # Because no files were added to the cache for the torrent
+            # we will once again parse and attempt to process it.
+            if _is_torrent_downloading(media_items):
+                LOG.debug('torrent still downloading, next...')
+                continue
+
+            dbapi.bulk_create_medias(
+                _filter_media(torrent.torrent_id, media_items))
 
 
 def _is_parsing_required(torrent):
@@ -121,13 +125,6 @@ def _filter_media(torrent_id, media_items):
     args:
         torrent: includes access to torrent and its location
     """
-    compressed_types = tools.format_file_ext(
-        cfg.CONF.torrent.compressed_filetypes)
-    video_types = tools.format_file_ext(cfg.CONF.torrent.video_filetypes)
-    # 75000000 ~= 75MB
-    # need to change to be specific to filetype as music is always
-    # smaller than video, etc.
-    min_file_size = cfg.CONF.torrent.minimum_file_size
 
     file_list = []
     for (filename, filesize) in media_items:
@@ -149,25 +146,23 @@ def _filter_media(torrent_id, media_items):
         # desired (not skipped), and accessible
         media.compressed = False
         media.synced = False
-        media.skipped = False
-        media.missing = False
 
         # if ends with rar, then it is a compressed file;
-        if in_ext in compressed_types:
+        if in_ext in COMPRESSED_TYPES:
             media.compressed = True
-            LOG.debug('adding compressed file: %s', filename)
+            LOG.debug('found compressed file: %s', filename)
 
         # if the file is a video type, but less than 75Mb then
         # the file is just a sample video and as such we will
         # skip the file
-        elif in_ext in video_types:
-            if filesize < min_file_size:
-                media.skipped = True
+        elif in_ext in VIDEO_TYPES:
+            if filesize < cfg.CONF.torrent.minimum_file_size:
                 LOG.debug(
-                    'Based on size, this is a sample file [%s].\
-                     Skipping..', filename)
+                    'Based on size, this is a sample file [%s]. Skipping..',
+                    filename)
+                continue
             else:
-                LOG.debug('adding video file: %s', filename)
+                LOG.debug('found video file: %s', filename)
 
         # if the file has any other extension (rNN, etc.) we will
         # simply skip the file
@@ -176,15 +171,10 @@ def _filter_media(torrent_id, media_items):
                 'Unsupported filetype (%s); skipping file', in_ext)
             continue
 
-        # now that we know if the file should be skipped or not from above
-        # we will determine if the file is truly available based on the
-        # full path and filename. If file is not found, then we will set
-        # the file to missing
-        if not media.skipped:
-            (media.file_path, media.filename) = _get_file_path(filename)
-            if not media.file_path:
-                media.missing = True
-                LOG.info('Media file [%s] not found', filename)
+        media.file_path = _get_file_path(filename)
+        if not media.file_path:
+            LOG.info('Media file [%s] not found', filename)
+            continue
 
         # now we can add the file to the torrent
         file_list.append(media)
@@ -202,15 +192,13 @@ def _get_file_path(filename):
         None if not found
     """
 
-    found_file = None
     found_path = None
     for location in cfg.CONF.torrent.media_paths:
 
-        full_path = os.path.join(location, filename)
         # if the file is found then break out of the loop and
         # return found; else we will return default not found
-        if os.path.exists(full_path):
-            (found_path, found_file) = os.path.split(full_path)
+        if os.path.exists(os.path.join(location, filename)):
+            found_path = location
             break
 
-    return found_path, found_file
+    return found_path
