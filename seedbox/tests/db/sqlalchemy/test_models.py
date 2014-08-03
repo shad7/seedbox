@@ -111,9 +111,9 @@ class SAModelsTestCase(test.BaseTestCase):
         _query = transformer.apply_filter(qfilter)
         self.assertIsNotNone(_query.statement)
 
-        qfilter = {'and': [{'=': {'invalid': 0}},
-                           {'=': {'purged': 0}},
-                           {'=': {'failed': 0}},
+        qfilter = {'and': [{'=': {'invalid': False}},
+                           {'=': {'purged': False}},
+                           {'=': {'failed': False}},
                            {'in': {'state': ['init', 'ready', 'active']}}
                            ]}
         _query = transformer.apply_filter(qfilter)

@@ -66,3 +66,15 @@ class ProcessTestCase(test.ConfiguredBaseTestCase):
 
         process.start()
         self.assertTrue(True)
+
+    def test_process_empty_torrent(self):
+
+        self.dbapi.save_torrent(
+            models.Torrent(torrent_id=None,
+                           name='fake21.torrent'))
+
+        FakeManager.DBAPI = self.dbapi
+        self.patch(process, 'manager', FakeManager)
+
+        process.start()
+        self.assertTrue(True)

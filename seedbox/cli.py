@@ -34,12 +34,11 @@ def main():
     logmgr.configure()
     cfg.CONF.log_opt_values(LOG, logging.DEBUG)
 
-    # need to create a lock to make sure multiple instances do not start at
-    # the same time because we are running as a cron.
-    filelock = os.path.join(cfg.CONF.config_dir, 'seedmgr.lock')
-    lock = pidlockfile.PIDLockFile(filelock, timeout=10)
     try:
-        with lock:
+        # need to create a lock to make sure multiple instances do not start
+        # at the same time because we are running as a cron.
+        with pidlockfile.PIDLockFile(os.path.join(cfg.CONF.config_dir,
+                                     'seedmgr.lock'), timeout=10):
 
             # setup database and initialize connection
             db.dbapi(cfg.CONF)

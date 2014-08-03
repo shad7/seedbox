@@ -92,6 +92,7 @@ class BaseTask(object):
         """
         Perform the action associated with task for the provided media_file.
         """
+        raise NotImplementedError
 
     def __str__(self):
         return '{0}: {1}'.format(self.__class__.__name__, self.__dict__)

@@ -219,7 +219,8 @@ class ApiDBTestCase(test.ConfiguredBaseTestCase):
                                                filename='movie-1.mp4',
                                                file_ext='.mp4',
                                                file_path='/tmp/media',
-                                               synced=i % 2))
+                                               synced=True if i % 2 else False)
+                           )
         self.dbapi.bulk_create_medias(_medias)
 
         qfilter = {'=': {'synced': True}}
@@ -273,10 +274,10 @@ class ApiDBTestCase(test.ConfiguredBaseTestCase):
                 filename='movie-{0}.mp4'.format(i),
                 file_ext='.mp4',
                 file_path='/tmp/media/{0}'.format('a' if i % 2 else 'b'),
-                compressed=0 if i % 2 else 1,
-                synced=1 if i % 2 else 0,
-                missing=0 if i % 2 else 1,
-                skipped=1 if i == 5 else 0,
+                compressed=False if i % 2 else True,
+                synced=True if i % 2 else False,
+                missing=False if i % 2 else True,
+                skipped=True if i == 5 else False,
                 ))
         self.dbapi.bulk_create_medias(_medias)
 
@@ -323,10 +324,10 @@ class ApiDBTestCase(test.ConfiguredBaseTestCase):
                 filename='movie-{0}.mp4'.format(i),
                 file_ext='.mp4',
                 file_path='/tmp/media/{0}'.format('a' if i % 2 else 'b'),
-                compressed=0 if i % 2 else 1,
-                synced=1 if i % 2 else 0,
-                missing=0 if i % 2 else 1,
-                skipped=1 if i == 5 else 0,
+                compressed=False if i % 2 else True,
+                synced=True if i % 2 else False,
+                missing=False if i % 2 else True,
+                skipped=True if i == 5 else False,
                 ))
         self.dbapi.bulk_create_medias(_medias)
 

@@ -26,9 +26,20 @@ class Workflow(flow.BaseFlow):
 
     def run(self):
         """Orchestrate each step of the process based on current state"""
+
         if not self.is_done():
             next_step = getattr(self, self.phase)
             LOG.debug('next_step: %s', next_step)
-            next_step()
+            try:
+                next_step()
+            except (flow.WorkflowError, flow.AbortTransition,
+                    flow.InvalidTransitionError,
+                    flow.ForbiddenTransition) as wferr:
+                LOG.error('workflow error: %s', wferr)
+                self.torrent = self.dbapi.get_torrent(self.torrent.torrent_id)
+                self.torrent.error_msg = str(wferr)
+                self.torrent.failed = True
+                self.torrent = self.dbapi.save_torrent(self.torrent)
+                return True
 
         return self.is_done()

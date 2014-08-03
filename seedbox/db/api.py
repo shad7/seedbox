@@ -93,9 +93,9 @@ class DBApi(object):
         :return: torrent instance(s)
         :rtype: :class:`~seedbox.db.models.Torrent`
         """
-        qfilter = {'and': [{'=': {'invalid': 0}},
-                           {'=': {'purged': 0}},
-                           {'=': {'failed': 0}},
+        qfilter = {'and': [{'=': {'invalid': False}},
+                           {'=': {'purged': False}},
+                           {'=': {'failed': False}},
                            {'in': {'state': constants.ACTIVE_STATES}}
                            ]}
         return self.get_torrents(qfilter)
@@ -111,7 +111,7 @@ class DBApi(object):
         :rtype: :class:`~seedbox.db.models.Torrent`
         """
         qfilter = {'and': [{'=': {'state': state}},
-                           {'=': {'failed': 1 if failed else 0}}
+                           {'=': {'failed': True if failed else False}}
                            ]}
         return self.get_torrents(qfilter)
 
@@ -123,8 +123,8 @@ class DBApi(object):
         :return: torrent instance(s)
         :rtype: :class:`~seedbox.db.models.Torrent`
         """
-        qfilter = {'and': [{'=': {'invalid': 0}},
-                           {'=': {'purged': 0}},
+        qfilter = {'and': [{'=': {'invalid': False}},
+                           {'=': {'purged': False}},
                            {'in': {'state': constants.INACTIVE_STATES}}
                            ]}
         return self.get_torrents(qfilter)
@@ -137,7 +137,7 @@ class DBApi(object):
         :return: torrent instance(s)
         :rtype: :class:`~seedbox.db.models.Torrent`
         """
-        qfilter = {'and': [{'=': {'purged': 1}},
+        qfilter = {'and': [{'=': {'purged': True}},
                            {'in': {'state': constants.INACTIVE_STATES}}
                            ]}
         return self.get_torrents(qfilter)
@@ -263,13 +263,14 @@ class DBApi(object):
         if file_path is not None:
             conditions.append({'=': {'file_path': file_path}})
         if compressed is not None:
-            conditions.append({'=': {'compressed': 1 if compressed else 0}})
+            conditions.append(
+                {'=': {'compressed': True if compressed else False}})
         if synced is not None:
-            conditions.append({'=': {'synced': 1 if synced else 0}})
+            conditions.append({'=': {'synced': True if synced else False}})
         if missing is not None:
-            conditions.append({'=': {'missing': 1 if missing else 0}})
+            conditions.append({'=': {'missing': True if missing else False}})
         if skipped is not None:
-            conditions.append({'=': {'skipped': 1 if skipped else 0}})
+            conditions.append({'=': {'skipped': True if skipped else False}})
         qfilter = {'and': conditions}
         return self.get_medias(qfilter)
 
@@ -283,9 +284,9 @@ class DBApi(object):
         :rtype: :class:`~seedbox.db.models.MediaFile`
         """
         qfilter = {'and': [{'=': {'torrent_id': torrent_id}},
-                           {'or': [{'=': {'synced': 1}},
-                                   {'=': {'missing': 1}},
-                                   {'=': {'skipped': 1}}
+                           {'or': [{'=': {'synced': True}},
+                                   {'=': {'missing': True}},
+                                   {'=': {'skipped': True}}
                                    ]}
                            ]}
         return self.get_medias(qfilter)

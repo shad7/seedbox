@@ -9,6 +9,27 @@ SeedboxManager
 SeedboxManager is an automated task manager for for synchronizing files from 
 a seedbox to your home library.
 
+
+.. image:: https://travis-ci.org/shad7/seedbox.png?branch=master
+    :target: https://travis-ci.org/shad7/seedbox
+    :alt: Build status
+
+
+.. image:: https://coveralls.io/repos/shad7/seedbox/badge.png
+    :target: https://coveralls.io/r/shad7/seedbox
+    :alt: Coverage
+
+
+.. image:: https://badge.fury.io/py/SeedboxManager.svg
+    :target: http://badge.fury.io/py/SeedboxManager
+    :alt: Version
+
+
+.. image:: https://requires.io/github/shad7/seedbox/requirements.png?branch=master
+     :target: https://requires.io/github/shad7/seedbox/requirements/?branch=master
+     :alt: Requirements Status
+
+
 Getting started
 ===============
 
@@ -29,11 +50,6 @@ Install `SeedboxManager <https://pypi.python.org/pypi/SeedboxManager>`_ in the v
 Running SeedboxManager::
 
     seedmgr
-
-.. note::
-
-    As long as virtualenv is running **(source ~/seedbox/bin/activate)**; you will be able
-    to execute seedmgr from anywhere.
 
 Running SeedboxManager from crontab::
 
@@ -134,9 +150,12 @@ Command line interface::
 Resources
 =========
 
-* Package on PyPI: https://pypi.python.org/pypi/SeedboxManager
-* Repository and issues on GitHub: http://github.com/shad7/seedbox
-* Doc on http://seedboxmanager.readthedocs.org/
+* `PyPI <https://pypi.python.org/pypi/SeedboxManager>`_
+* `GitHub <http://github.com/shad7/seedbox>`_
+* `Travis CI <https://travis-ci.org/shad7/seedbox>`_
+* `Coveralls <https://coveralls.io/r/shad7/seedbox>`_
+* `Requires <https://requires.io/github/shad7/seedbox/requirements/?branch=master>`_
+* `Read the Docs <http://seedboxmanager.readthedocs.org/>`_
 
 
 Contents
@@ -147,6 +166,7 @@ Contents
 
     ChangeLog
     ToDo
+    design
     sourcecode/autoindex
 
 .. toctree::

@@ -28,17 +28,22 @@ OPTS = [
 
 cfg.CONF.register_opts(OPTS, group='process')
 
+WorkflowError = xworkflows.WorkflowError
+AbortTransition = xworkflows.AbortTransition
+InvalidTransitionError = xworkflows.InvalidTransitionError
+ForbiddenTransition = xworkflows.ForbiddenTransition
+
 
 class Taskflow(xworkflows.Workflow):
     """
     Define the workflow conditions for managing torrents;
     """
     states = (
-        (constants.INIT, u"Initial state"),
-        (constants.READY, u"Ready"),
-        (constants.ACTIVE, u"Active"),
-        (constants.DONE, u"Done"),
-        (constants.CANCELLED, u"Cancelled"),
+        (constants.INIT, u'Initial state'),
+        (constants.READY, u'Ready'),
+        (constants.ACTIVE, u'Active'),
+        (constants.DONE, u'Done'),
+        (constants.CANCELLED, u'Cancelled'),
     )
 
     transitions = (
@@ -134,6 +139,26 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         self.torrent.state = self.state.name
         self.torrent = self.dbapi.save_torrent(self.torrent)
         LOG.debug('torrent: %s' % self.torrent)
+
+    @xworkflows.transition_check()
+    def validate(self):
+        """
+        Validate that the transition should proceed or not
+        """
+        LOG.debug('state: %s phase: %s torrent: %s',
+                  self.state.name, self.phase, self.torrent)
+
+        result = True
+        for mf in list(self.dbapi.get_medias_by(self.torrent.torrent_id,
+                                                missing=False,
+                                                skipped=False)):
+            # if any of the media files failed during processing
+            # then we need to stop the workflow from continuing.
+            if mf.error_msg:
+                result = False
+                break
+
+        return result
 
     @xworkflows.transition()
     def prepare(self):
