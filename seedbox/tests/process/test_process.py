@@ -69,7 +69,7 @@ class ProcessTestCase(test.ConfiguredBaseTestCase):
 
     def test_process_empty_torrent(self):
 
-        tor1 = self.dbapi.save_torrent(
+        self.dbapi.save_torrent(
             models.Torrent(torrent_id=None,
                            name='fake21.torrent'))
 
@@ -78,4 +78,3 @@ class ProcessTestCase(test.ConfiguredBaseTestCase):
 
         process.start()
         self.assertTrue(True)
-

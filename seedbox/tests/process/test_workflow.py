@@ -35,9 +35,10 @@ class WorkflowTestCase(test.ConfiguredBaseTestCase):
 
     def test_stop_workflow(self):
 
-        torrent = self.dbapi.save_torrent(models.Torrent(torrent_id=None,
-                                                         name='fake177.torrent',
-                                                         state='active'))
+        torrent = self.dbapi.save_torrent(
+            models.Torrent(torrent_id=None,
+                           name='fake177.torrent',
+                           state='active'))
 
         media = models.MediaFile(media_id=None,
                                  torrent_id=torrent.torrent_id,
@@ -50,5 +51,3 @@ class WorkflowTestCase(test.ConfiguredBaseTestCase):
         wf = workflow.Workflow(torrent)
         status = wf.run()
         self.assertTrue(status)
-
-

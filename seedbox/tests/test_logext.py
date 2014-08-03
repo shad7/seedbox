@@ -7,7 +7,6 @@ from seedbox import logext
 
 class LogextTest(test.ConfiguredBaseTestCase):
 
-    
     CFG_FILE = 'logging.cfg'
 
     cfg_data = []
