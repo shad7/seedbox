@@ -1,6 +1,18 @@
 CHANGES
 =======
 
+* added logic to stop workflow from continuing execution when a task associated with a media file failed to further support retry
+* code cleanup and simplification and duplication
+* skip adding files found with the torrent if not found on filesystem to avoid processing a torrent w/o files to process; general cleanup and simplification of code
+* replaced empty abstract methods with raise NotImplementedError for clarity and coverage
+* converted from previous use of 1 or 0 to represent True and False when setting values to be stored in the database
+* clean up to further simplify implementation of pid lockfile
+* added links to requires.io
+* added ignore raise NotImplementedError
+* adding travis_retry during install travis config
+* trying a different travis config
+* added design documentation
+
 2.3.8
 -----
 
@@ -140,6 +152,10 @@ CHANGES
 * removed extra parentheses
 * moved global variable from inside function to module level
 * changed local variable that shadows builtin to more descriptive variable name
+
+2.2.4
+-----
+
 * Update to version v2.2.4
 * get_torrents_active did not take into account that the torrent contained media_files but to keep from processing the torrent and marking done and to keep query simple, added simple check if torrent contains media_files before adding to workflow list
 * added script to handle packaging a new release, pushing to pypi, and releasing updates to remote git
