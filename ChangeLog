@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+2.3.9
+-----
+
+* Update to version v2.3.9
+* fixed minor pep8 issues within new test cases
+* added more test cases
+* update ChangeLog based on recent changes
 * added logic to stop workflow from continuing execution when a task associated with a media file failed to further support retry
 * code cleanup and simplification and duplication
 * skip adding files found with the torrent if not found on filesystem to avoid processing a torrent w/o files to process; general cleanup and simplification of code
