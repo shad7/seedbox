@@ -9,4 +9,5 @@ six>=1.4.1
 sqlalchemy
 sqlalchemy-migrate
 stevedore>=0.10
+twine
 xworkflows
