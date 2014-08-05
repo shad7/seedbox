@@ -69,7 +69,13 @@ git commit --all --amend --no-edit
 #       Release branch 'release/$1' has been deleted
 #       'develop', 'master' and tags have been pushed to 'origin'
 #       Release branch 'release/$1' in 'origin' has been deleted.
-git flow release finish -F -p -m "version $1" $1
+#
+# Because we do not publish the release branch; and do a push, it is
+# resulting in an error when the deletion of the branch from remote
+# happens; as such we check for unable to delete in error message to determine
+# if we continue with execution and upload the distribution.
+#git flow release finish -F -p -m "version $1" $1 || true
+[[ $(git flow release finish -F -p -m "version $1" $1 2>&1) =~ "unable to delete" ]]
 
 #####
 # Release has been tagged and merged; now prepare to publish
