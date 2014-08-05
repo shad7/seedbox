@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+2.3.10
+------
+
+* Update to version v2.3.10
+* updated release process to separate the packaging from the release via twine
+* changed url from pypi to github
+
 2.3.9
 -----
 
