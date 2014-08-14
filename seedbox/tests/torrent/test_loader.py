@@ -126,11 +126,11 @@ class TorrentLoaderTest(test.ConfiguredBaseTestCase):
                                [self.base_dir],
                                group='torrent')
 
-        location = loader._get_file_path('fake-name.mp4')
+        (location, filename) = loader._get_file_path('fake-name.mp4')
         self.assertIsNone(location)
 
         media1 = tempfile.NamedTemporaryFile(suffix='.mp4',
                                              dir=self.base_dir)
 
-        location = loader._get_file_path(media1.name)
+        (location, filename) = loader._get_file_path(media1.name)
         self.assertIsNotNone(location)
