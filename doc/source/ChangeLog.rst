@@ -1,6 +1,17 @@
 CHANGES
 =======
 
+2.3.11
+------
+
+* Update to version v2.3.11
+* [TASK] General cleanup activities
+* [TASK] Apply shell lint changes to update_version
+* [TASK] Fix up spelling errors
+* [BUGFIX] Fix capture of filename when coming from compressed file
+* remove patch for what was oslo.config a bug; replaced original way of setting config_dir with set_default. Consistent response regardless of version of oslo.config
+* minor change to handle the fact we do not publish the release branch to the remote, and git flow raises an exception when attempting to remove the remote branch. now catching that exception only and allowing script to continue with upload if everything else was successful
+
 2.3.10
 ------
 

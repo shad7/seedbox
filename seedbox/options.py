@@ -99,7 +99,8 @@ def initialize(args):
     # if no config_dir was provided then we will set it to the
     # path of the most specific config file found.
     if not cfg.CONF.config_dir:
-        cfg.CONF.config_dir = os.path.dirname(cfg.CONF.config_file[-1])
+        cfg.CONF.set_default('config_dir',
+                             os.path.dirname(cfg.CONF.config_file[-1]))
 
 
 def list_opts():

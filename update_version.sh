@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 txtbld=$(tput bold)             # Bold
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 #####
 
 # intialize release with a version
-git flow release start $1
+git flow release start "$1"
 
 # update version within setup
 sed -i -e "s/version = .*/version = $1/g" setup.cfg
@@ -29,7 +29,7 @@ git commit setup.cfg -m "Update to version v$1"
 # the version number; also required when generating the
 # ChangeLog file updates.
 COMMIT_HASH=$(git log -1 --pretty=format:"%h")
-git tag -a $1 -m "version $1" ${COMMIT_HASH}
+git tag -a "$1" -m "version $1" "${COMMIT_HASH}"
 
 # generate ChangeLog and updated docs; commit
 python setup.py sdist bdist_egg bdist_wheel
@@ -39,7 +39,7 @@ cp ChangeLog doc/source/ChangeLog.rst
 
 # delete tag (only needed temporary to workaround our issue with pbr;
 # git flow will add it back in and push it
-git tag -d $1
+git tag -d "$1"
 
 # should result in updating the previous commit to now include
 # AUTHOR, ChangeLog, doc/source/ChangeLog.rst
@@ -69,7 +69,14 @@ git commit --all --amend --no-edit
 #       Release branch 'release/$1' has been deleted
 #       'develop', 'master' and tags have been pushed to 'origin'
 #       Release branch 'release/$1' in 'origin' has been deleted.
-git flow release finish -F -p -m "version $1" $1
+#
+# Because we do not publish the release branch; and do a push, it is
+# resulting in an error when the deletion of the branch from remote
+# happens; as such we check for unable to delete in error message to determine
+# if we continue with execution and upload the distribution.
+#git flow release finish -F -p -m "version $1" $1 || true
+errstr="unable to delete"
+[[ $(git flow release finish -F -p -m "version $1" "$1" 2>&1) =~ $errstr ]]
 
 #####
 # Release has been tagged and merged; now prepare to publish

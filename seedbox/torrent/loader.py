@@ -171,8 +171,8 @@ def _filter_media(torrent_id, media_items):
                 'Unsupported filetype (%s); skipping file', in_ext)
             continue
 
-        media.file_path = _get_file_path(filename)
-        if not media.file_path:
+        (media.file_path, media.filename) = _get_file_path(filename)
+        if media.file_path is None:
             LOG.info('Media file [%s] not found', filename)
             continue
 
@@ -193,12 +193,14 @@ def _get_file_path(filename):
     """
 
     found_path = None
+    found_file = None
     for location in cfg.CONF.torrent.media_paths:
 
+        full_path = os.path.join(location, filename)
         # if the file is found then break out of the loop and
         # return found; else we will return default not found
-        if os.path.exists(os.path.join(location, filename)):
-            found_path = location
+        if os.path.exists(full_path):
+            (found_path, found_file) = os.path.split(full_path)
             break
 
-    return found_path
+    return (found_path, found_file)
