@@ -33,11 +33,11 @@ a seedbox to your home library.
 Getting started
 ===============
 
-Create `virutalenv <http://www.virtualenv.org/en/latest/>`_ ::
+Create `virtualenv <http://www.virtualenv.org/en/latest/>`_ ::
 
     virtualenv ~/seedbox/
 
-Start `virutalenv <http://www.virtualenv.org/en/latest/>`_ ::
+Start `virtualenv <http://www.virtualenv.org/en/latest/>`_ ::
 
     cd ~/seedbox
     source bin/activate
