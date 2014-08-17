@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+2.3.11
+------
+
+* Update to version v2.3.11
+* [TASK] General cleanup activities
 * [TASK] Apply shell lint changes to update_version
 * [TASK] Fix up spelling errors
 * [BUGFIX] Fix capture of filename when coming from compressed file
