@@ -6,7 +6,7 @@
 SeedboxManager
 ===============
 
-SeedboxManager is an automated task manager for for synchronizing files from 
+SeedboxManager is an automated task manager for synchronizing files from 
 a seedbox to your home library.
 
 

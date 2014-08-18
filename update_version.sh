@@ -23,7 +23,7 @@ git flow release start "$1"
 # update version within setup
 sed -i -e "s/version = .*/version = $1/g" setup.cfg
 python setup.py develop
-git commit setup.cfg -m "Update to version v$1"
+git commit setup.cfg -m "[RELEASE] Update to version v$1"
 
 # tag the last commit such that pbr picks up the tag as
 # the version number; also required when generating the
@@ -74,7 +74,6 @@ git commit --all --amend --no-edit
 # resulting in an error when the deletion of the branch from remote
 # happens; as such we check for unable to delete in error message to determine
 # if we continue with execution and upload the distribution.
-#git flow release finish -F -p -m "version $1" $1 || true
 errstr="unable to delete"
 [[ $(git flow release finish -F -p -m "version $1" "$1" 2>&1) =~ $errstr ]]
 
