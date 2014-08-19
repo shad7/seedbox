@@ -11,7 +11,7 @@ if [ -z "$1" ]
 fi
 
 # make sure all requirements are installed; else setup.py develop fails
-pip install -r requirements.txt
+pip install -q -r requirements.txt
 
 ######
 # Prepare release by updating version, generating updated ChangeLog
@@ -22,7 +22,7 @@ git flow release start "$1"
 
 # update version within setup
 sed -i -e "s/version = .*/version = $1/g" setup.cfg
-python setup.py develop
+python setup.py -q develop
 git commit setup.cfg -m "[RELEASE] Update to version v$1"
 
 # tag the last commit such that pbr picks up the tag as
