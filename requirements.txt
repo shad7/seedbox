@@ -1,6 +1,6 @@
 click
 futures
-oslo.config==1.4.0.0a3
+oslo.config
 lockfile
 pbr
 rarfile>=2.6
