@@ -33,9 +33,6 @@ git tag -a "$1" -m "version $1" "${COMMIT_HASH}"
 
 # generate ChangeLog and updated docs; commit
 python setup.py sdist bdist_egg bdist_wheel
-# copy the updated ChangeLog with rst suffix to the
-# doc area to be included in documentation.
-cp ChangeLog doc/source/ChangeLog.rst
 
 # delete tag (only needed temporary to workaround our issue with pbr;
 # git flow will add it back in and push it

@@ -28,6 +28,11 @@ SeedboxManager
     :alt: 'Stories in Ready'
 
 
+.. image:: https://landscape.io/github/shad7/seedbox/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/shad7/seedbox/master
+   :alt: Code Health
+
+
 Links
 =====
 
@@ -38,6 +43,7 @@ Links
 * Requires_
 * `Read the Docs`_
 * Waffle_
+* Landscape_
 
 
 .. _PyPI: https://pypi.python.org/pypi/SeedboxManager
@@ -47,3 +53,4 @@ Links
 .. _`Requires`: https://requires.io/github/shad7/seedbox/requirements/?branch=master
 .. _`Read the Docs`: http://seedboxmanager.readthedocs.org/
 .. _Waffle: https://waffle.io/shad7/seedbox
+.. _Landscape: https://landscape.io/github/shad7/seedbox
