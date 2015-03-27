@@ -197,7 +197,7 @@ class TorrentParser(object):
             raise ValueError('Path of the torrent file not provided')
 
         if not os.path.exists(torrent_file_path):
-            raise IOError('No file found at {}'.format(torrent_file_path))
+            raise IOError('No file found at %s' % torrent_file_path)
 
         with io.open(file=torrent_file_path, mode='rb') as handle:
             self.torrent_content = handle.read()
