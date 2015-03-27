@@ -2,9 +2,7 @@
 tox>=1.7.2
 
 # coding standards
-pep8>=1.4.5
-pyflakes>=0.7.2
-flake8>=2.0
+hacking
 
 # test coverage
 coverage>=3.6
