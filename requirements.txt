@@ -6,7 +6,7 @@ pbr
 rarfile>=2.6
 sandman
 six>=1.4.1
-sqlalchemy
+sqlalchemy==0.9.8
 sqlalchemy-migrate
 stevedore>=0.10
 twine
