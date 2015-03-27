@@ -1,4 +1,5 @@
-"""
+"""Version wrapper
+
 Access to the version as configured as part of installation package.
 Leverages pbr (Python Build Reasonableness)
 """
@@ -8,8 +9,7 @@ version_info = pbr_version.VersionInfo('SeedboxManager')
 
 
 def version_string():
-    """
-    Provide a string representing the version of the project.
+    """Provide a string representing the version of the project.
 
     :return: project version
     :rtype: string
@@ -18,8 +18,7 @@ def version_string():
 
 
 def release_string():
-    """
-    Provide a string representing the release of the project.
+    """Provide a string representing the release of the project.
 
     :return: project release
     :rtype: string

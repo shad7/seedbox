@@ -1,6 +1,7 @@
-"""
-Wrapper for sandman; replacement for sandmanctl that provides additional
-options not available via sandmanctl
+"""Wrapper for sandman
+
+replacement for sandmanctl that provides additional options
+not available via sandmanctl
 """
 import logging
 
@@ -13,6 +14,7 @@ from seedbox import version
 
 def print_version(ctx, value):
     """Print the current version of sandman and exit.
+
     :param ctx: application context
     :param value:
     """
@@ -38,14 +40,15 @@ def print_version(ctx, value):
 @click.argument('URI', metavar='<URI>')
 def run(generate_pks, show_pks, host, port, debug, uri):
     """Connect sandman to <URI> and start the API server/admin
+
     :param generate_pks: Have sandman generate primary keys for tables
-    without one
+                         without one
     :param show_pks: Have sandman show primary key columns in the admin view
     :param host: Hostname of database server to connect to
     :param port: Port of database server to connect to
     :param debug: Enable debug output from webserver
-    :param uri: database uri
-    interface."""
+    :param uri: database uri interface.
+    """
     app.config['SQLALCHEMY_DATABASE_URI'] = uri
     app.config['SANDMAN_GENERATE_PKS'] = generate_pks
     app.config['SANDMAN_SHOW_PKS'] = show_pks

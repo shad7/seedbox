@@ -17,15 +17,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+
+"""Test class for benecode
+
+* example values partially taken from http://en.wikipedia.org/wiki/Bencode
+* test case inspired by Mark Pilgrim's examples:
+        http://diveintopython.org/unit_testing/romantest.html
+"""
 from seedbox.tests import test
 from seedbox.torrent import bencode
 
 
 class KnownValues(test.BaseTestCase):
-    """ * example values partially taken from http://en.wikipedia.org/wiki/Bencode
-        * test case inspired by Mark Pilgrim's examples:
-            http://diveintopython.org/unit_testing/romantest.html
-    """
     knownValues = (
         (0, b'i0e'),
         (1, b'i1e'),
@@ -43,64 +46,49 @@ class KnownValues(test.BaseTestCase):
     )
 
     def test_bencode_known_values(self):
-        """bencode should give known result with known input"""
         for plain, encoded in self.knownValues:
             result = bencode.bencode(plain)
             self.assertEqual(encoded, result)
 
     def test_bdecode_known_values(self):
-        """bdecode should give known result with known input"""
         for plain, encoded in self.knownValues:
             result = bencode.bdecode(encoded)
             self.assertEqual(plain, result)
 
     def test_roundtrip_encoded(self):
-        """ consecutive calls to bdecode and bencode should deliver the original
-            data again
-        """
         for plain, encoded in self.knownValues:
             result = bencode.bdecode(encoded)
             self.assertEqual(encoded, bencode.bencode(result))
 
     def test_roundtrip_decoded(self):
-        """ consecutive calls to bencode and bdecode should deliver the original
-            data again
-        """
         for plain, encoded in self.knownValues:
             result = bencode.bencode(plain)
             self.assertEqual(plain, bencode.bdecode(result))
 
 
 class IllegaleValues(test.BaseTestCase):
-    """ handling of illegal values"""
 
     def test_nonstrings_raise_illegal_input_for_decode(self):
-        """ non-strings should raise an exception. """
         self.assertRaises(bencode.BTFailure, bencode.bdecode, [0])
         self.assertRaises(bencode.BTFailure, bencode.bdecode, None)
         self.assertRaises(bencode.BTFailure, bencode.bdecode, [1, 2])
         self.assertRaises(bencode.BTFailure, bencode.bdecode, {b'foo': b'bar'})
 
     def test_raise_illegal_input_for_decode(self):
-        """Illegally formatted strings should raise an exception when
-        decoded."""
         self.assertRaises(bencode.BTFailure, bencode.bdecode, b"foo")
         self.assertRaises(bencode.BTFailure, bencode.bdecode, b"x:foo")
         self.assertRaises(bencode.BTFailure, bencode.bdecode, b"x42e")
 
 
 class Dictionaries(test.BaseTestCase):
-    """ handling of dictionaries """
 
     def test_sorted_keys_for_dicts(self):
-        """ the keys of a dictionary must be sorted before encoded. """
         adict = {b'zoo': 42, b'bar': b'spam'}
         encoded_dict = bencode.bencode(adict)
         self.assertTrue(
             encoded_dict.index(b'zoo') > encoded_dict.index(b'bar'))
 
     def test_nested_dictionary(self):
-        """ tests for handling of nested dicts"""
         adict = {b'foo': 42, b'bar': {b'sketch': b'parrot', b'foobar': 23}}
         encoded_dict = bencode.bencode(adict)
         self.assertEqual(encoded_dict,

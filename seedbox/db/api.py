@@ -1,22 +1,20 @@
-"""
+"""Database API
+
 Public facing database api that leverages a provided implementation to
 execute database operations.
 """
 import logging
 import os
 
-from seedbox import constants
 from seedbox.common import timeutil
+from seedbox import constants
 from seedbox.db import models
 
 LOG = logging.getLogger(__name__)
 
 
 class DBApi(object):
-
-    """
-    Provides API for supported database operations that leverage specified
-    implementation.
+    """Provides API for supported database operations.
 
     :param impl: database plugin instance
     :type impl: :class:`~seedbox.db.base.Connection`
@@ -26,9 +24,7 @@ class DBApi(object):
         self.impl = impl
 
     def clear(self):
-        """
-        Clears all data from database.
-        """
+        """Clears all data from database."""
         self.impl.clear()
 
     def backup(self):
@@ -40,8 +36,7 @@ class DBApi(object):
         self.impl.shrink_db()
 
     def save_torrent(self, torrent):
-        """
-        Performs save (insert/update) operation on an instance of torrent.
+        """Performs save (insert/update) operation on an instance of torrent.
 
         :param torrent: an instance of a torrent
         :return: saved torrent instance
@@ -50,9 +45,9 @@ class DBApi(object):
         return self.impl.save(torrent)
 
     def bulk_save_torrents(self, value_map, qfilter):
-        """
-        Performs save (update) operation on multiple instances of torrents
-        using the provided data map.
+        """Performs save (update) operation on multiple instances.
+
+         Using the provided data map.
 
         :param value_map: data attributes and values to update
         :param qfilter: query filter to determine instances to update
@@ -60,24 +55,21 @@ class DBApi(object):
         self.impl.bulk_update(value_map, models.Torrent, qfilter)
 
     def delete_torrent(self, torrent):
-        """
-        Performs delete operation on specific instance of torrent.
+        """Performs delete operation on specific instance of torrent.
 
         :param torrent: an instance of torrent
         """
         self.impl.delete(torrent)
 
     def delete_torrents(self, qfilter):
-        """
-        Performs delete operation on selection of torrent instances.
+        """Performs delete operation on selection of torrent instances.
 
         :param qfilter: query filter to determine instances to delete.
         """
         self.impl.delete_by(models.Torrent, qfilter)
 
     def get_torrents(self, qfilter):
-        """
-        Perform select operation on selection of torrent instances.
+        """Perform select operation on selection of torrent instances.
 
         :param qfilter: query filter to determine instances to fetch.
         :return: torrent instance(s)
@@ -86,7 +78,8 @@ class DBApi(object):
         return self.impl.fetch_by(models.Torrent, qfilter)
 
     def get_torrents_active(self):
-        """
+        """Retrieves active torrents.
+
         Perform select operation using a pre-defined criteria for what
         constitutes an active torrent.
 
@@ -101,7 +94,8 @@ class DBApi(object):
         return self.get_torrents(qfilter)
 
     def get_torrents_by_state(self, state, failed=False):
-        """
+        """Retrieve torrents by specified state.
+
         Perform select operation using a pre-defined criteria to get torrents
         by a specific state.
 
@@ -116,7 +110,8 @@ class DBApi(object):
         return self.get_torrents(qfilter)
 
     def get_torrents_eligible_for_purging(self):
-        """
+        """Retrieves eligible to purge.
+
         Perform select operation using a pre-defined criteria for what
         constitutes eligible for purging.
 
@@ -130,7 +125,8 @@ class DBApi(object):
         return self.get_torrents(qfilter)
 
     def get_torrents_eligible_for_removal(self):
-        """
+        """Retrieve torrents eligible for removal.
+
         Perform select operation using a pre-defined criteria for what
         constitutes eligible for removal.
 
@@ -143,7 +139,8 @@ class DBApi(object):
         return self.get_torrents(qfilter)
 
     def get_torrent_by_name(self, name):
-        """
+        """Fetch torrent by name.
+
         Perform select operation using the name of torrent to fetch torrent.
 
         :param name: the name of torrent
@@ -154,7 +151,8 @@ class DBApi(object):
         return list(self.get_torrents(qfilter))
 
     def get_torrent(self, torrent_id):
-        """
+        """Fetch torrent by id.
+
         Perform select operation using the primary key of torrent to fetch
         torrent.
 
@@ -165,7 +163,8 @@ class DBApi(object):
         return self.impl.fetch(models.Torrent, torrent_id)
 
     def fetch_or_create_torrent(self, name):
-        """
+        """Fetch or create torrent by name.
+
         Performs select operation using the name of torrent to fetch torrent,
         and if the torrent is not found, then the save (insert) operation is
         performed using the name of the torrent.
@@ -182,7 +181,8 @@ class DBApi(object):
         return _torrent
 
     def save_media(self, media):
-        """
+        """Saves media file metadata.
+
         Perform save (insert/update) operation on an instance of media.
 
         :param media: an instance of media file
@@ -192,7 +192,8 @@ class DBApi(object):
         return self.impl.save(media)
 
     def bulk_create_medias(self, medias):
-        """
+        """Saves metadata for multiple media files.
+
         Perform save (insert) operation on a list of instances of media.
 
         :param medias: a list of instances of media file
@@ -202,7 +203,8 @@ class DBApi(object):
         return list(self.impl.bulk_create(medias))
 
     def delete_media(self, media):
-        """
+        """Deletes metadata for media file.
+
         Perform delete operation on an instance of media.
 
         :param media: an instance of media file
@@ -210,7 +212,8 @@ class DBApi(object):
         self.impl.delete(media)
 
     def delete_medias(self, qfilter):
-        """
+        """Deletes metadata for multiple media files.
+
         Perform delete operation on a list of instances of media.
 
         :param qfilter: query filter to determine instances to delete
@@ -218,7 +221,8 @@ class DBApi(object):
         self.impl.delete_by(models.MediaFile, qfilter)
 
     def get_medias(self, qfilter):
-        """
+        """Retrieves metadata for multiple media files.
+
         Perform select operation on selection of media instances.
 
         :param qfilter: query filter to determine instances to fetch.
@@ -228,7 +232,8 @@ class DBApi(object):
         return self.impl.fetch_by(models.MediaFile, qfilter)
 
     def get_medias_by_torrent(self, torrent_id):
-        """
+        """Fetch all media file metadata by torrent id.
+
         Perform select operation using the primary key of torrent to fetch
         associated media.
 
@@ -241,7 +246,8 @@ class DBApi(object):
 
     def get_medias_by(self, torrent_id, file_path=None, compressed=None,
                       synced=None, missing=None, skipped=None):
-        """
+        """Retrieve media file metadata using specified criteria.
+
         Perform select operation using a combination of the provided
         parameters to find specified media.
 
@@ -275,7 +281,8 @@ class DBApi(object):
         return self.get_medias(qfilter)
 
     def get_processed_medias(self, torrent_id):
-        """
+        """Retrieve processed media files by torrent id.
+
         Performed select operation using torrent primary key and pre-defined
         criteria for what constitutes processed media.
 
@@ -292,7 +299,8 @@ class DBApi(object):
         return self.get_medias(qfilter)
 
     def get_media(self, media_id):
-        """
+        """Fetch media file metadata by id.
+
         Perform select operation using media primary key to fetch media.
 
         :param media_id: media primary key
@@ -302,8 +310,7 @@ class DBApi(object):
         return self.impl.fetch(models.MediaFile, media_id)
 
     def save_appstate(self, appstate):
-        """
-        Perform save (insert/update) operation on an instance of appstate.
+        """Perform save (insert/update) operation on an instance of appstate.
 
         :param appstate: an instance of appstate
         :return: appstate instance
@@ -312,15 +319,15 @@ class DBApi(object):
         return self.impl.save(appstate)
 
     def delete_appstate(self, appstate):
-        """
-        Perform delete operation on an instance of appstate.
+        """Perform delete operation on an instance of appstate.
 
         :param appstate: an instance of appstate
         """
         self.impl.delete(appstate)
 
     def get_appstate(self, name):
-        """
+        """Retrieve appstate by name.
+
         Perform select operation using name of appstate to fetch an instance
         of appstate.
 
@@ -331,7 +338,8 @@ class DBApi(object):
         return self.impl.fetch(models.AppState, name)
 
     def clean_up(self):
-        """
+        """Cleans up data within tables.
+
         Periodically check for data no longer needed (fully processed,
         invalid, or deleted) and then remove from the database.
         """

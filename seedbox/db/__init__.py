@@ -1,6 +1,4 @@
-"""
-Provides access to the database API for interacting with the torrent data.
-"""
+"""Provides access to database API for interacting with the torrent data."""
 import logging
 
 from oslo.config import cfg
@@ -38,8 +36,7 @@ def _get_connection(conf):
 
 
 def dbapi(conf=cfg.CONF):
-    """
-    Retrieves an instance of the configured database API.
+    """Retrieves an instance of the configured database API.
 
     :param oslo.config.cfg.ConfigOpts conf: an instance of the configuration
                                             file
@@ -55,8 +52,7 @@ def dbapi(conf=cfg.CONF):
 
 
 def list_opts():
-    """
-    Returns a list of oslo.config options available in the library.
+    """Returns a list of oslo.config options available in the library.
 
     The returned list includes all oslo.config options which may be registered
     at runtime by the library.

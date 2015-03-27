@@ -1,4 +1,5 @@
-"""
+"""Extension of subprocess.Popen
+
 Extends the subprocess.Popen class to provide logging threads for stdout and
 stderr of the child process such that it will log stdout through logging
 module to provided logger.info() and log stderr to provided logger.warn().
@@ -66,12 +67,11 @@ def _log(name, filepath, unique_id, data):
 
 
 class ProcessLogging(subprocess.Popen):
-    """
-    Run a command as a subprocess sending output to a logger.
-    """
+    """Run a command as a subprocess sending output to a logger."""
 
     def __init__(self, cmd):
-        """
+        """Initializes new instance.
+
         :param list cmd: command and options sent to subprocess to execute
         """
         self._cmd = cmd
@@ -87,9 +87,7 @@ class ProcessLogging(subprocess.Popen):
         LOG.debug('Command:  %s', ' '.join(self._cmd))
 
     def complete(self):
-        """
-        Handle all the processing of the subprocess
-        """
+        """Handle all the processing of the subprocess"""
         outdata = None
         outerr = None
 
@@ -118,8 +116,9 @@ class ProcessLogging(subprocess.Popen):
 
     @staticmethod
     def execute(cmd):
-        """
-        provide a convenience method for creating the object and
+        """Simple convenience method.
+
+        Provide a convenience method for creating the object and
         waiting for the results; very similar to check_call() but not at
         module level.
 

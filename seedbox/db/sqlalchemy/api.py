@@ -1,6 +1,4 @@
-"""
-Private database API implemented for sqlalchemy for database operations.
-"""
+"""Private database API implemented for sqlalchemy for database operations."""
 import logging
 
 from seedbox.db import base
@@ -17,7 +15,8 @@ class Connection(base.Connection):
     """SQLAlchemy connection."""
 
     def __init__(self, conf):
-        """
+        """Initialize new instance.
+
         :param conf: an instance of configuration file
         :type conf: oslo.config.cfg.ConfigOpts
         """
@@ -84,9 +83,9 @@ class Connection(base.Connection):
             yield model_util.from_db(_row)
 
     def bulk_update(self, value_map, entity_type, qfilter):
-        """
-        Perform bulk save based on filter criteria with values
-        from value map to the database.
+        """Perform bulk save.
+
+        based on filter criteria with values from value map to the database.
 
         :param dict value_map: a dict of key-value pairs representing the
                                data of an instance.

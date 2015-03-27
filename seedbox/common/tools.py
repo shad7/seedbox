@@ -1,6 +1,4 @@
-"""
-Holds a group of tools useful by all modules.
-"""
+"""Holds a group of tools useful by all modules."""
 import copy
 import itertools
 import logging
@@ -12,9 +10,9 @@ LOG = logging.getLogger(__name__)
 
 
 def verify_path(path_entry):
-    """
-    verify a path, if it exists make sure it is
-    an absolute path and return. else None
+    """Verify a path
+
+    if it exists make sure it is an absolute path and return. else None
 
     :param path_entry: path to file or directory on host
     """
@@ -28,8 +26,9 @@ def verify_path(path_entry):
 
 
 def format_file_ext(filetypes):
-    """
-    verifies that each item in the list of filetypes is a string
+    """Format file extensions
+
+    Verifies that each item in the list of filetypes is a string
     and starts with a '.'
 
     :param list filetypes: a list of extensions representing types of files
@@ -58,8 +57,7 @@ def format_file_ext(filetypes):
 
 
 def make_opt_list(opts, group):
-    """
-    Generate a list of tuple containing group, options
+    """Generate a list of tuple containing group, options
 
     :param opts: option lists associated with a group
     :type opts: list

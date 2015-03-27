@@ -1,14 +1,12 @@
-"""
-Provides database model compliant with sqlalchemy.
-"""
+"""Provides database model compliant with sqlalchemy."""
 import datetime
 import operator
 import re
 
 import six
 import sqlalchemy as sa
-from sqlalchemy import orm
 from sqlalchemy.ext import declarative
+from sqlalchemy import orm
 
 from seedbox import constants
 
@@ -21,7 +19,8 @@ VAL_TYPES = [NONE_TYPE, BOOL_TYPE, DATE_TYPE, INT_TYPE, STR_TYPE]
 
 
 def to_table_name(klass_name):
-    """
+    """Generate table name based on class name.
+
     Convention is to take camel-case class name and rewrite it to an
     underscore form, e.g. 'ClassName' to 'class_name'
 
@@ -36,9 +35,7 @@ def to_table_name(klass_name):
 
 @declarative.as_declarative()
 class Base(six.Iterator):
-    """
-    Represents a Base class mapped to table in the database.
-    """
+    """Represents a Base class mapped to table in the database."""
 
     @declarative.declared_attr
     def __tablename__(cls):
@@ -46,6 +43,7 @@ class Base(six.Iterator):
 
     def save(self, session):
         """Save this object.
+
         :param session: a database connection session
         """
         with session.begin(subtransactions=True):
@@ -67,8 +65,7 @@ class Base(six.Iterator):
         return getattr(self, key)
 
     def get(self, key, default=None):
-        """
-        Retrieve value for an attribute in the table.
+        """Retrieve value for an attribute in the table.
 
         :param key: name of field/attribute
         :param default: default value if not found
@@ -85,8 +82,7 @@ class Base(six.Iterator):
         return n, getattr(self, n)
 
     def next(self):
-        """
-        Using an iterator to get next attribute value from generator
+        """Using an iterator to get next attribute value from generator
 
         :return: attribute, attribute value
         :rtype: tuple
@@ -102,8 +98,7 @@ class Base(six.Iterator):
             setattr(self, k, v)
 
     def iteritems(self):
-        """
-        an iterator over dictionary items
+        """an iterator over dictionary items
 
         :return: dictionary items
         :rtype: iterator
@@ -116,24 +111,18 @@ class Base(six.Iterator):
 
 
 class HasId(object):
-    """
-    Table mixin providing a class/table id attribute
-    """
+    """Table mixin providing a class/table id attribute"""
     id = sa.Column(sa.Integer, primary_key=True)
 
 
 class HasTimestamp(object):
-    """
-    Table mixin providing a class/table date attributes
-    """
+    """Table mixin providing a class/table date attributes"""
     created_at = sa.Column(sa.DateTime, default=datetime.datetime.utcnow)
     updated_at = sa.Column(sa.DateTime, onupdate=datetime.datetime.utcnow)
 
 
 class Torrent(Base, HasId, HasTimestamp):
-    """
-    Class representing a torrent in the database
-    """
+    """Class representing a torrent in the database"""
 
     __table_args__ = {
         'sqlite_autoincrement':  True,
@@ -151,9 +140,7 @@ class Torrent(Base, HasId, HasTimestamp):
 
 
 class MediaFile(Base, HasId):
-    """
-    Class representing a media file in the database
-    """
+    """Class representing a media file in the database"""
 
     __table_args__ = {
         'sqlite_autoincrement':  True,
@@ -173,9 +160,7 @@ class MediaFile(Base, HasId):
 
 
 class AppState(Base):
-
-    """
-    Class representing an app state in the database
+    """Class representing an app state in the database
 
     :param id: primary key of app state (alias for name)
     :type id: string
@@ -203,8 +188,7 @@ class AppState(Base):
         return self.get(key)
 
     def get(self, key, default=None):
-        """
-        Overrides base class get method to handle primary key of app state
+        """Overrides base class get method to handle primary key of app state
 
         :param key: id/name of app state
         :param default: default value if not found
@@ -227,8 +211,7 @@ class AppState(Base):
             self[k] = v
 
     def get_value(self):
-        """
-        Retrieve the value of an instance of AppState
+        """Retrieve the value of an instance of AppState
 
         :return: value of app state
         :rtype: varies
@@ -245,9 +228,7 @@ class AppState(Base):
         return None
 
     def set_value(self, value):
-
-        """
-        Sets the value of an instance of AppState
+        """Sets the value of an instance of AppState
 
         :param value: the value of an app state instance
         :raise TypeError: if value type does not map to supported type
@@ -291,9 +272,7 @@ class AppState(Base):
                     dtype, VAL_TYPES))
 
     def reset_value(self):
-        """
-        Resets the value associated with AppState to empty
-        """
+        """Resets the value associated with AppState to empty"""
         self.t_int = None
         self.t_bool = None
         self.t_datetime = None
@@ -305,8 +284,7 @@ class AppState(Base):
 
 
 def verify_tables(engine):
-    """
-    Creates all the defined tables within the database
+    """Creates all the defined tables within the database
 
     :param engine: database engine instance
     """
@@ -314,8 +292,7 @@ def verify_tables(engine):
 
 
 def purge_all_tables(engine):
-    """
-    Drops all the defined tables within the database
+    """Drops all the defined tables within the database
 
     :param engine: database engine instance
     """
@@ -323,8 +300,8 @@ def purge_all_tables(engine):
 
 
 class QueryTransformer(object):
+    """Generates query based on formatted filter.
 
-    """
     Provides the ability to transform a query filter into database query in
     the sqlalchemy compliant manner.
 
@@ -377,8 +354,7 @@ class QueryTransformer(object):
             return self._handle_simple_op(op, nodes)
 
     def apply_filter(self, expression_tree):
-        """
-        Uses the filter to update the query
+        """Uses the filter to update the query
 
         :param expression_tree: query filter to apply
         :return: database query

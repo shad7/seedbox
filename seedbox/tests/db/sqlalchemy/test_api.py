@@ -1,7 +1,8 @@
 from __future__ import print_function
+
 from seedbox.db import models as api_model
-from seedbox.db.sqlalchemy import models as db_model
 from seedbox.db.sqlalchemy import api
+from seedbox.db.sqlalchemy import models as db_model
 from seedbox.tests import test
 
 
@@ -21,7 +22,7 @@ class SAApiTestCase(test.ConfiguredBaseTestCase):
         try:
             self.dbconn.upgrade()
             self.assertTrue(True)
-        except:
+        except Exception:
             self.assertTrue(False)
 
     def test_clear(self):

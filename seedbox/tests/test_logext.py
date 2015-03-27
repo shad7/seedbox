@@ -1,8 +1,8 @@
 import logging
 import os
 
-from seedbox.tests import test
 from seedbox import logext
+from seedbox.tests import test
 
 
 class LogextTest(test.ConfiguredBaseTestCase):

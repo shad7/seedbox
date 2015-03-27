@@ -1,6 +1,4 @@
-"""
-Manages connection to the database via sqlalchemy
-"""
+"""Manages connection to the database via sqlalchemy"""
 import logging
 
 import sqlalchemy as sa
@@ -12,8 +10,7 @@ LOG = logging.getLogger(__name__)
 
 
 def receive_connect(dbapi_con, con_record):
-    """
-    Ensures that the foreign key constraints are enforced in SQLite.
+    """Ensures that the foreign key constraints are enforced in SQLite.
 
     The foreign key constraints are disabled by default in SQLite,
     so the foreign key constraints will be enabled here for every
@@ -66,9 +63,9 @@ def get_maker(engine):
 
 
 class EngineFacade(object):
-    """
-    A helper class that creates engine and sessionmaker
-    on its instantiation and provides get_engine()/get_session() methods.
+    """Helper class that creates engine and sessionmaker.
+
+    Performs instantiation and provides get_engine()/get_session() methods.
 
     engine/sessionmaker instances will be global.
 
@@ -119,7 +116,6 @@ class EngineFacade(object):
 
         :param connection_string: SQLAlchemy connection string
         :type connection_string: string
-
         :param conf: oslo.config config instance
         :type conf: oslo.config.cfg.ConfigOpts
 

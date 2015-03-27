@@ -1,21 +1,13 @@
 from __future__ import absolute_import
 import os
 
-from seedbox.tests import test
-# now include what we need to test
 from seedbox.common import tools
+from seedbox.tests import test
 
 
 class ToolsTest(test.BaseTestCase):
-    """
-    create a test case for each tool within tools to verify it works
-    as expected.
-    """
 
     def test_verify_path(self):
-        """
-        make sure it is able to verify all different path types properly
-        """
         self.assertIsNotNone(tools.verify_path(os.getcwd()))
         self.assertIsNotNone(tools.verify_path(os.path.expanduser('~')))
         self.assertIsNotNone(tools.verify_path('.'))
@@ -28,10 +20,6 @@ class ToolsTest(test.BaseTestCase):
                                            'junk-tmp-simple-duh.txt')))
 
     def test_format_file_ext(self):
-        """
-        make sure it is able to process the different types of
-        extension lists properly
-        """
         self.assertIsInstance(tools.format_file_ext([]), list)
         self.assertEqual(len(tools.format_file_ext([])), 0)
         self.assertIsInstance(tools.format_file_ext(''), list)
