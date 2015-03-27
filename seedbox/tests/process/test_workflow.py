@@ -1,7 +1,7 @@
 from seedbox import db
 from seedbox.db import models
-from seedbox.tests import test
 from seedbox.process import workflow
+from seedbox.tests import test
 
 
 class WorkflowTestCase(test.ConfiguredBaseTestCase):

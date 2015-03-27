@@ -1,4 +1,5 @@
-"""
+"""Logging configuration
+
 Configures logging module for the entire application, setting default log
 levels for library code.
 """
@@ -15,27 +16,14 @@ if hasattr(logging, 'NullHandler'):
 else:
     # NullHandler added in Python 2.7
     class NullHandler(logging.Handler):
-        """
-        Copied from Python 2.7 logging module
-        """
+        """Copied from Python 2.7 logging module"""
         def handle(self, record):
-            """
-            @see logging module
-            :param record:
-            """
             pass
 
         def emit(self, record):
-            """
-            @see logging module
-            :param record:
-            """
             pass
 
         def createLock(self):
-            """
-            @see logging module
-            """
             self.lock = None
 
 DEFAULT_LOG_FILENAME = 'seedbox.log'
@@ -78,9 +66,7 @@ DEFAULT_LIBRARY_LOG_LEVEL = {'xworkflows': logging.ERROR,
 
 
 def configure():
-    """
-    configure all logging for this execution
-    """
+    """configure all logging for this execution"""
 
     if cfg.CONF.logconfig and os.path.exists(cfg.CONF.logconfig):
         logging.config.fileConfig(cfg.CONF.logconfig,

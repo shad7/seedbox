@@ -1,7 +1,7 @@
 from seedbox import db
 from seedbox.db import models
-from seedbox.tests import test
 from seedbox.process import flow
+from seedbox.tests import test
 
 
 class FlowTestCase(test.ConfiguredBaseTestCase):

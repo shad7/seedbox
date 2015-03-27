@@ -1,6 +1,4 @@
-"""
-Manages the execution of tasks using parallel processes.
-"""
+"""Manages the execution of tasks using parallel processes."""
 import logging
 
 import concurrent.futures as conc_futures
@@ -19,10 +17,9 @@ CONF.register_opts(OPTS, 'process')
 
 
 class TaskManager(object):
+    """Creates a pool of processes
 
-    """
-    Creates a pool of processes and executes the supplied tasks using the
-    process pool.
+    Executes the supplied tasks using the process pool.
     """
 
     def __init__(self):
@@ -31,8 +28,7 @@ class TaskManager(object):
         self.tasks = []
 
     def add_tasks(self, tasks):
-        """
-        Adds tasks to list of tasks to be executed.
+        """Adds tasks to list of tasks to be executed.
 
         :param tasks: a task or list of tasks to add to the list of tasks to
                       execute
@@ -43,9 +39,7 @@ class TaskManager(object):
             self.tasks.append(tasks)
 
     def run(self):
-
-        """
-        Executes the list of tasks.
+        """Executes the list of tasks.
 
         :return: the result/output from each tasks
         :rtype: list
@@ -60,7 +54,5 @@ class TaskManager(object):
         return results
 
     def shutdown(self):
-        """
-        Shuts down the process pool to free up resources.
-        """
+        """Shuts down the process pool to free up resources."""
         self.executor.shutdown()

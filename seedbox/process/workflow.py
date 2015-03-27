@@ -1,6 +1,6 @@
-"""
-Workflow implementation that handles automatic execution of each workflow
-step until the workflow reaches completion.
+"""Workflow implementation that handles automatic execution.
+
+Continues to process each step until the workflow reaches completion.
 
 ::
 
@@ -20,9 +20,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Workflow(flow.BaseFlow):
-    """
-    Wrapper class around Flow that handles the orchestration of the process
-    """
+    """Implementation that handles the orchestration of the process"""
 
     def run(self):
         """Orchestrate each step of the process based on current state"""

@@ -17,8 +17,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-"""
-Encodes and Decodes messages (http://en.wikipedia.org/wiki/Bencode)
+"""Encodes and Decodes messages (http://en.wikipedia.org/wiki/Bencode)
+
 updated to support Python 3
 """
 import sys
@@ -41,15 +41,12 @@ if bytes == str:
 
 
 class BTFailure(Exception):
-    """
-    Represents any torrent failure
-    """
+    """Represents any torrent failure"""
     pass
 
 
 def bytes_index(s, pattern, start):
-    """
-    Returns the index of pattern within string starting at position start.
+    """Returns the index of pattern within string starting at position start.
 
     :param s: byte string to search for pattern
     :type s: str
@@ -71,7 +68,8 @@ def bytes_index(s, pattern, start):
 
 
 def ord_(s):
-    """
+    """Character to integer mapping.
+
     Given a string representing one Unicode character, return an integer
     representing the Unicode code point of that character.
 
@@ -86,7 +84,8 @@ def ord_(s):
 
 
 def chr_(s):
-    """
+    """Integer to character to mapping.
+
     Return the string representing a character whose Unicode code point is
     the integer i.
 
@@ -155,8 +154,7 @@ decode_func = {
 
 
 def bdecode(x):
-    """
-    Public method for decoding a message
+    """Public method for decoding a message
 
     :param x: message to decode
     :return: decoded message
@@ -174,9 +172,7 @@ def bdecode(x):
 
 
 class Bencached(object):
-    """
-    Cached bencode class
-    """
+    """Cached bencode class"""
 
     __slots__ = ['bencoded']
 
@@ -237,8 +233,7 @@ encode_func = {
 
 
 def bencode(x):
-    """
-    Public method for encoding message
+    """Public method for encoding message
 
     :param x: message
     :return: encoded string

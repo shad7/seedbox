@@ -1,12 +1,13 @@
-"""
+"""Process flow
+
 The core process flow for managing the syncing of torrents to remote location.
 """
 import logging
 
-from seedbox import torrent
 from seedbox import db
 from seedbox.process import manager
 from seedbox.process import workflow
+from seedbox import torrent
 
 LOG = logging.getLogger(__name__)
 
@@ -33,9 +34,7 @@ def _get_work(dbapi):
 
 
 def start():
-    """
-    The primary entry point for the process
-    """
+    """The primary entry point for the process"""
     dbapi = db.dbapi()
     mgr = manager.TaskManager()
     flows = []
@@ -76,8 +75,7 @@ def start():
 
 
 def list_opts():
-    """
-    Returns a list of oslo.config options available in the library.
+    """Returns a list of oslo.config options available in the library.
 
     The returned list includes all oslo.config options which may be registered
     at runtime by the library.

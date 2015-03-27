@@ -10,7 +10,8 @@ LOG = logging.getLogger(__name__)
 
 
 def from_db(db_item):
-    """
+    """Database to Model
+
     Handles the conversion from the database model object to the
     corresponding public facing api model object. If an item has
     a reference to another model object then the call is recursive.
@@ -55,7 +56,8 @@ def from_db(db_item):
 
 
 def to_db(api_item, db_item=None):
-    """
+    """Model to database
+
     Handles the conversion from the api model object to the
     corresponding database model object. If an item has
     a reference to another model object then the call is recursive.

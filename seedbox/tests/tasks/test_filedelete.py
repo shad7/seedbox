@@ -1,8 +1,8 @@
 import os
 
 from seedbox.db import models
-from seedbox.tests import test
 from seedbox.tasks import filedelete
+from seedbox.tests import test
 
 
 class FileDeleteTest(test.ConfiguredBaseTestCase):

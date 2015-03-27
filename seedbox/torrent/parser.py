@@ -1,5 +1,6 @@
-"""
-Parses a torrent file and provides method to access the following attributes.
+"""Parses a torrent file.
+
+Provides method to access the following attributes.
     * Tracker URL
     * Creation date
     * Client name, if any
@@ -35,7 +36,9 @@ def _is_int(val):
 
 
 class ParsingError(Exception):
-    """ Error class representing errors that occur while parsing
+    """Holds parsing error messages.
+
+    Error class representing errors that occur while parsing
     the torrent content.
     """
     def __init__(self, error_msg):
@@ -47,9 +50,9 @@ class ParsingError(Exception):
 
 
 class TorrentParser(object):
-    """
-    Parses a torrent file and returns various properties based on the
-    content of the torrent file.
+    """Parses a torrent file.
+
+    returns various properties based on the content of the torrent file.
 
     .. note::
         bencode is supremely more efficient parser of torrents but extremely
@@ -72,7 +75,7 @@ class TorrentParser(object):
     INT_START = 'i'
 
     class _TorrentStr(object):
-        """ StringIO wrapper over the torrent string.
+        """StringIO wrapper over the torrent string.
 
             TODO:
                 . Create unittests to cover this class.
@@ -87,8 +90,8 @@ class TorrentParser(object):
             self.curr_char = None
 
         def next_char(self):
-            """
-            to provide 2 ways of accessing the current parsed char -
+            """to provide 2 ways of accessing the current parsed char -
+
                 1. as return value,
                 2. as self.curr_char (useful in some circumstances)
             """
@@ -96,8 +99,9 @@ class TorrentParser(object):
             return self.curr_char
 
         def step_back(self, position=-1, mode=1):
-            """ Step back, by default, 1 position relative to the
-            current position.
+            """Step back
+
+            by default, 1 position relative to the current position.
 
             :param position: offset from current position
             :param mode: current position
@@ -105,7 +109,8 @@ class TorrentParser(object):
             self.torr_str.seek(position, mode)
 
         def parse_str(self):
-            """ Parse and return a string from the torrent file content.
+            """Parse and return a string from the torrent file content.
+
             Format <string length>:<string>
 
                 Returns:
@@ -127,7 +132,8 @@ class TorrentParser(object):
             return self.torr_str.read(str_len)
 
         def parse_int(self):
-            """ Parse and return an integer from the torrent file content.
+            """Parse and return an integer from the torrent file content.
+
             Format i[0-9]+e
 
                 Returns:
@@ -154,9 +160,10 @@ class TorrentParser(object):
             return self._parse_number(delimiter=self.INT_END)
 
         def _parse_number(self, delimiter):
-            """
-            Parses a sequence of digits representing either an integer or
-            string length and returns the number.
+            """Parses a sequence of digits
+
+            representing either an integer or string length and
+            returns the number.
             """
             parsed_int = ''
             while True:
@@ -175,8 +182,7 @@ class TorrentParser(object):
             return int(parsed_int)
 
     def __init__(self, torrent_file_path):
-        """
-        Reads the torrent file and sets the content as an object attribute.
+        """Reads the torrent file and sets the content as an object attribute.
 
         .. todo::
 
@@ -191,7 +197,7 @@ class TorrentParser(object):
             raise ValueError('Path of the torrent file not provided')
 
         if not os.path.exists(torrent_file_path):
-            raise IOError('No file found at %s'.format(torrent_file_path))
+            raise IOError('No file found at {}'.format(torrent_file_path))
 
         with io.open(file=torrent_file_path, mode='rb') as handle:
             self.torrent_content = handle.read()
@@ -208,14 +214,13 @@ class TorrentParser(object):
         try:
             self.parsed_content = bencode.bdecode(self.torrent_content)
         except bencode.BTFailure as bterr:
-            LOG.info('bencode.bdecode failed: ({0});'
-                     'trying alternate approach'.format(bterr))
+            LOG.info('bencode.bdecode failed: (%s); trying alternate approach',
+                     bterr)
             self.torrent_str = self._TorrentStr(self.torrent_content)
             self.parsed_content = self._parse_torrent()
 
     def get_tracker_url(self):
-        """
-        Retrieves tracker URL from the parsed torrent file
+        """Retrieves tracker URL from the parsed torrent file
 
         :returns:   tracker URL from parsed torrent file
         :rtype:     str
@@ -223,9 +228,9 @@ class TorrentParser(object):
         return self.parsed_content.get(b'announce')
 
     def get_creation_date(self, time_format='iso'):
-        """
-        Retrieves creation date of the torrent, if present, in ISO
-        time_format from the parsed torrent file.
+        """Retrieves creation date of the torrent
+
+        if present, in ISO time_format from the parsed torrent file.
 
         :param str time_format: determines the time_format of the time value
                                 returned. ['iso', 'datetime'] defaults: 'iso'
@@ -242,9 +247,9 @@ class TorrentParser(object):
                 return time_stamp
 
     def get_client_name(self):
-        """
-        Returns the name of the client that created the torrent if present,
-        from the parsed torrent file.
+        """Returns the name of the client.
+
+        that created the torrent if present, from the parsed torrent file.
 
         :returns:   name of the client that created the torrent
         :rtype:     str
@@ -252,9 +257,9 @@ class TorrentParser(object):
         return self.parsed_content.get(b'created by')
 
     def get_files_details(self):
-        """
-        Parses torrent file and returns details of the files contained
-        in the torrent.
+        """Parses torrent file.
+
+        returns details of the files contained in the torrent.
 
         File details tuple:
             * name
@@ -269,14 +274,14 @@ class TorrentParser(object):
         # 'info' should be present in all torrent files. Nevertheless..
         if files_info:
             multiple_files_info = files_info.get(b'files')
-            LOG.debug('files: |{0}|'.format(multiple_files_info))
+            LOG.debug('files: |%s|', multiple_files_info)
             if multiple_files_info:  # multiple-file torrent
                 # the name attribute was holding the directory name that each
                 # of the multiple files were contained within.
                 dir_name = files_info.get(b'name').decode('utf-8')
-                LOG.debug('dirname: |{0}|'.format(dir_name))
+                LOG.debug('dirname: |%s|', dir_name)
                 for file_info in multiple_files_info:
-                    LOG.debug('file_info: |{0}|'.format(file_info))
+                    LOG.debug('file_info: |%s|', file_info)
                     # simply append the directory to the concatenated list
                     # of items under path, mostly it is a single item.
                     parsed_files_info.append(
@@ -293,8 +298,7 @@ class TorrentParser(object):
         return parsed_files_info
 
     def _parse_torrent(self):
-        """
-        Parse the torrent content in bencode format into python data format.
+        """Parse the torrent content in bencode format into python data format.
 
             Returns:
                 A dictionary containing info parsed from torrent file.

@@ -1,9 +1,7 @@
-"""
-Test cases for generating sample configs
-"""
+"""Test cases for generating sample configs"""
 
-from seedbox import options
 from seedbox import db
+from seedbox import options
 from seedbox import process
 from seedbox import tasks
 from seedbox.tests import test

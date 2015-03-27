@@ -1,6 +1,3 @@
-"""
-seedbox package
-"""
 from oslo.config import cfg
 
 OPTS = [
@@ -29,7 +26,8 @@ cfg.CONF.register_opts(OPTS, group='torrent')
 
 
 def load():
-    """
+    """Loads torrents.
+
     Simple wrapper to provide parsing and loading torrents into a
     database cache.
     """
@@ -38,8 +36,7 @@ def load():
 
 
 def list_opts():
-    """
-    Returns a list of oslo.config options available in the library.
+    """Returns a list of oslo.config options available in the library.
 
     The returned list includes all oslo.config options which may be registered
     at runtime by the library.

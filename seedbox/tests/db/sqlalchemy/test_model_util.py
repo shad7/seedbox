@@ -1,6 +1,6 @@
 from seedbox.db import models as api_model
-from seedbox.db.sqlalchemy import models as db_model
 from seedbox.db.sqlalchemy import model_util
+from seedbox.db.sqlalchemy import models as db_model
 from seedbox.db.sqlalchemy import session
 from seedbox.tests import test
 
