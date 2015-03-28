@@ -63,7 +63,8 @@ Running SeedboxManager from crontab::
 
 Starting Admin UI and REST API::
 
-    dbadmin sqlite:////home/USER/.seedbox/torrent.db >> /home/USER/seedbox/etc/seedbox/admin.log 2>&1
+    dbadmin passwd --password <your_password>
+    dbadmin run sqlite:////home/USER/.seedbox/torrent.db >> /home/USER/seedbox/etc/seedbox/admin.log 2>&1
 
 
 General Information
