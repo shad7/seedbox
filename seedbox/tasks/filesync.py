@@ -5,7 +5,7 @@ Performs rsync of a file to a specified location.
 import logging
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from seedbox.tasks import base
 from seedbox.tasks import subprocessext

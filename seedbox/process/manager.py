@@ -2,7 +2,7 @@
 import logging
 
 import concurrent.futures as conc_futures
-from oslo.config import cfg
+from oslo_config import cfg
 
 LOG = logging.getLogger(__name__)
 

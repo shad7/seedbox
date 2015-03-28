@@ -7,7 +7,7 @@ import logging
 import os
 
 import click
-from oslo.config import cfg
+from oslo_config import cfg
 from passlib.hash import sha256_crypt
 import sandman
 from sandman import model

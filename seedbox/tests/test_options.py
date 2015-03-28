@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import os
 
 import fixtures
-from oslo.config import cfg
+from oslo_config import cfg
 
 from seedbox import options
 from seedbox.tests import test

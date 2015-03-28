@@ -3,7 +3,7 @@ import logging
 import os
 import shutil
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from seedbox.tasks import base
 

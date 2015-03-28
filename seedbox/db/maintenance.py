@@ -13,7 +13,7 @@ MAX_BACKUP_COUNT = 8
 def backup(conf):
     """create a backup copy of the database file.
 
-    :param oslo.config.cfg.ConfigOpts conf: an instance of configuration
+    :param oslo_config.cfg.ConfigOpts conf: an instance of configuration
     """
 
     LOG.debug('starting database backup process')

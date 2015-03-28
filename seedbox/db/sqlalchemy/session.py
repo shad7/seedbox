@@ -112,12 +112,12 @@ class EngineFacade(object):
 
     @classmethod
     def from_config(cls, connection_string, conf):
-        """Initialize EngineFacade using oslo.config config instance options.
+        """Initialize EngineFacade using oslo_config config instance options.
 
         :param connection_string: SQLAlchemy connection string
         :type connection_string: string
-        :param conf: oslo.config config instance
-        :type conf: oslo.config.cfg.ConfigOpts
+        :param conf: oslo_config config instance
+        :type conf: oslo_config.cfg.ConfigOpts
 
         """
         LOG.debug('making connection using connect string: %s',

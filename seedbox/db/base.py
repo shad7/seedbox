@@ -12,7 +12,7 @@ class Connection(object):
         """Initializes new instance.
 
         :param conf: an instance of configuration file
-        :type conf: oslo.config.cfg.ConfigOpts
+        :type conf: oslo_config.cfg.ConfigOpts
         """
         self.conf = conf
 

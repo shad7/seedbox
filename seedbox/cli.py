@@ -11,7 +11,7 @@ import sys
 
 import lockfile
 from lockfile import pidlockfile
-from oslo.config import cfg
+from oslo_config import cfg
 
 from seedbox import db
 from seedbox import logext as logmgr

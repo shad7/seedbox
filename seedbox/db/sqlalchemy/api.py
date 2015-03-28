@@ -18,7 +18,7 @@ class Connection(base.Connection):
         """Initialize new instance.
 
         :param conf: an instance of configuration file
-        :type conf: oslo.config.cfg.ConfigOpts
+        :type conf: oslo_config.cfg.ConfigOpts
         """
         super(Connection, self).__init__(conf)
         self._engine_facade = db_session.EngineFacade.from_config(

@@ -5,7 +5,7 @@ For decompressing archived files to specified location.
 import logging
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 import rarfile
 
 from seedbox.tasks import base

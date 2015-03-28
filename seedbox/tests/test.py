@@ -19,7 +19,7 @@ import os
 import shutil
 import tempfile
 
-from oslo.config import fixture as config
+from oslo_config import fixture as config
 from oslotest import base
 
 

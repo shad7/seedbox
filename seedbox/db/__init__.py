@@ -1,7 +1,7 @@
 """Provides access to database API for interacting with the torrent data."""
 import logging
 
-from oslo.config import cfg
+from oslo_config import cfg
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
 
@@ -38,7 +38,7 @@ def _get_connection(conf):
 def dbapi(conf=cfg.CONF):
     """Retrieves an instance of the configured database API.
 
-    :param oslo.config.cfg.ConfigOpts conf: an instance of the configuration
+    :param oslo_config.cfg.ConfigOpts conf: an instance of the configuration
                                             file
     :return: database API instance
     :rtype: :class:`~seedbox.db.api.DBApi`
@@ -52,9 +52,9 @@ def dbapi(conf=cfg.CONF):
 
 
 def list_opts():
-    """Returns a list of oslo.config options available in the library.
+    """Returns a list of oslo_config options available in the library.
 
-    The returned list includes all oslo.config options which may be registered
+    The returned list includes all oslo_config options which may be registered
     at runtime by the library.
 
     Each element of the list is a tuple. The first element is the name of the

@@ -5,7 +5,7 @@ plugins for each and updating the db cache after each step.
 """
 import logging
 
-from oslo.config import cfg
+from oslo_config import cfg
 from stevedore import named
 import xworkflows
 

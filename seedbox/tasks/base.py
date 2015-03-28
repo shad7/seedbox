@@ -7,7 +7,7 @@ import logging
 import os
 import traceback
 
-from oslo.config import cfg
+from oslo_config import cfg
 import six
 
 from seedbox.common import timeutil

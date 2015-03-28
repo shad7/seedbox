@@ -7,7 +7,7 @@ import glob
 import logging
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from seedbox.common import tools
 from seedbox import constants

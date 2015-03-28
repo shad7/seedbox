@@ -2,7 +2,7 @@ pbr
 twine
 
 futures
-oslo.config
+oslo.config>=1.9.0
 lockfile
 rarfile>=2.6
 six>=1.4.1
