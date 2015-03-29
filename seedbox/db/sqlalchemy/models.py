@@ -155,7 +155,7 @@ class MediaFile(Base, HasId):
     missing = sa.Column(sa.Boolean, default=False)
     skipped = sa.Column(sa.Boolean, default=False)
     error_msg = sa.Column(sa.String(500), default=None)
-    total_time = sa.Column(sa.Integer, default=0)
+    total_time = sa.Column(sa.Float, default=0)
     torrent_id = sa.Column(sa.Integer, sa.ForeignKey('torrents.id'))
 
 
