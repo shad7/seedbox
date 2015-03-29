@@ -1,11 +1,11 @@
-"""
-Provides the definition of workflow (steps and transition),
-and implementation what happens during each step by binding in the provided
+"""Provides the definition of workflow (steps and transition).
+
+Implements what happens during each step by binding in the provided
 plugins for each and updating the db cache after each step.
 """
 import logging
 
-from oslo.config import cfg
+from oslo_config import cfg
 from stevedore import named
 import xworkflows
 
@@ -35,9 +35,7 @@ ForbiddenTransition = xworkflows.ForbiddenTransition
 
 
 class Taskflow(xworkflows.Workflow):
-    """
-    Define the workflow conditions for managing torrents;
-    """
+    """Define the workflow conditions for managing torrents;"""
     states = (
         (constants.INIT, u'Initial state'),
         (constants.READY, u'Ready'),
@@ -57,11 +55,10 @@ class Taskflow(xworkflows.Workflow):
 
 
 class BaseFlow(xworkflows.WorkflowEnabled):
+    """Provides the base workflow implementation.
 
-    """
-    Provides the base workflow implementation on binding plugin tasks to each
-    step and determining which plugin is capable of operating on the media
-    files of the specified torrent.
+    On binding plugin tasks to each step and determining which plugin
+    is capable of operating on the media files of the specified torrent.
 
     :param torrent: an instance of a parsed torrent metadata
     :type torrent: :class:`~seedbox.db.models.Torrent`
@@ -81,8 +78,9 @@ class BaseFlow(xworkflows.WorkflowEnabled):
 
     @property
     def tasks(self):
-        """
-        Property for accessing the tasks associated with current workflow step
+        """Property for accessing the tasks
+
+        Using the context of the current workflow step
         by looking up the configured plugins.
 
         :return: list of tasks (:class:`~seedbox.tasks.base.BaseTask`)
@@ -92,8 +90,7 @@ class BaseFlow(xworkflows.WorkflowEnabled):
 
     @property
     def phase(self):
-        """
-        The name of current step/phase of the workflow
+        """The name of current step/phase of the workflow
 
         :return: name of current phase
         :rtype: string
@@ -101,8 +98,7 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         return list(Taskflow.transitions.available_from(self.state))[0].name
 
     def is_done(self):
-        """
-        Checks if the current state of workflow is either done or cancelled.
+        """Checks if the current state of workflow is either done or cancelled.
 
         :return: flag indicating workflow is done
         :rtype: boolean
@@ -110,8 +106,7 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         return self.state.is_done or self.state.is_cancelled
 
     def next_tasks(self):
-        """
-        Find the list of tasks and associated media eligible for processing.
+        """Find the list of tasks and associated media eligible for processing.
 
         :return: list of tasks
         :rtype: generator
@@ -129,8 +124,7 @@ class BaseFlow(xworkflows.WorkflowEnabled):
 
     @xworkflows.on_enter_state()
     def update_state(self, *args, **kwargs):
-        """
-        Handles the capturing the current state of processing
+        """Handles the capturing the current state of processing
 
         :param args: required parameter based on decorator (unused)
         :param kwargs: required parameter based on decorator (unused)
@@ -138,13 +132,11 @@ class BaseFlow(xworkflows.WorkflowEnabled):
         self.torrent = self.dbapi.get_torrent(self.torrent.torrent_id)
         self.torrent.state = self.state.name
         self.torrent = self.dbapi.save_torrent(self.torrent)
-        LOG.debug('torrent: %s' % self.torrent)
+        LOG.debug('torrent: %s', self.torrent)
 
     @xworkflows.transition_check()
     def validate(self):
-        """
-        Validate that the transition should proceed or not
-        """
+        """Validate that the transition should proceed or not"""
         LOG.debug('state: %s phase: %s torrent: %s',
                   self.state.name, self.phase, self.torrent)
 
@@ -162,29 +154,22 @@ class BaseFlow(xworkflows.WorkflowEnabled):
 
     @xworkflows.transition()
     def prepare(self):
-        """
-        Executes all the tasks for a torrent at prepare phase
-        """
+        """Executes all the tasks for a torrent at prepare phase"""
         LOG.debug('executing prepare phase')
 
     @xworkflows.transition()
     def activate(self):
-        """
-        Executes all the tasks for a torrent at activate phase
-        """
+        """Executes all the tasks for a torrent at activate phase"""
         LOG.debug('executing activate phase')
 
     @xworkflows.transition()
     def complete(self):
-        """
-        Executes all the tasks for a torrent at complete phase
-        """
+        """Executes all the tasks for a torrent at complete phase"""
         LOG.debug('executing complete phase')
 
 
 def get_tasks(phase):
-    """
-    Gets a list of tasks based the current phase of processing
+    """Gets a list of tasks based the current phase of processing
 
     :param phase: the name of the current phase/step of workflow
     """

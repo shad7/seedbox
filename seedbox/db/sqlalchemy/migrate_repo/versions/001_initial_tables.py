@@ -1,6 +1,6 @@
-"""
-Initial version of the database model; maintained to support anyone upgrading
-from a previous version.
+"""Initial version of the database model;
+
+maintained to support anyone upgrading from a previous version.
 """
 from datetime import datetime
 
@@ -10,8 +10,7 @@ STATES = ['init', 'ready', 'active', 'done', 'cancelled']
 
 
 def upgrade(migrate_engine):
-    """
-    Creates the initial version of the database tables.
+    """Creates the initial version of the database tables.
 
     :param migrate_engine: an instance of database connection engine
     """
@@ -57,8 +56,7 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
-    """
-    Not implemented because this is associated with initial version.
+    """Not implemented because this is associated with initial version.
 
     :param migrate_engine: an instance of database connection engine
     :raise NotImplementedError: if method executed

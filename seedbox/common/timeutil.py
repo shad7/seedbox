@@ -13,9 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""
-Time related utilities and helper functions.
-"""
+"""Time related utilities and helper functions."""
 
 import functools
 import logging
@@ -24,7 +22,8 @@ import datetime
 
 
 class AfterDelta(object):
-    """
+    """Decorator for controlling execution after period of time.
+
     .. py:decorator:: AfterDelta
         A decorator that has state and handles checking if period of time
         (delta) has passed before executing the function. That way if you
@@ -40,8 +39,7 @@ class AfterDelta(object):
         self.before = None
 
     def get_delta(self):
-        """
-        Retrieves the delta (period of time to wait between executions)
+        """Retrieves the delta (period of time to wait between executions)
 
         .. note::
             To change the delta simply subclass and override
@@ -68,7 +66,8 @@ class AfterDelta(object):
 
 
 def timed(method=None, logger=None, loglvl=None):
-    """
+    """Decorator for timing method or function.
+
     .. py:decorator:: timed(logger, loglvl)
         A decorator that times the execution of a method/function and logs
         using the supplied logger at the specified loglevel.
@@ -101,8 +100,8 @@ def timed(method=None, logger=None, loglvl=None):
     # like method name or doc.
     @functools.wraps(method)
     def timer(*args, **kwargs):
-        """
-        Logs the execution time of the specified method.
+        """Logs the execution time of the specified method.
+
         :param args: the positional inputs to the method being timed
         :param kwargs: the key-value inputs to the method being timed
         :return: output of method being timed
@@ -119,9 +118,9 @@ def timed(method=None, logger=None, loglvl=None):
 
 
 def nvl_date(dt, default=None):
-    """
-    Determines if the provided date, time, or datetime has a value, and returns
-    the provided value back or the value of default (current time)
+    """Determines if the provided date, time, or datetime has a value.
+
+    Returns the provided value back or the value of default (current time)
 
     :param dt: an instance of a date, time, or datetime
     :param default: value to return if provided dt has no value
@@ -133,7 +132,8 @@ def nvl_date(dt, default=None):
 
 
 def utcnow():
-    """
+    """Gets current time.
+
     :returns:   current time from utc
     :rtype:     datetime
     """
@@ -141,8 +141,7 @@ def utcnow():
 
 
 def time_delta_seconds(seconds):
-    """
-    Retrieves a timedelta
+    """Retrieves a timedelta
 
     :param int seconds: delta of seconds
     :returns:   timedelta by seconds
@@ -152,8 +151,7 @@ def time_delta_seconds(seconds):
 
 
 def advance_time_delta(dt, timedelta):
-    """
-    Advances a datetime by a datetime.timedelta
+    """Advances a datetime by a datetime.timedelta
 
     :param datetime dt: a specified date time
     :param datetime.timedelta timedelta:    time offset (delta)
@@ -164,8 +162,7 @@ def advance_time_delta(dt, timedelta):
 
 
 def advance_time_seconds(dt, seconds):
-    """
-    Advances a datetime by a seconds
+    """Advances a datetime by a seconds
 
     :param datetime dt: a specified date time
     :param int seconds: seconds (delta)
@@ -176,8 +173,7 @@ def advance_time_seconds(dt, seconds):
 
 
 def is_older_than(before, seconds):
-    """
-    Checks if a datetime is older than seconds
+    """Checks if a datetime is older than seconds
 
     :param datetime before: a datetime to check
     :param int seconds: seconds (delta)
@@ -188,8 +184,7 @@ def is_older_than(before, seconds):
 
 
 def is_newer_than(after, seconds):
-    """
-    Checks if a datetime is newer than seconds
+    """Checks if a datetime is newer than seconds
 
     :param datetime after: a datetime to check
     :param int seconds: seconds (delta)
@@ -200,8 +195,7 @@ def is_newer_than(after, seconds):
 
 
 def delta_seconds(before, after):
-    """
-    Return the difference between two timing objects.
+    """Return the difference between two timing objects.
 
     Compute the difference in seconds between two date, time, or
     datetime objects (as a float, to microsecond resolution).
@@ -216,8 +210,7 @@ def delta_seconds(before, after):
 
 
 def total_seconds(delta):
-    """
-    Return the total seconds of datetime.timedelta object.
+    """Return the total seconds of datetime.timedelta object.
 
     Compute total seconds of datetime.timedelta, datetime.timedelta
     doesn't have method total_seconds in Python2.6, calculate it manually.
@@ -234,8 +227,7 @@ def total_seconds(delta):
 
 
 def is_soon(dt, window):
-    """
-    Determines if time is going to happen in the next window seconds.
+    """Determines if time is going to happen in the next window seconds.
 
     :param dt: the time
     :param window: minimum seconds to remain to consider the time not soon

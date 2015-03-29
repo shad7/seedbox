@@ -1,16 +1,17 @@
-"""
+"""Loads torrents into database.
+
 Torrent loader handles searches the directory where torrent files are stored
 and adds them to the database cache if not already found.
 """
-import logging
 import glob
+import logging
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 
+from seedbox.common import tools
 from seedbox import constants
 from seedbox import db
-from seedbox.common import tools
 from seedbox.db import models
 from seedbox.torrent import parser
 
@@ -21,7 +22,8 @@ VIDEO_TYPES = tools.format_file_ext(cfg.CONF.torrent.video_filetypes)
 
 
 def load_torrents():
-    """
+    """Loads torrents into database.
+
     Find all the torrents in the specified directory, verify it is a valid
     torrent file (via parsing) and capture the relevant details. Next create
     a record in the cache for each torrent.
@@ -64,9 +66,9 @@ def load_torrents():
 
 
 def _is_parsing_required(torrent):
-    """
-    Determines if parsing is required. Checks the following attributes
-    to determine if we should skip parsing or not:
+    """Determines if parsing is required.
+
+    Checks the following attributes to determine if parsing is needed:
     - if torrent.invalid is True, skip parsing
     - if torrent.purged is True, skip parsing
     - if len(torrent.media_files) > 0, skip parsing
@@ -93,7 +95,8 @@ def _is_parsing_required(torrent):
 
 
 def _is_torrent_downloading(media_items):
-    """
+    """Checks if torrent is still in progress.
+
     Verify if at least one item still located in the
     inprogress/downloading location
 
@@ -118,7 +121,8 @@ def _is_torrent_downloading(media_items):
 
 
 def _filter_media(torrent_id, media_items):
-    """
+    """Applies logic to determine if valid media file.
+
     Handles interacting with torrent parser and getting required details
     from the parser.
 
@@ -184,8 +188,7 @@ def _filter_media(torrent_id, media_items):
 
 
 def _get_file_path(filename):
-    """
-    A list of locations/paths/directories where the media file could exist.
+    """A list of locations/paths/directories where the media file could exist.
 
     return:
         location if found

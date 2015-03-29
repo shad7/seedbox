@@ -1,15 +1,11 @@
-"""
-Model classes to represent the structures of data.
-"""
+"""Model classes to represent the structures of data."""
 import inspect
 
 import six
 
 
 class Model(object):
-
-    """
-    Provides base methods for interacting with database model
+    """Provides base methods for interacting with database model
 
     :param kwds: keyword parameters and values of the model
     :type kwds: dict
@@ -22,8 +18,7 @@ class Model(object):
             setattr(self, k, v)
 
     def as_dict(self):
-        """
-        Generates a dictionary representation of the model.
+        """Generates a dictionary representation of the model.
 
         :return: model as dict
         :rtype: dict
@@ -39,9 +34,7 @@ class Model(object):
         return _d
 
     def items(self):
-        """
-        Provides a generator of key-value pair attributes for a model.
-        """
+        """Provides a generator of key-value pair attributes for a model."""
         for n in self.fields:
             yield n, getattr(self, n)
 
@@ -73,8 +66,7 @@ class Model(object):
 
     @classmethod
     def pk_filter(cls, value=None):
-        """
-        Creates a primary key filter for the given model.
+        """Creates a primary key filter for the given model.
 
         :param value: primary key value
         :return: primary key filter
@@ -84,9 +76,9 @@ class Model(object):
 
     @classmethod
     def make_empty(cls):
-        """
-        Create an instance of the model using the defined attributes from the
-        parameters of the model.
+        """Create an instance of the model.
+
+        Using the defined attributes from the parameters of the model.
 
         :return: model class
         :rtype: :class:`~seedbox.db.models.Model`
@@ -98,9 +90,9 @@ class Model(object):
 
 
 class Torrent(Model):
-    """
-    Represents the attributes of a torrent and the associated state based
-    on parsing and processing of the torrent.
+    """Represents the attributes of a torrent.
+
+    Also the associated state based on parsing and processing of the torrent.
     """
 
     PK_NAME = 'torrent_id'
@@ -108,7 +100,8 @@ class Torrent(Model):
     def __init__(self, torrent_id, name, created_at=None, updated_at=None,
                  state=None, retry_count=None, failed=None, error_msg=None,
                  invalid=None, purged=None, media_files=None):
-        """
+        """Initializes new instance.
+
         :param int torrent_id: primary key identifier of torrent
         :param str name: name of the torrent file
         :param datetime.datetime created_at: date when db entry created
@@ -142,9 +135,9 @@ class Torrent(Model):
 
 
 class MediaFile(Model):
-    """
-    Represents the attributes of media files associated to a torrent and the
-    associated state based on parsing and processing.
+    """Represents the attributes of media files associated to a torrent.
+
+    Also the associated state based on parsing and processing.
     """
 
     PK_NAME = 'media_id'
@@ -152,7 +145,8 @@ class MediaFile(Model):
     def __init__(self, media_id, torrent_id, filename, file_ext,
                  file_path=None, size=None, compressed=None, synced=None,
                  missing=None, skipped=None, error_msg=None, total_time=None):
-        """
+        """Initializes new instance.
+
         :param int media_id: primary key identifier of media file
         :param int torrent_id: foreign key identifier of torrent
         :param str filename: name of media file
@@ -186,14 +180,13 @@ class MediaFile(Model):
 
 
 class AppState(Model):
-    """
-    Represents the state of the application and internal processing.
-    """
+    """Represents the state of the application and internal processing."""
 
     PK_NAME = 'name'
 
     def __init__(self, name, value):
-        """
+        """Initializes new instance.
+
         :param name: an identifier for the capturing a state attribute
         :type name: str
         :param value: the data associated with the identifier

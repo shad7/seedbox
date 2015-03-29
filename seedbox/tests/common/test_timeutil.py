@@ -1,13 +1,13 @@
-from __future__ import absolute_import, print_function
+from __future__ import print_function
+
 import datetime
 import logging
 import time
 
 from testtools import matchers
 
-from seedbox.tests import test
-# now include what we need to test
 from seedbox.common import timeutil
+from seedbox.tests import test
 
 LOG = logging.getLogger('test_timeutil')
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""
+"""cli program
+
 The main program that is the entry point for the SeedboxManager application.
 Provides the ability to configure and start up processing.
 """
@@ -10,7 +11,7 @@ import sys
 
 import lockfile
 from lockfile import pidlockfile
-from oslo.config import cfg
+from oslo_config import cfg
 
 from seedbox import db
 from seedbox import logext as logmgr
@@ -21,9 +22,7 @@ LOG = logging.getLogger(__name__)
 
 
 def main():
-    """
-    Entry point for seedmgr
-    """
+    """Entry point for seedmgr"""
 
     # processes all command-line inputs that control how we execute
     # logging, run mode, etc.; and we get a handle back to access

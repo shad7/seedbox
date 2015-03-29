@@ -11,7 +11,7 @@ if [ -z "$1" ]
 fi
 
 # make sure all requirements are installed; else setup.py develop fails
-pip install -r requirements.txt
+pip install -q -r requirements.txt
 
 ######
 # Prepare release by updating version, generating updated ChangeLog
@@ -22,8 +22,8 @@ git flow release start "$1"
 
 # update version within setup
 sed -i -e "s/version = .*/version = $1/g" setup.cfg
-python setup.py develop
-git commit setup.cfg -m "Update to version v$1"
+python setup.py -q develop
+git commit setup.cfg -m "[RELEASE] Update to version v$1"
 
 # tag the last commit such that pbr picks up the tag as
 # the version number; also required when generating the
@@ -33,9 +33,6 @@ git tag -a "$1" -m "version $1" "${COMMIT_HASH}"
 
 # generate ChangeLog and updated docs; commit
 python setup.py sdist bdist_egg bdist_wheel
-# copy the updated ChangeLog with rst suffix to the
-# doc area to be included in documentation.
-cp ChangeLog doc/source/ChangeLog.rst
 
 # delete tag (only needed temporary to workaround our issue with pbr;
 # git flow will add it back in and push it
@@ -74,7 +71,6 @@ git commit --all --amend --no-edit
 # resulting in an error when the deletion of the branch from remote
 # happens; as such we check for unable to delete in error message to determine
 # if we continue with execution and upload the distribution.
-#git flow release finish -F -p -m "version $1" $1 || true
 errstr="unable to delete"
 [[ $(git flow release finish -F -p -m "version $1" "$1" 2>&1) =~ $errstr ]]
 

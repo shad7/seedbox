@@ -1,10 +1,11 @@
-"""
-SyncFile task plugin for performing rsync of a file to a specified location.
+"""SyncFile task plugin
+
+Performs rsync of a file to a specified location.
 """
 import logging
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 
 from seedbox.tasks import base
 from seedbox.tasks import subprocessext
@@ -50,9 +51,7 @@ cfg.CONF.register_opts(OPTS, group='tasks_filesync')
 
 
 class SyncFile(base.BaseTask):
-    """
-    Provides the capability of rsync file to a specified location.
-    """
+    """Provides the capability of rsync file to a specified location."""
 
     def __init__(self, media_file):
         super(SyncFile, self).__init__(media_file)
@@ -61,9 +60,7 @@ class SyncFile(base.BaseTask):
 
     @property
     def cmd(self):
-        """
-        A property for accessing the rsync command used for specified media
-        file.
+        """Constructed rsync command used for specified media file.
 
         :return: rsync command
         :rtype: list
@@ -106,8 +103,7 @@ class SyncFile(base.BaseTask):
 
     @property
     def destination(self):
-        """
-        A property for accessing the destination to sync file to.
+        """A property for accessing the destination to sync file to.
 
         :return: remote destination
         :rtype: string
@@ -125,8 +121,7 @@ class SyncFile(base.BaseTask):
 
     @staticmethod
     def is_actionable(media_file):
-        """
-        Perform check to determine if action should be taken.
+        """Perform check to determine if action should be taken.
 
         :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
@@ -136,9 +131,7 @@ class SyncFile(base.BaseTask):
                 not media_file.synced)
 
     def execute(self):
-        """
-        Perform the action associated with task for the provided media_file.
-        """
+        """Perform remote file copy for the provided media_file."""
         LOG.debug('syncing file %s', self.media_file.filename)
         subprocessext.ProcessLogging.execute(self.cmd)
         self.media_file.synced = True

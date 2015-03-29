@@ -1,10 +1,11 @@
-"""
-UnrarFile task plugin for decompressing archived files to specified location.
+"""UnrarFile task plugin
+
+For decompressing archived files to specified location.
 """
 import logging
 import os
 
-from oslo.config import cfg
+from oslo_config import cfg
 import rarfile
 
 from seedbox.tasks import base
@@ -13,15 +14,11 @@ LOG = logging.getLogger(__name__)
 
 
 class UnrarFile(base.BaseTask):
-    """
-    Provides the capability of decompressing archived files to specified
-    location.
-    """
+    """Provides the capability of decompressing archived files."""
 
     @staticmethod
     def is_actionable(media_file):
-        """
-        Perform check to determine if action should be taken.
+        """Perform check to determine if action should be taken.
 
         :param media_file: an instance of a MediaFile to check
         :returns: a flag indicating to act or not to act
@@ -30,9 +27,7 @@ class UnrarFile(base.BaseTask):
         return media_file.compressed
 
     def execute(self):
-        """
-        Perform the action associated with task for the provided media_file.
-        """
+        """Perform file decompression for the provided media_file."""
         LOG.debug('decompressing file %s', self.media_file.filename)
         with rarfile.RarFile(
                 os.path.join(

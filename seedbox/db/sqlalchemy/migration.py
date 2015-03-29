@@ -36,9 +36,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-"""
-Provides ability to manage versions of database models
-"""
+"""Provides ability to manage versions of database models"""
 import os
 
 from migrate import exceptions as versioning_exceptions
@@ -52,8 +50,7 @@ _REPO = None
 
 
 def db_sync(engine, version=None, init_version=INIT_VERSION):
-    """
-    Upgrade or downgrade a database.
+    """Upgrade or downgrade a database.
 
     Function runs the upgrade() or downgrade() functions in change scripts.
 
@@ -80,8 +77,7 @@ def db_sync(engine, version=None, init_version=INIT_VERSION):
 
 
 def db_version(engine, init_version=INIT_VERSION):
-    """
-    Show the current version of the repository.
+    """Show the current version of the repository.
 
     :param engine:  SQLAlchemy engine instance for a given database
     :param init_version:  Initial database version
@@ -95,8 +91,7 @@ def db_version(engine, init_version=INIT_VERSION):
 
 
 def db_version_control(engine, version=None):
-    """
-    Mark a database as under this repository's version control.
+    """Mark a database as under this repository's version control.
 
     Once a database is under version control, schema changes should
     only be done via change scripts in this repository.
@@ -108,9 +103,7 @@ def db_version_control(engine, version=None):
 
 
 def _find_migrate_repo():
-    """
-    Get the project's change script repository
-    """
+    """Get the project's change script repository"""
     global _REPO
 
     if _REPO is None:

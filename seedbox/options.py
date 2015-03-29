@@ -1,12 +1,13 @@
-"""
+"""Handles configuration options.
+
 Defines all the common configurations for the application, and then
 manages loading all Options for system.
 """
 import os
 import sys
 
+from oslo_config import cfg
 from six import moves
-from oslo.config import cfg
 
 from seedbox import version
 
@@ -68,7 +69,8 @@ def _find_config_files():
 
 
 def initialize(args):
-    """
+    """Initialize options.
+
     Handles finding and loading configuration options for the entire
     system. Searches for configuration files in the following locations:
 
@@ -104,10 +106,9 @@ def initialize(args):
 
 
 def list_opts():
-    """
-    Returns a list of oslo.config options available in the library.
+    """Returns a list of oslo_config options available in the library.
 
-    The returned list includes all oslo.config options which may be registered
+    The returned list includes all oslo_config options which may be registered
     at runtime by the library.
 
     Each element of the list is a tuple. The first element is the name of the

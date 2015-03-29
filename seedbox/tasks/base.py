@@ -1,13 +1,13 @@
-"""
-Provides the basic definition for a task that handles execution and basic
-error handling.
+"""Provides the basic definition for a task.
+
+Also handles execution and basic error handling.
 """
 import abc
 import logging
 import os
 import traceback
 
-from oslo.config import cfg
+from oslo_config import cfg
 import six
 
 from seedbox.common import timeutil
@@ -25,18 +25,14 @@ cfg.CONF.register_opts(OPTS, group='tasks')
 
 @six.add_metaclass(abc.ABCMeta)
 class BaseTask(object):
-    """
-    Provides the base definition of a task.
-    """
+    """Provides the base definition of a task."""
 
     def __init__(self, media_file):
         self.media_file = media_file
         self.gen_files = []
 
     def __call__(self):
-        """
-        Provides ability to execute the task in a consistent manner.
-        """
+        """Provides ability to execute the task in a consistent manner."""
         try:
             _start = timeutil.utcnow()
             self.execute()
@@ -48,9 +44,9 @@ class BaseTask(object):
         return self.gen_files
 
     def add_gen_files(self, files):
-        """
-        Adds media files included within an archived file to be processed
-        separately to increase parallel processing.
+        """Adds media files included within an archived file.
+
+        Enables parallel processing.
 
         :param files: a list of media files produced by a plugin to be
                       included on the torrent.
@@ -77,8 +73,7 @@ class BaseTask(object):
 
     @staticmethod
     def is_actionable(media_file):
-        """
-        Perform check to determine if action should be taken.
+        """Perform check to determine if action should be taken.
 
         :param media_file: the file to inspect to determine
                            if action is necessary
@@ -89,9 +84,7 @@ class BaseTask(object):
 
     @abc.abstractmethod
     def execute(self):
-        """
-        Perform the action associated with task for the provided media_file.
-        """
+        """Perform action associated with task for the provided media_file."""
         raise NotImplementedError
 
     def __str__(self):

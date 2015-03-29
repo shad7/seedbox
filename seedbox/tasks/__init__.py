@@ -1,13 +1,10 @@
-"""
-Defines tasks to execute as part of the process
-"""
+"""Defines tasks to execute as part of the process"""
 
 
 def list_opts():
-    """
-    Returns a list of oslo.config options available in the library.
+    """Returns a list of oslo_config options available in the library.
 
-    The returned list includes all oslo.config options which may be registered
+    The returned list includes all oslo_config options which may be registered
     at runtime by the library.
 
     Each element of the list is a tuple. The first element is the name of the
