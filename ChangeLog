@@ -1,6 +1,25 @@
 CHANGES
 =======
 
+2.3.12
+------
+
+* [RELEASE] Update to version v2.3.12
+* [TASK] Switch to oslo_config
+* [FEATURE] Added Admin UI and REST APIs
+* [TASK] Fixed error message formatting
+* [TASK] Standards alignment with hacking
+* [TASK] Requirements updates
+* [TASK] Fixed error message formatting
+* [TASK] Standards alignment with hacking
+* [TASK] Requirements updates
+* [TASK] Document updates
+* [TASK] Remove intersphinx dependency
+* [TASK] Upgrade version of oslo.config
+* [TASK] Update README to include Waffle
+* [TASK] Reduce output from update_version
+* [TASK] General cleanup activities
+
 2.3.11
 ------
 
