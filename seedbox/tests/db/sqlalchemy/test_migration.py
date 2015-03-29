@@ -27,7 +27,7 @@ class DBMigrationTestCase(test.BaseTestCase):
 
         migration.db_sync(self.facade.engine)
         ver = migration.db_version(self.facade.engine)
-        self.assertEqual(ver, 3)
+        self.assertEqual(ver, 4)
 
     def test_db_sync_bad_version(self):
         dbname = 'sqlite:////tmp/' + str(uuid.uuid4()) + '.db'
