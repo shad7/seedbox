@@ -16,10 +16,10 @@ from seedbox import options
 from seedbox import version
 
 
-options.initialize([])
-
-
 def load_passfile():
+
+    options.initialize([])
+
     pwfile = cfg.CONF.find_file('.admin_pass')
     if not pwfile:
         pwfile = os.path.join(cfg.CONF.config_dir, '.admin_pass')

@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+2.3.13
+------
+
+* [RELEASE] Update to version v2.3.13
+* [FEATURE] Update requirements
+* updated version from 3 to 4
+* [BUGFIX] Fix total_time column type
+
 2.3.12
 ------
 

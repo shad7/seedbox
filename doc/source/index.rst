@@ -1,8 +1,3 @@
-.. seedbox documentation master file, created by
-   sphinx-quickstart on Fri Jan 10 19:45:26 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 SeedboxManager
 ===============
 
@@ -168,7 +163,7 @@ Contents
     ChangeLog
     ToDo
     design
-    sourcecode/autoindex
+    api/autoindex
 
 .. toctree::
     :hidden:
