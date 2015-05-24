@@ -1,0 +1,58 @@
+Dockerfile
+
+# Distribution / Packages
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+*.egg
+.installed.cfg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+cover/
+.testrepository/
+subunit.log
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Django stuff:
+*.log
+*.pot
+
+AUTHORS
+
+# Sphinx documentation
+docs/_build/
+doc/source/api/seedbox.*.rst
+doc/source/api/tests.*.rst
+doc/source/api/autoindex.rst
+doc/source/sourcecode
+
+# Pycharm
+.idea
+
+# Vagrant
+.vagrant
