@@ -1,9 +1,4 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-
-# C extensions
-*.so
+Dockerfile
 
 # Distribution / Packages
 bin/
