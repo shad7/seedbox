@@ -26,7 +26,7 @@ a seedbox to your home library.
 
 
 Getting started
-===============
+---------------
 
 Create `virtualenv <http://www.virtualenv.org/en/latest/>`_ ::
 
@@ -142,9 +142,11 @@ Command line interface::
         A generated configuration file that contains each option a designation for required,
         a help message, default value, and associated type.
 
+:doc:`Module Docs <api/autoindex>`
+
 
 Resources
-=========
+^^^^^^^^^
 
 * `PyPI <https://pypi.python.org/pypi/SeedboxManager>`_
 * `GitHub <http://github.com/shad7/seedbox>`_
@@ -155,23 +157,24 @@ Resources
 
 
 Contents
-========
+--------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     ChangeLog
     ToDo
     design
-    api/autoindex
 
 .. toctree::
     :hidden:
 
     seedbox-config
+    api/autoindex
+
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
