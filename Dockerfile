@@ -1,4 +1,4 @@
-FROM alpine:3.1
+FROM alpine:3.2
 
 RUN apk add --update py-pip python \
     && rm -rf /var/cache/apk/* \
@@ -9,7 +9,7 @@ COPY . /seedbox/
 WORKDIR /seedbox
 
 RUN apk add --update git g++ python-dev \
-    && pip install -U -r /seedbox/requirements.txt \
+    && pip install -U -r requirements.txt \
     && python setup.py install \
     && apk del git g++ python-dev \
     && rm -rf /var/cache/apk/* \
