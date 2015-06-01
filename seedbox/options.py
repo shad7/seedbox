@@ -4,14 +4,14 @@ Defines all the common configurations for the application, and then
 manages loading all Options for system.
 """
 import os
-import sys
 
 from oslo_config import cfg
 from six import moves
 
 from seedbox import version
 
-PROJECT_NAME = 'seedbox'
+PROJECT = __package__
+DEFAULT_FILENAME = PROJECT + '.conf'
 
 OPTS = [
     cfg.StrOpt('base_path',
@@ -27,48 +27,28 @@ cfg.CONF.register_opts(OPTS)
 
 def _find_config_files():
 
-    virtual_path = os.getenv('VIRTUAL_ENV')
-    default_cfg_type = '.conf'
-    legacy_cfg_type = '.cfg'
+    def _fixpath(p):
+        """Apply tilde expansion and absolutization to a path."""
+        return os.path.abspath(os.path.expanduser(p))
 
-    possible = []
-    # in reverse order as the last one loaded always takes precedence
-    # system-level /etc and /etc/<project>
-    possible.append(os.sep + 'etc')
-    possible.append(os.path.join(os.sep, 'etc', PROJECT_NAME))
+    virtual_env = os.environ.get('VIRTUAL_ENV', '')
 
-    # if virtualenv is active; then leverage <virtualenv>/etc
-    # and <virtualenv>/etc/<project>
-    if virtual_path:
-        possible.append(os.path.join(virtual_path, 'etc'))
-        possible.append(os.path.join(virtual_path, 'etc', PROJECT_NAME))
-
-    # the user's home directory
-    possible.append(os.path.expanduser('~'))
-
-    # the user's home directory with project specific directory
-    possible.append(os.path.join(os.path.expanduser('~'), '.' + PROJECT_NAME))
-    if sys.platform.startswith('win'):
-        # On windows look in ~/seedbox as well, as explorer does not
-        # let you create a folder starting with a dot
-        possible.append(os.path.join(os.path.expanduser('~'), PROJECT_NAME))
-
-    # current working directory as a last ditch effort
-    possible.append(os.getcwd())
-
-    # now append the filename to the possible locations we search
-    config_files = []
-    for loc in possible:
-        config_files.append(
-            os.path.join(loc, PROJECT_NAME + default_cfg_type))
-        config_files.append(
-            os.path.join(loc, PROJECT_NAME + legacy_cfg_type))
+    config_files = [
+        _fixpath(os.path.join('~', '.' + PROJECT, DEFAULT_FILENAME)),
+        _fixpath(os.path.join('~', DEFAULT_FILENAME)),
+        os.path.join(os.sep + 'etc', PROJECT, DEFAULT_FILENAME),
+        os.path.join(os.sep + 'etc', DEFAULT_FILENAME),
+        os.path.join(PROJECT, 'etc', PROJECT, DEFAULT_FILENAME),
+        os.path.join(virtual_env, 'etc', PROJECT, DEFAULT_FILENAME),
+        os.path.join(virtual_env, 'etc', DEFAULT_FILENAME),
+        os.path.join(os.getcwd(), DEFAULT_FILENAME)
+    ]
 
     # return back the list of the config files found
     return list(moves.filter(os.path.exists, config_files))
 
 
-def initialize(args):
+def initialize(args=None):
     """Initialize options.
 
     Handles finding and loading configuration options for the entire
@@ -93,7 +73,7 @@ def initialize(args):
     # configure the program to start....
     cfg.CONF(
         args,
-        project=PROJECT_NAME,
+        project=PROJECT,
         version=version.version_string(),
         default_config_files=_find_config_files(),
     )

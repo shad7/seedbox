@@ -4,12 +4,9 @@
 The main program that is the entry point for the SeedboxManager application.
 Provides the ability to configure and start up processing.
 """
-from __future__ import absolute_import
 import logging
 import os
-import sys
 
-import lockfile
 from lockfile import pidlockfile
 from oslo_config import cfg
 
@@ -27,7 +24,7 @@ def main():
     # processes all command-line inputs that control how we execute
     # logging, run mode, etc.; and we get a handle back to access
     # the info
-    options.initialize(sys.argv[1:])
+    options.initialize()
 
     # configure our logging
     logmgr.configure()
@@ -45,7 +42,7 @@ def main():
             # time to start processing
             process.start()
 
-    except lockfile.LockTimeout as lockerr:
+    except pidlockfile.LockTimeout as lockerr:
         # if we have managed timeout, it means there is another instance
         # already running so we will simply bow out and let the existing
         # one still run.

@@ -8,7 +8,7 @@ from seedbox.tests import test
 class FakeOptions(object):
 
     @staticmethod
-    def initialize(args):
+    def initialize(args=None):
         pass
 
 
