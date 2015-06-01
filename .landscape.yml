@@ -5,6 +5,7 @@ max-line-length: 80
 autodetect: yes
 requirements:
     - requirements.txt
+    - test-requirements.txt
 ignore-paths:
     - doc
     - seedbox/db/sqlalchemy/migrate_repo
