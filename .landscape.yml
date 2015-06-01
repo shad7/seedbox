@@ -10,3 +10,4 @@ ignore-paths:
     - doc
     - seedbox/db/sqlalchemy/migrate_repo
     - seedbox/torrent/bencode.py
+    - setup.py
