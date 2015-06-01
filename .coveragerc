@@ -1,7 +1,7 @@
 [run]
 branch = True
 source = seedbox
-omit = seedbox/tests/*, seedbox/db/admin.py, seedbox/db/sqlalchemy/migrate_repo/manage.py, seedbox/torrent/bencode.py
+omit = seedbox/tests/*, seedbox/db/admin.py, seedbox/db/sqlalchemy/migrate_repo/*, seedbox/torrent/bencode.py
 
 [report]
 ignore-errors = True

@@ -13,7 +13,6 @@ import sandman
 from sandman import model
 
 from seedbox import options
-from seedbox import version
 
 
 def load_passfile():
@@ -28,6 +27,8 @@ def load_passfile():
 
 @sandman.auth.verify_password
 def verify_password(username, password):
+    if username != 'admin':
+        return False
     pw = None
     with open(load_passfile(), 'r') as fd:
         pw = fd.read()
@@ -64,8 +65,6 @@ def save_password(password):
               help='Port of database server to connect to')
 @click.option('--debug', default=False,
               help='Enable debug output from webserver')
-@click.version_option(version=version.version_string(),
-                      message='SeedboxManager v%(version)s')
 @click.argument('URI', metavar='<URI>')
 def run(generate_pks, show_pks, host, port, debug, uri):
     """Start the admin UI for managing data

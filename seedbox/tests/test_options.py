@@ -114,21 +114,3 @@ class OptionsTest(test.BaseTestCase):
 
             cfg.CONF.reset()
             self._delete_cfg_file(location)
-
-    def test_for_windows_home(self):
-
-        location = os.path.join(os.path.expanduser('~'), options.PROJECT_NAME)
-
-        with fixtures.MonkeyPatch('sys.platform', 'win'):
-
-            self._write_cfg_file(location)
-
-            self.assertTrue(os.path.exists(
-                os.path.join(location, self.CFG_FILE)))
-
-            options.initialize([])
-            self.assertIsNotNone(cfg.CONF.config_file)
-            self.assertEqual(cfg.CONF.config_dir, location)
-
-            cfg.CONF.reset()
-            self._delete_cfg_file(location)
