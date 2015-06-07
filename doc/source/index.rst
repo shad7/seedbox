@@ -142,8 +142,6 @@ Command line interface::
         A generated configuration file that contains each option a designation for required,
         a help message, default value, and associated type.
 
-:doc:`Module Docs <api/autoindex>`
-
 
 Resources
 ^^^^^^^^^
@@ -165,12 +163,12 @@ Contents
     ChangeLog
     ToDo
     design
+    source
 
 .. toctree::
     :hidden:
 
     seedbox-config
-    api/autoindex
 
 
 Indices and tables
