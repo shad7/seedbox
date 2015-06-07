@@ -7,20 +7,17 @@ import os
 
 from oslo_config import cfg
 
-DEFAULT_LOG_FILENAME = '{0}.log'.format(__package__)
-DEFAULT_LOG_LEVEL = 'info'
-
 CLI_OPTS = [
     cfg.BoolOpt('cron',
                 default=False,
                 help='Disable console output when running via cron'),
     cfg.StrOpt('logfile',
                metavar='LOG_FILE',
-               default=DEFAULT_LOG_FILENAME,
+               default='{0}.log'.format(__package__),
                help='specify name of log file default: %(default)s'),
     cfg.StrOpt('loglevel',
                metavar='LOG_LEVEL',
-               default=DEFAULT_LOG_LEVEL,
+               default='info',
                help='specify logging level to log messages: %(choices)s',
                choices=['none',
                         'critical',
@@ -75,7 +72,7 @@ PROC_OPTS = [
     cfg.ListOpt('complete',
                 default=[],
                 help='name of tasks associated with complete phase'),
-    ]
+]
 
 cfg.CONF.register_opts(PROC_OPTS, group='process')
 

@@ -88,7 +88,7 @@ class ServiceTest(test.ConfiguredBaseTestCase):
                 matchers.MatchesAny(
                     matchers.IsInstance(logging.handlers.RotatingFileHandler),
                     matchers.IsInstance(logging.StreamHandler),
-                    matchers.IsInstance(service.NullHandler)))
+                    matchers.IsInstance(logging.NullHandler)))
 
     def test_setup_logging_no_logfile(self):
         self.CONF.set_override('logfile', None)
@@ -99,7 +99,7 @@ class ServiceTest(test.ConfiguredBaseTestCase):
                 hndler,
                 matchers.MatchesAny(
                     matchers.IsInstance(logging.StreamHandler),
-                    matchers.IsInstance(service.NullHandler)))
+                    matchers.IsInstance(logging.NullHandler)))
 
     def test_setup_logging_cron(self):
         self.CONF.set_override('cron', True)
@@ -110,7 +110,7 @@ class ServiceTest(test.ConfiguredBaseTestCase):
                 hndler,
                 matchers.MatchesAny(
                     matchers.IsInstance(logging.handlers.RotatingFileHandler),
-                    matchers.IsInstance(service.NullHandler)))
+                    matchers.IsInstance(logging.NullHandler)))
 
     def test_setup_logging_no_logging(self):
         self.CONF.set_override('logfile', None)
@@ -121,7 +121,7 @@ class ServiceTest(test.ConfiguredBaseTestCase):
             self.assertThat(
                 hndler,
                 matchers.MatchesAny(
-                    matchers.IsInstance(service.NullHandler)))
+                    matchers.IsInstance(logging.NullHandler)))
 
     def test_setup_logging_via_file(self):
         logfile = self.create_tempfiles([('seedbox',

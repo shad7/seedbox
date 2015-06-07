@@ -11,15 +11,7 @@ from six import moves
 from seedbox import version
 
 
-if hasattr(logging, 'NullHandler'):
-    NullHandler = logging.NullHandler
-else:
-    # NullHandler added in Python 2.7
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
-
-logging.getLogger().addHandler(NullHandler())
+logging.getLogger().addHandler(logging.NullHandler())
 
 PROJECT = __package__
 DEFAULT_LIBRARY_LOG_LEVEL = {'xworkflows': logging.ERROR,
