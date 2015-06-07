@@ -33,22 +33,7 @@ from oslo_config import cfg
 
 LOG = logging.getLogger(__name__)
 
-OPTS = [
-    cfg.StrOpt('stdout_dir',
-               default='$config_dir/sync_out',
-               help='Output directory for stdout files'),
-    cfg.StrOpt('stderr_dir',
-               default='$config_dir/sync_err',
-               help='Output directory for stderr files'),
-    cfg.BoolOpt('stdout_verbose',
-                default=False,
-                help='Write output to stdout'),
-    cfg.BoolOpt('stderr_verbose',
-                default=True,
-                help='Output verbose details about exceptions'),
-]
-
-cfg.CONF.register_opts(OPTS, group='tasks_synclog')
+cfg.CONF.import_group('tasks_synclog', 'seedbox.options')
 
 
 def _log(name, filepath, unique_id, data):

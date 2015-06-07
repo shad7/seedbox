@@ -7,7 +7,6 @@ import tempfile
 from seedbox import db
 from seedbox.db import models
 from seedbox.tests import test
-from seedbox import torrent as torrent_loader
 from seedbox.torrent import loader
 from seedbox.torrent import parser
 
@@ -32,11 +31,11 @@ class TorrentLoaderTest(test.ConfiguredBaseTestCase):
                                torrent_path,
                                group='torrent')
 
-    def test_pub_loader(self):
-        self.patch(db, '_DBAPI', None)
-        torrent_loader.load()
-
     def test_load_torrents(self):
+        self.patch(db, '_DBAPI', None)
+        loader.load_torrents()
+
+    def test_load_torrents_still_downloading(self):
         self.patch(db, '_DBAPI', None)
 
         def _is_torrent_downloading(media_items):

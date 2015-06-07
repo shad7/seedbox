@@ -14,19 +14,7 @@ from seedbox import db
 
 LOG = logging.getLogger(__name__)
 
-OPTS = [
-    cfg.ListOpt('prepare',
-                default=[],
-                help='name of tasks associated with prepare phase'),
-    cfg.ListOpt('activate',
-                default=[],
-                help='name of tasks associated with activate phase'),
-    cfg.ListOpt('complete',
-                default=[],
-                help='name of tasks associated with complete phase'),
-    ]
-
-cfg.CONF.register_opts(OPTS, group='process')
+cfg.CONF.import_group('process', 'seedbox.options')
 
 WorkflowError = xworkflows.WorkflowError
 AbortTransition = xworkflows.AbortTransition
