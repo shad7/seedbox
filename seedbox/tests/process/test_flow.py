@@ -9,7 +9,7 @@ class FlowTestCase(test.ConfiguredBaseTestCase):
     def setUp(self):
         super(FlowTestCase, self).setUp()
 
-        self.patch(db, '_DBAPI', None)
+        self.patch(db, '_DBAPI', {})
         self.dbapi = db.dbapi(self.CONF)
 
         self.torrent = self.dbapi.save_torrent(
@@ -55,7 +55,7 @@ class FlowTestCase(test.ConfiguredBaseTestCase):
             ))
         self.dbapi.bulk_create_medias(_medias)
 
-        wf = flow.BaseFlow(self.torrent)
+        wf = flow.BaseFlow(self.dbapi, self.torrent)
 
         tasks = wf.next_tasks()
         self.assertEqual(len(list(tasks)), 2)

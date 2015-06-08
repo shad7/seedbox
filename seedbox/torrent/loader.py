@@ -11,7 +11,6 @@ from oslo_config import cfg
 
 from seedbox.common import tools
 from seedbox import constants
-from seedbox import db
 from seedbox.db import models
 from seedbox.torrent import parser
 
@@ -22,15 +21,13 @@ COMPRESSED_TYPES = tools.format_file_ext(cfg.CONF.torrent.compressed_filetypes)
 VIDEO_TYPES = tools.format_file_ext(cfg.CONF.torrent.video_filetypes)
 
 
-def load_torrents():
+def load_torrents(dbapi):
     """Loads torrents into database.
 
     Find all the torrents in the specified directory, verify it is a valid
     torrent file (via parsing) and capture the relevant details. Next create
     a record in the cache for each torrent.
     """
-
-    dbapi = db.dbapi()
 
     for torrent_file in glob.glob(os.path.join(cfg.CONF.torrent.torrent_path,
                                                '*.torrent')):
@@ -43,12 +40,11 @@ def load_torrents():
 
             try:
                 torparser = parser.TorrentParser(torrent_file)
-            except parser.ParsingError as ape:
+            except parser.ParsingError:
                 torrent.invalid = True
                 torrent.state = constants.CANCELLED
                 dbapi.save_torrent(torrent)
-                LOG.error('Torrent Parsing Error: [%s] [%s]',
-                          torrent_file, ape)
+                LOG.exception('Torrent Parsing Error: [%s]', torrent_file)
                 continue
 
             media_items = torparser.get_files_details()
