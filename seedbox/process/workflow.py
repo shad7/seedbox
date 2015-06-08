@@ -33,7 +33,7 @@ class Workflow(flow.BaseFlow):
             except (flow.WorkflowError, flow.AbortTransition,
                     flow.InvalidTransitionError,
                     flow.ForbiddenTransition) as wferr:
-                LOG.error('workflow error: %s', wferr)
+                LOG.exception('workflow error:')
                 self.torrent = self.dbapi.get_torrent(self.torrent.torrent_id)
                 self.torrent.error_msg = str(wferr)
                 self.torrent.failed = True

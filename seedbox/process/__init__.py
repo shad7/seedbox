@@ -16,7 +16,7 @@ def _get_work(dbapi):
 
     # search through the directory of torrents and load any
     # new ones into the cache.
-    loader.load_torrents()
+    loader.load_torrents(dbapi)
 
     flows = []
     # now retrieve any torrents that are eligible for processing
@@ -28,7 +28,7 @@ def _get_work(dbapi):
                   tor.torrent_id, tor.media_files)
         if tor.media_files:
             LOG.debug('creating workflow for torrent: %s', tor)
-            flows.append(workflow.Workflow(tor))
+            flows.append(workflow.Workflow(dbapi, tor))
 
     return flows
 

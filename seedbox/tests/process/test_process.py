@@ -38,7 +38,7 @@ class ProcessTestCase(test.ConfiguredBaseTestCase):
     def setUp(self):
         super(ProcessTestCase, self).setUp()
 
-        self.patch(db, '_DBAPI', None)
+        self.patch(db, '_DBAPI', {})
         self.dbapi = db.dbapi(self.CONF)
 
     def test_process_no_work(self):

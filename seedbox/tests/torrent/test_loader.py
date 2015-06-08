@@ -31,21 +31,21 @@ class TorrentLoaderTest(test.ConfiguredBaseTestCase):
                                torrent_path,
                                group='torrent')
 
+        self.patch(db, '_DBAPI', {})
+        self.dbapi = db.dbapi(self.CONF)
+
     def test_load_torrents(self):
-        self.patch(db, '_DBAPI', None)
-        loader.load_torrents()
+        loader.load_torrents(self.dbapi)
 
     def test_load_torrents_still_downloading(self):
-        self.patch(db, '_DBAPI', None)
 
         def _is_torrent_downloading(media_items):
             return True
 
         self.patch(loader, '_is_torrent_downloading', _is_torrent_downloading)
-        loader.load_torrents()
+        loader.load_torrents(self.dbapi)
 
     def test_load_torrents_parse_error(self):
-        self.patch(db, '_DBAPI', None)
 
         class TorrentParser(object):
 
@@ -53,50 +53,45 @@ class TorrentLoaderTest(test.ConfiguredBaseTestCase):
                 raise parser.ParsingError('failed to parse')
 
         self.patch(parser, 'TorrentParser', TorrentParser)
-        loader.load_torrents()
+        loader.load_torrents(self.dbapi)
 
     def test_load_torrents_no_parse(self):
-        self.patch(db, '_DBAPI', None)
-        dbapi = db.dbapi(self.CONF)
         for tor in glob.glob(os.path.join(torrent_path, '*.torrent')):
             _tor = models.Torrent.make_empty()
             _tor.name = os.path.basename(tor)
             _tor.invalid = True
-            dbapi.save_torrent(_tor)
+            self.dbapi.save_torrent(_tor)
 
-        loader.load_torrents()
+        loader.load_torrents(self.dbapi)
 
     def test_parsing_required(self):
-        self.patch(db, '_DBAPI', None)
-        dbapi = db.dbapi(self.CONF)
-
         _tor = models.Torrent.make_empty()
         _tor.name = 'preq-check'
-        torrent = dbapi.save_torrent(_tor)
+        torrent = self.dbapi.save_torrent(_tor)
         result = loader._is_parsing_required(torrent)
         self.assertTrue(result)
 
         torrent.invalid = True
-        torrent = dbapi.save_torrent(torrent)
+        torrent = self.dbapi.save_torrent(torrent)
         result = loader._is_parsing_required(torrent)
         self.assertFalse(result)
 
         torrent.invalid = False
         torrent.purged = True
-        torrent = dbapi.save_torrent(torrent)
+        torrent = self.dbapi.save_torrent(torrent)
         result = loader._is_parsing_required(torrent)
         self.assertFalse(result)
 
         torrent.purged = False
-        torrent = dbapi.save_torrent(torrent)
+        torrent = self.dbapi.save_torrent(torrent)
 
         _media = models.MediaFile.make_empty()
         _media.filename = 'media'
         _media.file_ext = '.mp4'
         _media.torrent_id = torrent.torrent_id
-        dbapi.save_media(_media)
+        self.dbapi.save_media(_media)
 
-        torrent = dbapi.get_torrent(torrent.torrent_id)
+        torrent = self.dbapi.get_torrent(torrent.torrent_id)
         result = loader._is_parsing_required(torrent)
         self.assertFalse(result)
 

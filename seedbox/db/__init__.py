@@ -12,7 +12,7 @@ DB_ENGINE_NAMESPACE = 'seedbox.db'
 
 cfg.CONF.import_group('database', 'seedbox.options')
 
-_DBAPI = None
+_DBAPI = {}
 
 
 def _get_connection(conf):
@@ -31,9 +31,7 @@ def dbapi(conf=cfg.CONF):
     :return: database API instance
     :rtype: :class:`~seedbox.db.api.DBApi`
     """
-    global _DBAPI
-
-    if _DBAPI is None:
-        _DBAPI = api.DBApi(_get_connection(conf))
-        _DBAPI.shrink_db()
-    return _DBAPI
+    if not _DBAPI:
+        _DBAPI[DB_ENGINE_NAMESPACE] = api.DBApi(_get_connection(conf))
+        _DBAPI[DB_ENGINE_NAMESPACE].shrink_db()
+    return _DBAPI[DB_ENGINE_NAMESPACE]
