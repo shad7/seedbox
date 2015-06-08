@@ -12,6 +12,8 @@ from seedbox.tasks import base
 
 LOG = logging.getLogger(__name__)
 
+cfg.CONF.import_group('tasks', 'seedbox.options')
+
 
 class UnrarFile(base.BaseTask):
     """Provides the capability of decompressing archived files."""

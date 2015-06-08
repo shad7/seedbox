@@ -7,7 +7,7 @@ import logging
 from seedbox import db
 from seedbox.process import manager
 from seedbox.process import workflow
-from seedbox import torrent
+from seedbox.torrent import loader
 
 LOG = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ def _get_work(dbapi):
 
     # search through the directory of torrents and load any
     # new ones into the cache.
-    torrent.load()
+    loader.load_torrents()
 
     flows = []
     # now retrieve any torrents that are eligible for processing
@@ -72,24 +72,3 @@ def start():
     finally:
         mgr.shutdown()
         dbapi.clean_up()
-
-
-def list_opts():
-    """Returns a list of oslo_config options available in the library.
-
-    The returned list includes all oslo_config options which may be registered
-    at runtime by the library.
-
-    Each element of the list is a tuple. The first element is the name of the
-    group under which the list of elements in the second element will be
-    registered. A group name of None corresponds to the [DEFAULT] group in
-    config files.
-
-    The purpose of this is to allow tools like the Oslo sample config file
-    generator to discover the options exposed to users by this library.
-
-    :returns: a list of (group_name, opts) tuples
-    """
-    from seedbox.common import tools
-    from seedbox.process import flow
-    return tools.make_opt_list([flow.OPTS, manager.OPTS], 'process')

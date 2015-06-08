@@ -17,6 +17,7 @@ from seedbox.torrent import parser
 
 LOG = logging.getLogger(__name__)
 
+cfg.CONF.import_group('torrent', 'seedbox.options')
 COMPRESSED_TYPES = tools.format_file_ext(cfg.CONF.torrent.compressed_filetypes)
 VIDEO_TYPES = tools.format_file_ext(cfg.CONF.torrent.video_filetypes)
 
