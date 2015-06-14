@@ -11,7 +11,6 @@ coveralls
 # Docs Requirements
 docutils>=0.9.1
 sphinx>=1.2.2
-sphinxcontrib-httpdomain
 
 # packaging
 wheel
