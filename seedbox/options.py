@@ -4,14 +4,35 @@ Defines all the common configurations for the application, and then
 manages loading all Options for system.
 """
 import os
-import sys
 
 from oslo_config import cfg
-from six import moves
 
-from seedbox import version
+CLI_OPTS = [
+    cfg.BoolOpt('cron',
+                default=False,
+                help='Disable console output when running via cron'),
+    cfg.StrOpt('logfile',
+               metavar='LOG_FILE',
+               default='{0}.log'.format(__package__),
+               help='specify name of log file default: %(default)s'),
+    cfg.StrOpt('loglevel',
+               metavar='LOG_LEVEL',
+               default='info',
+               help='specify logging level to log messages: %(choices)s',
+               choices=['none',
+                        'critical',
+                        'error',
+                        'warning',
+                        'info',
+                        'debug',
+                        'trace']),
+    cfg.StrOpt('logconfig',
+               metavar='LOG_CONFIG',
+               help='specific path and filename of logging configuration \
+                    (override defaults)'),
+]
 
-PROJECT_NAME = 'seedbox'
+cfg.CONF.register_cli_opts(CLI_OPTS)
 
 OPTS = [
     cfg.StrOpt('base_path',
@@ -24,85 +45,122 @@ OPTS = [
 
 cfg.CONF.register_opts(OPTS)
 
+DB_OPTS = [
+    cfg.StrOpt('connection',
+               default='sqlite:///$config_dir/torrent.db',
+               help='The connection string used to connect to the database'),
+    cfg.IntOpt('idle_timeout',
+               default=3600,
+               help='Timeout before idle sql connections are reaped'),
+    cfg.IntOpt('connection_debug',
+               default=0,
+               help='Verbosity of SQL debugging information. 0=None, 100=All'),
+]
 
-def _find_config_files():
+cfg.CONF.register_opts(DB_OPTS, 'database')
 
-    virtual_path = os.getenv('VIRTUAL_ENV')
-    default_cfg_type = '.conf'
-    legacy_cfg_type = '.cfg'
+PROC_OPTS = [
+    cfg.IntOpt('max_processes',
+               default=4,
+               help='max processes to use for performing sync of torrents'),
+    cfg.ListOpt('prepare',
+                default=[],
+                help='name of tasks associated with prepare phase'),
+    cfg.ListOpt('activate',
+                default=[],
+                help='name of tasks associated with activate phase'),
+    cfg.ListOpt('complete',
+                default=[],
+                help='name of tasks associated with complete phase'),
+]
 
-    possible = []
-    # in reverse order as the last one loaded always takes precedence
-    # system-level /etc and /etc/<project>
-    possible.append(os.sep + 'etc')
-    possible.append(os.path.join(os.sep, 'etc', PROJECT_NAME))
+cfg.CONF.register_opts(PROC_OPTS, group='process')
 
-    # if virtualenv is active; then leverage <virtualenv>/etc
-    # and <virtualenv>/etc/<project>
-    if virtual_path:
-        possible.append(os.path.join(virtual_path, 'etc'))
-        possible.append(os.path.join(virtual_path, 'etc', PROJECT_NAME))
+TASK_OPTS = [
+    cfg.StrOpt('sync_path',
+               default='/tmp/sync',
+               help='Location to temp media copies for syncing to library'),
+]
 
-    # the user's home directory
-    possible.append(os.path.expanduser('~'))
+cfg.CONF.register_opts(TASK_OPTS, group='tasks')
 
-    # the user's home directory with project specific directory
-    possible.append(os.path.join(os.path.expanduser('~'), '.' + PROJECT_NAME))
-    if sys.platform.startswith('win'):
-        # On windows look in ~/seedbox as well, as explorer does not
-        # let you create a folder starting with a dot
-        possible.append(os.path.join(os.path.expanduser('~'), PROJECT_NAME))
+SYNC_OPTS = [
+    cfg.BoolOpt('dryrun',
+                default=False,
+                help='rsync dryrun option'),
+    cfg.BoolOpt('verbose',
+                default=False,
+                help='rsync verbose option'),
+    cfg.BoolOpt('progress',
+                default=False,
+                help='rsync progress option'),
+    cfg.BoolOpt('perms',
+                default=True,
+                help='rsync perms option'),
+    cfg.BoolOpt('delayupdates',
+                default=True,
+                help='rsync delayupdates option'),
+    cfg.BoolOpt('recursive',
+                default=True,
+                help='rsync recursive option'),
+    cfg.StrOpt('chmod',
+               default='ugo+rwx',
+               help='rsync chmod option'),
+    cfg.StrOpt('identity',
+               help='rsync-ssh identity option (ssh key)'),
+    cfg.StrOpt('port',
+               default='22',
+               help='rsync-ssh port'),
+    cfg.StrOpt('remote_user',
+               help='User name on remote system (ssh)'),
+    cfg.StrOpt('remote_host',
+               help='Host name/IP Address of remote system'),
+    cfg.StrOpt('remote_path',
+               help='rsync destination path'),
+]
 
-    # current working directory as a last ditch effort
-    possible.append(os.getcwd())
+cfg.CONF.register_opts(SYNC_OPTS, group='tasks_filesync')
 
-    # now append the filename to the possible locations we search
-    config_files = []
-    for loc in possible:
-        config_files.append(
-            os.path.join(loc, PROJECT_NAME + default_cfg_type))
-        config_files.append(
-            os.path.join(loc, PROJECT_NAME + legacy_cfg_type))
+SYNCLOG_OPTS = [
+    cfg.StrOpt('stdout_dir',
+               default='$config_dir/sync_out',
+               help='Output directory for stdout files'),
+    cfg.StrOpt('stderr_dir',
+               default='$config_dir/sync_err',
+               help='Output directory for stderr files'),
+    cfg.BoolOpt('stdout_verbose',
+                default=False,
+                help='Write output to stdout'),
+    cfg.BoolOpt('stderr_verbose',
+                default=True,
+                help='Output verbose details about exceptions'),
+]
 
-    # return back the list of the config files found
-    return list(moves.filter(os.path.exists, config_files))
+cfg.CONF.register_opts(SYNCLOG_OPTS, group='tasks_synclog')
 
+TORRENT_OPTS = [
+    cfg.StrOpt('torrent_path',
+               required=True,
+               help='Location of the .torrent files'),
+    cfg.ListOpt('media_paths',
+                required=True,
+                help='Location(s) of the media files'),
+    cfg.StrOpt('incomplete_path',
+               required=True,
+               help='Location of the downloading torrents'),
+    cfg.ListOpt('video_filetypes',
+                default=['.avi', '.mp4', '.mkv', '.mpg'],
+                help='List of video filetypes to support. (ignore others)'),
+    cfg.ListOpt('compressed_filetypes',
+                default=['.rar'],
+                help='List of compressed filetypes to support. '
+                     '(ignore others)'),
+    cfg.IntOpt('minimum_file_size',
+               default=75000000,
+               help='Minimum file size of a media file'),
+]
 
-def initialize(args):
-    """Initialize options.
-
-    Handles finding and loading configuration options for the entire
-    system. Searches for configuration files in the following locations:
-
-    .. envvar:: VIRTUAL_ENV
-        defined when virtualenv is started
-        source bin/activation
-
-
-        * /etc/
-        * /etc/seedbox/
-        * ~/VIRTUAL_ENV/etc/
-        * ~/VIRTUAL_ENV/etc/seedbox/
-        * ~/
-        * ~/.seedbox/
-        * ./ (current working directory)
-
-
-    :param list args:   command line inputs
-    """
-    # configure the program to start....
-    cfg.CONF(
-        args,
-        project=PROJECT_NAME,
-        version=version.version_string(),
-        default_config_files=_find_config_files(),
-    )
-
-    # if no config_dir was provided then we will set it to the
-    # path of the most specific config file found.
-    if not cfg.CONF.config_dir:
-        cfg.CONF.set_default('config_dir',
-                             os.path.dirname(cfg.CONF.config_file[-1]))
+cfg.CONF.register_opts(TORRENT_OPTS, group='torrent')
 
 
 def list_opts():
@@ -122,4 +180,12 @@ def list_opts():
     :returns: a list of (group_name, opts) tuples
     """
     from seedbox.common import tools
-    return tools.make_opt_list([OPTS], None)
+    all_opts = []
+    all_opts.extend(tools.make_opt_list([OPTS], None))
+    all_opts.extend(tools.make_opt_list([DB_OPTS], 'database'))
+    all_opts.extend(tools.make_opt_list([PROC_OPTS], 'process'))
+    all_opts.extend(tools.make_opt_list([TASK_OPTS], 'tasks'))
+    all_opts.extend(tools.make_opt_list([SYNC_OPTS], 'tasks_filesync'))
+    all_opts.extend(tools.make_opt_list([SYNCLOG_OPTS], 'tasks_synclog'))
+    all_opts.extend(tools.make_opt_list([TORRENT_OPTS], 'torrent'))
+    return all_opts

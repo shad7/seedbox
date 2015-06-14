@@ -9,6 +9,8 @@ from seedbox.tasks import base
 
 LOG = logging.getLogger(__name__)
 
+cfg.CONF.import_group('tasks', 'seedbox.options')
+
 
 class CopyFile(base.BaseTask):
     """Provides the capability of copying files locally."""

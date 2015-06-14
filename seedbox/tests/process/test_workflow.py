@@ -9,7 +9,7 @@ class WorkflowTestCase(test.ConfiguredBaseTestCase):
     def setUp(self):
         super(WorkflowTestCase, self).setUp()
 
-        self.patch(db, '_DBAPI', None)
+        self.patch(db, '_DBAPI', {})
         self.dbapi = db.dbapi(self.CONF)
 
         self.torrent = self.dbapi.save_torrent(
@@ -17,7 +17,7 @@ class WorkflowTestCase(test.ConfiguredBaseTestCase):
                            name='fake1.torrent'))
 
     def test_workflow(self):
-        wf = workflow.Workflow(self.torrent)
+        wf = workflow.Workflow(self.dbapi, self.torrent)
         status = wf.run()
         self.assertFalse(status)
         status = wf.run()
@@ -29,7 +29,7 @@ class WorkflowTestCase(test.ConfiguredBaseTestCase):
 
     def test_cancelled(self):
         self.torrent.state = 'cancelled'
-        wf = workflow.Workflow(self.torrent)
+        wf = workflow.Workflow(self.dbapi, self.torrent)
         status = wf.run()
         self.assertTrue(status)
 
@@ -48,6 +48,6 @@ class WorkflowTestCase(test.ConfiguredBaseTestCase):
                                  error_msg='bad thing happened')
         media = self.dbapi.save_media(media)
 
-        wf = workflow.Workflow(torrent)
+        wf = workflow.Workflow(self.dbapi, torrent)
         status = wf.run()
         self.assertTrue(status)

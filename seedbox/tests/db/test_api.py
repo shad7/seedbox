@@ -12,7 +12,7 @@ class ApiDBTestCase(test.ConfiguredBaseTestCase):
     def setUp(self):
         super(ApiDBTestCase, self).setUp()
 
-        self.patch(db, '_DBAPI', None)
+        self.patch(db, '_DBAPI', {})
         self.dbapi = db.dbapi(self.CONF)
 
     def test_clear(self):

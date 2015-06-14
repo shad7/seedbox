@@ -8,6 +8,8 @@ from seedbox.tasks import base
 
 LOG = logging.getLogger(__name__)
 
+cfg.CONF.import_group('tasks', 'seedbox.options')
+
 
 class DeleteFile(base.BaseTask):
     """Provides capability of deleting file from a specified location."""

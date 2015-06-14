@@ -10,23 +10,10 @@ from stevedore import named
 import xworkflows
 
 from seedbox import constants
-from seedbox import db
 
 LOG = logging.getLogger(__name__)
 
-OPTS = [
-    cfg.ListOpt('prepare',
-                default=[],
-                help='name of tasks associated with prepare phase'),
-    cfg.ListOpt('activate',
-                default=[],
-                help='name of tasks associated with activate phase'),
-    cfg.ListOpt('complete',
-                default=[],
-                help='name of tasks associated with complete phase'),
-    ]
-
-cfg.CONF.register_opts(OPTS, group='process')
+cfg.CONF.import_group('process', 'seedbox.options')
 
 WorkflowError = xworkflows.WorkflowError
 AbortTransition = xworkflows.AbortTransition
@@ -60,15 +47,17 @@ class BaseFlow(xworkflows.WorkflowEnabled):
     On binding plugin tasks to each step and determining which plugin
     is capable of operating on the media files of the specified torrent.
 
+    :param dbapi: an instance of the database API
+    :type dbapi: :class:`~seedbox.db.api.DBApi`
     :param torrent: an instance of a parsed torrent metadata
     :type torrent: :class:`~seedbox.db.models.Torrent`
     """
     state = Taskflow()
 
-    def __init__(self, torrent):
+    def __init__(self, dbapi, torrent):
         super(BaseFlow, self).__init__()
+        self.dbapi = dbapi
         self.torrent = torrent
-        self.dbapi = db.dbapi()
 
         # if we failed in the middle of the flow last time
         # we need to start from where we left off

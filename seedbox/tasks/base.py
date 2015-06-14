@@ -14,13 +14,7 @@ from seedbox.common import timeutil
 
 LOG = logging.getLogger(__name__)
 
-OPTS = [
-    cfg.StrOpt('sync_path',
-               default='/tmp/sync',
-               help='Location to temp media copies for syncing to library'),
-]
-
-cfg.CONF.register_opts(OPTS, group='tasks')
+cfg.CONF.import_group('tasks', 'seedbox.options')
 
 
 @six.add_metaclass(abc.ABCMeta)

@@ -6,14 +6,7 @@ from oslo_config import cfg
 
 LOG = logging.getLogger(__name__)
 
-OPTS = [
-    cfg.IntOpt('max_processes',
-               default=4,
-               help='max processes to use for performing sync of torrents'),
-]
-
-CONF = cfg.CONF
-CONF.register_opts(OPTS, 'process')
+cfg.CONF.import_group('process', 'seedbox.options')
 
 
 class TaskManager(object):
@@ -24,7 +17,7 @@ class TaskManager(object):
 
     def __init__(self):
         self.executor = conc_futures.ProcessPoolExecutor(
-            CONF.process.max_processes)
+            cfg.CONF.process.max_processes)
         self.tasks = []
 
     def add_tasks(self, tasks):

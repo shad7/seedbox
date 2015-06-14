@@ -1,6 +1,27 @@
 CHANGES
 =======
 
+2.3.14
+------
+
+* [RELEASE] Update to version v2.3.14
+* [TASK] Database API access clean up
+* [TASK] Drop support for Python 2.6 and 3.3
+* [TASK] Cleanup options define and loading
+* updated how source code documentation handled
+* updated landscape config
+* updated landscape config
+* updated landscape config
+* updated landscape config
+* updated landscape config
+* added landscape configuration
+* [TASK] Basic cleanup of code base
+* update doc formatting
+* updated alpine version
+* added .dockerignore
+* added Dockerfile
+* fix file permissions
+
 2.3.13
 ------
 
