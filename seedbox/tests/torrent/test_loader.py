@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import glob
 import os
 import tempfile
@@ -114,6 +112,19 @@ class TorrentLoaderTest(test.ConfiguredBaseTestCase):
 
         result = loader._is_torrent_downloading(mediafiles)
         self.assertTrue(result)
+
+    def test_filter_media(self):
+
+        self.CONF.set_override('media_paths',
+                               [self.base_dir],
+                               group='torrent')
+
+        media1 = tempfile.NamedTemporaryFile(suffix='.mp4',
+                                             dir=self.base_dir)
+
+        media_list = loader._filter_media('1234', [(media1.name, 75000001)])
+        self.assertEqual(len(media_list),  1)
+        self.assertEqual(media_list[0].filename, os.path.basename(media1.name))
 
     def test_get_file_path(self):
 
