@@ -47,7 +47,7 @@ def load_torrents(dbapi):
                 LOG.exception('Torrent Parsing Error: [%s]', torrent_file)
                 continue
 
-            media_items = torparser.get_files_details()
+            media_items = torparser.get_file_details()
             LOG.debug('Total files in torrent %d', len(media_items))
 
             # determine if any of the files are still inprogress of
