@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+2.3.15
+------
+
+* [RELEASE] Update to version v2.3.15
+* [TASK] Leverage invoke for managing releases
+* [TASK] Simplified custom torrent parser
+* [TASK] Update to latest pbr
+
 2.3.14
 ------
 
@@ -9,10 +17,6 @@ CHANGES
 * [TASK] Drop support for Python 2.6 and 3.3
 * [TASK] Cleanup options define and loading
 * updated how source code documentation handled
-* updated landscape config
-* updated landscape config
-* updated landscape config
-* updated landscape config
 * updated landscape config
 * added landscape configuration
 * [TASK] Basic cleanup of code base
@@ -126,7 +130,6 @@ CHANGES
 * add generation of sample config via oslo.config instead of custom version copied from oslo.incubator project
 * undo travis configuration
 * updating travis configuration
-* updating travis configuration
 * removing copy of config fixture; leverage instance within oslo.config
 * replaced extra imports for the purpose of making config options available; leverage library approach for importing options from other modules
 * moved to using mockpatch from oslotest instead of local one
@@ -161,7 +164,6 @@ CHANGES
 2.3.1
 -----
 
-* fixing up ChangeLog within docs
 * fixing up ChangeLog within docs
 
 2.3.0
@@ -214,12 +216,9 @@ CHANGES
 * converted print builtin calls to print function calls to be python3 compatiable
 * fixed class name
 * fixed naming of class
-* fixed naming of class
 * removed extra parentheses
 * simplified variable comparison against 2 values
 * updated method parameter name to be different than local variable used within the outter method
-* converted print builtin calls to print function calls to be python3 compatiable
-* converted print builtin calls to print function calls to be python3 compatiable
 * converted print builtin calls to print function calls to be python3 compatiable
 * changed name of parameter to avoid collision with outter method parameter
 * removed extra parentheses
@@ -294,11 +293,6 @@ CHANGES
 * update settings for travis-ci
 * minor tweaks
 * documentation updates
-* updating changelog and increasing version
-
-2.1
----
-
 * updating changelog and increasing version
 * code fixes and cleanup
 * made several updates to clean up code and added significant amount of test code to finally reach ~75% code coverage
@@ -377,17 +371,11 @@ CHANGES
 
 * lockfile on pypi is out of date by nearly 2 years. I pulled from GitHub to get latest version. No longered required extension to lockfile
 * updated README
-* updated README
-* updated README
 
 0.1.12
 ------
 
 * bugfix: date calculation to determine when to perform db back
-* updated README
-* updated README
-* updated README
-* updated README
 * updated README
 * updated README info
 
@@ -456,8 +444,6 @@ CHANGES
 * Added another test set related to processing options and command line
 * Started using unittest module for doing proper testing and converting some of the scripts I had been using to do proper unit testing. This was the first one
 * updated readme
-* updated readme
-* Updated readme
 * made adjustment so that filecopy works the same as fileunrar, after copy create a new entry for syncing. And then within delete, simply ignore any file that does not exist to avoid any exceptions
 * Bug fixes related to database backup, some extra logging
 
