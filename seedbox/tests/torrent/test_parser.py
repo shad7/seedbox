@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import glob
 import os
 
@@ -21,10 +19,8 @@ class TorrentParserTest(test.BaseTestCase):
         for tfile in tfiles:
             torrent = parser.TorrentParser(tfile)
             self.assertIsNotNone(torrent)
-            self.assertIsNotNone(torrent.get_tracker_url())
-            self.assertIsNotNone(torrent.get_creation_date())
-            self.assertIsNotNone(torrent.get_creation_date(str()))
-            self.assertTrue(len(torrent.get_files_details()) > 0)
+            self.assertIsNotNone(torrent.content)
+            self.assertTrue(len(torrent.get_file_details()) > 0)
 
     def test_custom_parser1(self):
         tfile = os.path.join(torrent_path, 'bencode-bad-1.torrent')
@@ -56,19 +52,16 @@ class TorrentParserTest(test.BaseTestCase):
         torrent = parser.TorrentParser(tfile)
         self.assertIsNotNone(torrent)
 
-    def test_client_name(self):
-        tfile = os.path.join(torrent_path, 'other-5.torrent')
-        torrent = parser.TorrentParser(tfile)
-        self.assertIsNotNone(torrent.get_client_name())
-
-        tfile = os.path.join(torrent_path, 'other-9.torrent')
-        torrent = parser.TorrentParser(tfile)
-        self.assertIsNone(torrent.get_client_name())
-
     def test_missing_file(self):
-
-        with testtools.ExpectedException(ValueError):
-            parser.TorrentParser(str())
 
         with testtools.ExpectedException(IOError):
             parser.TorrentParser('dummy/file/does/not/exist')
+
+    def test_parse_negative_integer(self):
+        self.assertEqual(parser.Bdecode.parse(b'i-123e'), -123)
+
+    def test_parse_invalid_integer(self):
+        self.assertRaises(parser.ParsingError, parser.Bdecode.parse, b'i123ae')
+
+    def test_parse_invalid_str(self):
+        self.assertRaises(parser.ParsingError, parser.Bdecode.parse, b'0:ae')

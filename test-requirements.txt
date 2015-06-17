@@ -4,6 +4,9 @@ tox>=1.7.2
 # coding standards
 hacking
 
+# testing
+oslotest
+
 # test coverage
 coverage>=3.6
 coveralls
@@ -11,10 +14,4 @@ coveralls
 # Docs Requirements
 docutils>=0.9.1
 sphinx>=1.2.2
-sphinxcontrib-httpdomain
 
-# packaging
-wheel
-
-# testing
-oslotest

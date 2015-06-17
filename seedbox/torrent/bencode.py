@@ -174,8 +174,6 @@ def bdecode(x):
 class Bencached(object):
     """Cached bencode class"""
 
-    __slots__ = ['bencoded']
-
     def __init__(self, s):
         self.bencoded = s
 
