@@ -4,6 +4,9 @@ tox>=1.7.2
 # coding standards
 hacking
 
+# testing
+oslotest
+
 # test coverage
 coverage>=3.6
 coveralls
@@ -12,8 +15,3 @@ coveralls
 docutils>=0.9.1
 sphinx>=1.2.2
 
-# packaging
-wheel
-
-# testing
-oslotest
