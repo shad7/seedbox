@@ -56,3 +56,6 @@ doc/source/sourcecode
 
 # Vagrant
 .vagrant
+Vagrantfile
+dev/
+
