@@ -51,7 +51,6 @@ AUTHORS
 
 # Sphinx documentation
 doc/build/
-doc/source/api/
 
 # Pycharm
 .idea

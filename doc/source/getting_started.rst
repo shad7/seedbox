@@ -88,10 +88,10 @@ Possible configuration file locations (General to specific)::
 
 Command line interface::
 
-        usage: seedmgr [-h] [--config-dir DIR] [--config-file PATH]
+        usage: seedmgr [-h] [--config-dir DIR] [--config-file PATH] [--cron]
                        [--logconfig LOG_CONFIG] [--logfile LOG_FILE]
-                       [--loglevel LOG_LEVEL] [--version]
-        
+                       [--loglevel LOG_LEVEL] [--version] [--nocron]
+
         optional arguments:
           -h, --help            show this help message and exit
           --config-dir DIR      Path to a config directory to pull *.conf files from.
@@ -102,13 +102,15 @@ Command line interface::
                                 over-ridden options in the directory take precedence.
           --config-file PATH    Path to a config file to use. Multiple config files
                                 can be specified, with values in later files taking
-                                precedence. The default files used are: None
+                                precedence. The default files used are: None.
+          --cron                Disable console output when running via cron
           --logconfig LOG_CONFIG
                                 specific path and filename of logging configuration
                                 (override defaults)
-          --logfile LOG_FILE    specify name of log file (location is resource path)
-          --loglevel LOG_LEVEL  specify logging level to log messages at
+          --logfile LOG_FILE    specify name of log file default: None
+          --loglevel LOG_LEVEL  specify logging level to log messages: None
           --version             show program's version number and exit
+          --nocron              The inverse of --cron
 
 
 :doc:`seedbox-config`
