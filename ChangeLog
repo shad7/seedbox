@@ -1,6 +1,16 @@
 Changelog
 =========
 
+2.3.16
+------
+
+* [RELEASE] Update to version v2.3.16
+* TASK] Auto image build on DockerHub and Quay
+* [TASK] Updated cli and config file options doc
+* [TASK] Refreshed documentation
+* [TASK] Add development artifacts
+* removed old release bash script
+
 2.3.15
 ------
 
