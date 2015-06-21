@@ -50,14 +50,15 @@ subunit.log
 AUTHORS
 
 # Sphinx documentation
-docs/_build/
-doc/source/api/seedbox.*.rst
-doc/source/api/tests.*.rst
-doc/source/api/autoindex.rst
-doc/source/sourcecode
+doc/build/
+doc/source/api/
 
 # Pycharm
 .idea
 
 # Vagrant
 .vagrant
+
+# virtualenv
+venv/
+.venv/
