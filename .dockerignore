@@ -1,4 +1,9 @@
-Dockerfile
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
 
 # Distribution / Packages
 bin/
@@ -45,14 +50,16 @@ subunit.log
 AUTHORS
 
 # Sphinx documentation
-docs/_build/
-doc/source/api/seedbox.*.rst
-doc/source/api/tests.*.rst
-doc/source/api/autoindex.rst
-doc/source/sourcecode
+doc/build/
 
 # Pycharm
 .idea
 
 # Vagrant
 .vagrant
+Vagrantfile
+dev/
+
+# virtualenv
+venv/
+.venv/

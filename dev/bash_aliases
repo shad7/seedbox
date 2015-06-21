@@ -1,0 +1,4 @@
+alias drma='docker rm $(docker ps -a -q)'
+alias drmia='docker rmi $(docker images -q --filter "dangling=true")'
+alias fig='docker-compose -f fig.yml'
+

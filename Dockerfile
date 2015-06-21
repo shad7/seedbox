@@ -1,6 +1,7 @@
 FROM alpine:3.2
 
 RUN apk add --update py-pip python \
+    && pip install -U pip \
     && rm -rf /var/cache/apk/* \
     && ln -s /usr/etc/seedbox /etc/seedbox
 

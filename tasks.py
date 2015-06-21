@@ -8,14 +8,20 @@ import os
 from invoke import task, run
 import pkg_resources
 
+# see urllib3 regarding InsecureRequestWarning and InsecurePlatformWarning
+logging.captureWarnings(True)
+
+if not os.getenv('VIRTUAL_ENV'):
+    if not os.path.exists('.venv'):
+        run('virtualenv -q --system-site-packages .venv', hide=True)
+    execfile('.venv/bin/activate_this.py', dict(__file__='.venv/bin/activate_this.py'))
+
 try:
     pkg_resources.require('semantic_version')
     pkg_resources.require('twine')
     pkg_resources.require('wheel')
 except pkg_resources.DistributionNotFound:
-    # see urllib3 regarding InsecureRequestWarning and InsecurePlatformWarning
-    logging.captureWarnings(True)
-    run('pip -q install semantic_version twine wheel')
+    run('pip -q install -U semantic_version twine wheel', hide=True)
 
 
 @task
@@ -76,7 +82,7 @@ def _iter_changelog(changelog):
     current_release = None
     prev_msg = None
 
-    yield current_release, 'CHANGES\n=======\n\n'
+    yield current_release, 'Changelog\n=========\n\n'
     for hash, tags, msg in changelog:
 
         if prev_msg is None:
@@ -203,3 +209,27 @@ def release(major=False, minor=False, patch=True, pypi_index=None):
     prepare_release(relver)
     finish_rel_branch(relver)
     publish(pypi_index)
+
+
+@task
+def clean(all=False, docs=False, dist=False, extra=None):
+    """Clean up build files"""
+    patterns = ['build', '*.egg-info/', '**/*.pyc']
+    if all or docs:
+        patterns.append('doc/build/html/*')
+        patterns.append('doc/source/api')
+    if all or dist:
+        patterns.append('dist')
+    if extra:
+        patterns.append(extra)
+    for pattern in patterns:
+        run('rm -rf {}'.format(pattern))
+
+
+@task
+def pep8():
+    try:
+        pkg_resources.require('hacking')
+    except pkg_resources.DistributionNotFound:
+        run('pip -q install -U hacking', hide=True)
+    run('flake8 --show-source seedbox')

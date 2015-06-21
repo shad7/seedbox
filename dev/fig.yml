@@ -1,0 +1,8 @@
+docs:
+  image: nginx
+  ports:
+   - "80:80"
+  volumes:
+   - ./seedbox/doc/build/html:/usr/share/nginx/html/docs:ro
+   - ./seedbox/cover:/usr/share/nginx/html/cover:ro
+

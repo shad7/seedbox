@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """cli program
 
 The main program that is the entry point for the SeedboxManager application.
