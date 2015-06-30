@@ -80,6 +80,12 @@ def _configure(args):
              default_config_files=list(moves.filter(os.path.isfile,
                                                     config_files)))
 
+    # if no config_dir was provided then we will set it to the
+    # path of the most specific config file found.
+    if not cfg.CONF.config_dir:
+        cfg.CONF.set_default('config_dir',
+                             os.path.dirname(cfg.CONF.config_file[-1]))
+
 
 def prepare_service(args=None):
     """Configures application and setups logging."""
