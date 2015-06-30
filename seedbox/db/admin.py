@@ -12,12 +12,12 @@ from passlib.hash import sha256_crypt
 import sandman
 from sandman import model
 
-from seedbox import options
+from seedbox import service
 
 
 def load_passfile():
 
-    options.initialize([])
+    service.prepare_service([])
 
     pwfile = cfg.CONF.find_file('.admin_pass')
     if not pwfile:

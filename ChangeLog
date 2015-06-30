@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.3.17
+------
+
+* [RELEASE] Update to version v2.3.17
+* [TASK] Updated db admin to leverage service
+
 2.3.16
 ------
 
