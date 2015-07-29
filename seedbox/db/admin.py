@@ -29,10 +29,10 @@ def load_passfile():
 def verify_password(username, password):
     if username != 'admin':
         return False
-    pw = None
-    with open(load_passfile(), 'r') as fd:
-        pw = fd.read()
-    return sha256_crypt.verify(password, pw)
+    stored_pw = None
+    with open(load_passfile(), 'r') as pwfile:
+        stored_pw = pwfile.read()
+    return sha256_crypt.verify(password, stored_pw)
 
 
 @sandman.app.before_request
@@ -50,8 +50,8 @@ def cli():
 @click.password_option()
 def save_password(password):
     """Set admin password for accessing admin UI"""
-    with open(load_passfile(), 'w') as fd:
-        fd.write(sha256_crypt.encrypt(password))
+    with open(load_passfile(), 'w') as pwfile:
+        pwfile.write(sha256_crypt.encrypt(password))
 
 
 @cli.command()

@@ -15,7 +15,6 @@ from seedbox.tests import test
 class ServiceTest(test.ConfiguredBaseTestCase):
 
     cfg_data = []
-    cfg_data = []
     cfg_data.append('[DEFAULT]\n')
     cfg_data.append('base_path=/home/shad\n')
     cfg_data.append('base_client_path=$base_path/torrent-test/deluge\n')

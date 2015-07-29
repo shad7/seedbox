@@ -14,8 +14,8 @@ class Model(object):
 
     def __init__(self, **kwds):
         self.fields = list(kwds)
-        for k, v in six.iteritems(kwds):
-            setattr(self, k, v)
+        for name, value in six.iteritems(kwds):
+            setattr(self, name, value)
 
     def as_dict(self):
         """Generates a dictionary representation of the model.
@@ -23,20 +23,20 @@ class Model(object):
         :return: model as dict
         :rtype: dict
         """
-        _d = dict()
-        for f in self.fields:
-            v = getattr(self, f)
-            if isinstance(v, Model):
-                v = v.as_dict()
-            elif isinstance(v, list) and v and isinstance(v[0], Model):
-                v = [sub.as_dict() for sub in v]
-            _d[f] = v
-        return _d
+        data = dict()
+        for name in self.fields:
+            val = getattr(self, name)
+            if isinstance(val, Model):
+                val = val.as_dict()
+            elif isinstance(val, list) and val and isinstance(val[0], Model):
+                val = [sub.as_dict() for sub in val]
+            data[name] = val
+        return data
 
     def items(self):
         """Provides a generator of key-value pair attributes for a model."""
-        for n in self.fields:
-            yield n, getattr(self, n)
+        for name in self.fields:
+            yield name, getattr(self, name)
 
     def __eq__(self, other):
         return self.as_dict() == other.as_dict()

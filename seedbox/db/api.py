@@ -369,12 +369,12 @@ class DBApi(object):
                 LOG.debug('purging media associated with torrents....')
                 qfilter = {
                     'in': {'torrent_id': [tor.torrent_id for tor in torrents]}
-                    }
+                }
                 self.delete_medias(qfilter)
 
                 qfilter = {
                     'in': {'id': [tor.torrent_id for tor in torrents]}
-                    }
+                }
                 self.bulk_save_torrents({'purged': True}, qfilter)
 
                 # now reset the last purge date to now.

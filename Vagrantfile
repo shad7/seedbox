@@ -1,15 +1,20 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+if Vagrant::Util::Platform.windows?
+  ENV["VAGRANT_DETECTED_OS"] = ENV["VAGRANT_DETECTED_OS"].to_s + " cygwin"
+end
+
 $script = <<SCRIPT
 if hash pip 2>/dev/null; then
-    echo "[+] pip already installed"
+    pip install -U pip
 else
     curl -sSL https://bootstrap.pypa.io/get-pip.py | python
-    pip -q install -U docker-compose tox invoke
-    curl -sSL https://raw.githubusercontent.com/docker/compose/1.2.0/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
-    wget --no-check-certificate -q  https://raw.github.com/petervanderdoes/gitflow/develop/contrib/gitflow-installer.sh && bash gitflow-installer.sh install develop; rm gitflow-installer.sh; rm -rf gitflow/
 fi
+
+pip -q install -U docker-compose tox invoke
+curl -sSL https://raw.githubusercontent.com/docker/compose/1.2.0/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose
+wget --no-check-certificate -q  https://raw.github.com/petervanderdoes/gitflow/develop/contrib/gitflow-installer.sh && bash gitflow-installer.sh install develop; rm gitflow-installer.sh; rm -rf gitflow/
 SCRIPT
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
@@ -19,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "ubuntu/trusty64"
 
-  config.vm.hostname = "local-dev"
+  config.vm.hostname = "seedbox-dev"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -38,11 +43,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: ".ssh/id_rsa.pub"
   config.vm.provision "file", source: "~/.pypirc", destination: ".pypirc"
 
-
   config.vm.provision "file", source: "./dev/fig.yml", destination: "fig.yml"
   config.vm.provision "file", source: "./dev/bash_aliases", destination: ".bash_aliases"
 
-  config.vm.synced_folder ".", "/home/vagrant/seedbox", type: "rsync", rsync__exclude: [".tox/", "cover/", "doc/build"]
+  config.vm.synced_folder ".", "/home/vagrant/seedbox", type: "rsync", rsync__exclude: [".tox/", ".venv/", "cover/", "doc/build"]
 
   # Provision using shell to execute ansible because of windows issues
   config.vm.provision "shell", inline: $script

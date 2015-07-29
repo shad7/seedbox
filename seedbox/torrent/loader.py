@@ -105,12 +105,12 @@ def _is_torrent_downloading(media_items):
     """
 
     found = False
-    for (filename, filesize) in media_items:
+    for media_item in media_items:
 
         # if the file is found then break out of the loop and
         # return found; else we will return default not found
         if os.path.exists(os.path.join(
-                cfg.CONF.torrent.incomplete_path, filename)):
+                cfg.CONF.torrent.incomplete_path, media_item[0])):
             found = True
             break
 

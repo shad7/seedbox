@@ -78,8 +78,8 @@ class Base(six.Iterator):
         return self
 
     def __next__(self):
-        n = six.advance_iterator(self._i)
-        return n, getattr(self, n)
+        name = six.advance_iterator(self._i)
+        return name, getattr(self, name)
 
     def next(self):
         """Using an iterator to get next attribute value from generator
@@ -94,8 +94,8 @@ class Base(six.Iterator):
 
         :param values: key-value pairs of attributes and values
         """
-        for k, v in six.iteritems(values):
-            setattr(self, k, v)
+        for name, value in six.iteritems(values):
+            setattr(self, name, value)
 
     def iteritems(self):
         """an iterator over dictionary items
@@ -104,8 +104,9 @@ class Base(six.Iterator):
         :rtype: iterator
         """
         local = dict(self)
-        joined = dict([(k, v) for k, v in six.iteritems(self.__dict__)
-                      if not k[0] == '_'])
+        joined = dict(
+            [(name, value) for name, value in six.iteritems(self.__dict__)
+             if not name[0] == '_'])
         local.update(joined)
         return six.iteritems(local)
 
@@ -206,9 +207,9 @@ class AppState(Base):
 
         :param values: key-value pairs to update in database
         """
-        for k, v in six.iteritems(values):
+        for name, value in six.iteritems(values):
             # this should result in __setitem__ being called
-            self[k] = v
+            self[name] = value
 
     def get_value(self):
         """Retrieve the value of an instance of AppState
